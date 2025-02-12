@@ -1,0 +1,28 @@
+// Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
+
+import SwiftData
+public import SwiftUI
+
+public struct LogsView: View {
+    public var body: some View {
+        LogsViewContent()
+            .modelContainer(for: LogEntity.self)
+    }
+}
+
+private struct LogsViewContent: View {
+    @Query var logs: [LogEntity]
+
+    public var body: some View {
+        List(logs) { log in
+            Text(log.message)
+        }
+    }
+}
+
+#Preview {
+    let container = LogEntity.previewContainer()
+
+    LogsViewContent()
+        .modelContainer(container)
+}
