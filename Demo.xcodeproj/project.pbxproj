@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		84A7B7A32CA03B9400E54AE4 /* REPLACE_ME in Frameworks */ = {isa = PBXBuildFile; productRef = 84A7B7A22CA03B9400E54AE4 /* REPLACE_ME */; };
+		847B56952D5CC445001C7B81 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 847B56942D5CC445001C7B81 /* Logging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84A7B7A32CA03B9400E54AE4 /* REPLACE_ME in Frameworks */,
+				847B56952D5CC445001C7B81 /* Logging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -38,6 +38,7 @@
 			isa = PBXGroup;
 			children = (
 				8457976E2C9EED48001B833D /* Demo */,
+				847B56932D5CC445001C7B81 /* Frameworks */,
 				8457976D2C9EED48001B833D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,6 +49,13 @@
 				8457976C2C9EED48001B833D /* Demo.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		847B56932D5CC445001C7B81 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,7 +79,7 @@
 			);
 			name = Demo;
 			packageProductDependencies = (
-				84A7B7A22CA03B9400E54AE4 /* REPLACE_ME */,
+				847B56942D5CC445001C7B81 /* Logging */,
 			);
 			productName = Demo;
 			productReference = 8457976C2C9EED48001B833D /* Demo.app */;
@@ -102,7 +110,6 @@
 			mainGroup = 845797632C9EED48001B833D;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				84A7B7A12CA03B9400E54AE4 /* XCLocalSwiftPackageReference "../template-lib-apple" */,
 				84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -305,7 +312,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.tunnicliff.REPLACE-ME.Demo";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tunnicliff.Logging.Demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx xros xrsimulator";
@@ -340,7 +347,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "dev.tunnicliff.REPLACE-ME.Demo";
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tunnicliff.Logging.Demo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx xros xrsimulator";
@@ -373,13 +380,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		84A7B7A12CA03B9400E54AE4 /* XCLocalSwiftPackageReference "../template-lib-apple" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../template-lib-apple";
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -392,9 +392,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		84A7B7A22CA03B9400E54AE4 /* REPLACE_ME */ = {
+		847B56942D5CC445001C7B81 /* Logging */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = REPLACE_ME;
+			productName = Logging;
 		};
 		84AA7F562D563950006598D6 /* LintBuildPlugin */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -13,8 +13,8 @@
       "targets" : [
         {
           "containerPath" : "container:",
-          "identifier" : "REPLACE_ME",
-          "name" : "REPLACE_ME"
+          "identifier" : "Logging",
+          "name" : "Logging"
         }
       ]
     },
@@ -24,8 +24,8 @@
     {
       "target" : {
         "containerPath" : "container:",
-        "identifier" : "REPLACE_METests",
-        "name" : "REPLACE_METests"
+        "identifier" : "LoggingTests",
+        "name" : "LoggingTests"
       }
     }
   ],

@@ -1,6 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import REPLACE_ME
+import Logging
 import SwiftUI
 
 struct ContentView: View {

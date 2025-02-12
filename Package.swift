@@ -12,7 +12,7 @@ private let swiftSettings: [PackageDescription.SwiftSetting] = [
 private let lintBuildPlugin: Target.PluginUsage = .plugin(name: "LintBuildPlugin", package: "swift-format-plugin")
 
 let package = Package(
-    name: "REPLACE_ME",
+    name: "Logging",
     platforms: [
         .iOS(.v17),
         .macOS(.v14),
@@ -22,8 +22,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "REPLACE_ME",
-            targets: ["REPLACE_ME"]
+            name: "Logging",
+            targets: ["Logging"]
         )
     ],
     dependencies: [
@@ -31,15 +31,15 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "REPLACE_ME",
+            name: "Logging",
             swiftSettings: swiftSettings,
             plugins: [
                 lintBuildPlugin
             ]
         ),
         .testTarget(
-            name: "REPLACE_METests",
-            dependencies: ["REPLACE_ME"],
+            name: "LoggingTests",
+            dependencies: ["Logging"],
             swiftSettings: swiftSettings,
             plugins: [
                 lintBuildPlugin
