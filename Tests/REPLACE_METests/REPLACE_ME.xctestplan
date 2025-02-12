@@ -1,0 +1,33 @@
+{
+  "configurations" : [
+    {
+      "id" : "40FEF27C-DF42-45BB-A51F-64DAED61B073",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:",
+          "identifier" : "REPLACE_ME",
+          "name" : "REPLACE_ME"
+        }
+      ]
+    },
+    "testExecutionOrdering" : "random"
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "REPLACE_METests",
+        "name" : "REPLACE_METests"
+      }
+    }
+  ],
+  "version" : 1
+}

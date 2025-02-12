@@ -1,0 +1,54 @@
+# Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
+
+name: Callable Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      destination:
+        description: "The destination used for xcodebuild commands"
+        default: "macOS"
+        required: true
+        type: string
+jobs:
+  pipeline:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+      - name: Build Package
+        run: xcodebuild build
+          -workspace "Package.xcworkspace"
+          -scheme "Package"
+          -destination "${{ inputs.destination }}"
+          -configuration "Debug"
+          -skipPackagePluginValidation
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+      - name: Build Package Unit tests
+        run: xcodebuild build-for-testing
+          -workspace "Package.xcworkspace"
+          -scheme "Package"
+          -destination "${{ inputs.destination }}"
+          -configuration "Debug"
+          -skipPackagePluginValidation
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+      - name: Run Package Unit tests
+        run: xcodebuild test-without-building
+          -workspace "Package.xcworkspace"
+          -scheme "Package"
+          -destination "${{ inputs.destination }}"
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+      - name: Build Demo
+        if: ${{ ! contains(inputs.destination, 'watchOS') }}
+        run: xcodebuild build
+          -workspace "Package.xcworkspace"
+          -scheme "Demo"
+          -destination "${{ inputs.destination }}"
+          -configuration "Debug"
+          -skipPackagePluginValidation
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
