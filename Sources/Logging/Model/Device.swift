@@ -16,23 +16,25 @@ extension Device: Codable {}
 extension Device: Equatable {}
 extension Device: Sendable {}
 
-extension Device {
-    public static func mock(
-        identifierForVendor: UUID? = UUID(),
-        model: String? = "iPhone",
-        systemName: String? = "iOS",
-        systemVersion: String? = "18.3",
-        userInterfaceIdiom: UserInterfaceIdiom = .phone
-    ) -> Device {
-        Device(
-            identifierForVendor: identifierForVendor,
-            model: model,
-            systemName: systemName,
-            systemVersion: systemVersion,
-            userInterfaceIdiom: userInterfaceIdiom
-        )
+#if DEBUG
+    extension Device {
+        public static func mock(
+            identifierForVendor: UUID? = UUID(),
+            model: String? = "iPhone",
+            systemName: String? = "iOS",
+            systemVersion: String? = "18.3",
+            userInterfaceIdiom: UserInterfaceIdiom = .phone
+        ) -> Device {
+            Device(
+                identifierForVendor: identifierForVendor,
+                model: model,
+                systemName: systemName,
+                systemVersion: systemVersion,
+                userInterfaceIdiom: userInterfaceIdiom
+            )
+        }
     }
-}
+#endif
 
 // MARK: - UserInterfaceIdiom
 
@@ -64,6 +66,7 @@ extension Device.UserInterfaceIdiom {
     public static let tv = Device.UserInterfaceIdiom(rawValue: .tv)
     public static let unspecified = Device.UserInterfaceIdiom(rawValue: .unspecified)
     public static let vision = Device.UserInterfaceIdiom(rawValue: .vision)
+    public static let watch = Device.UserInterfaceIdiom(rawValue: .watch)
 }
 
 extension Device.UserInterfaceIdiom: CaseIterable {
@@ -75,7 +78,8 @@ extension Device.UserInterfaceIdiom: CaseIterable {
         phone,
         tv,
         unspecified,
-        vision
+        vision,
+        watch
     ]
 }
 
@@ -100,7 +104,29 @@ extension Device.UserInterfaceIdiom.RawValue: CaseIterable {}
 
 // MARK: - Constants
 
-#if canImport(UIKit)
+// The order of these are important as some platforms can contain multiple.
+
+#if canImport(WatchKit)
+
+    // MARK: WatchKit
+
+    import WatchKit
+
+    extension Device {
+        @MainActor
+        public static let current: Device = {
+            let device = WKInterfaceDevice.current()
+            return Device(
+                identifierForVendor: device.identifierForVendor,
+                model: device.model,
+                systemName: device.systemName,
+                systemVersion: device.systemVersion,
+                userInterfaceIdiom: .watch
+            )
+        }()
+    }
+
+#elseif canImport(UIKit)
 
     // MARK: UIKit
 
@@ -139,7 +165,6 @@ extension Device.UserInterfaceIdiom.RawValue: CaseIterable {}
         }()
     }
 
-// iOS, MacOS and VisionOS can import IOKit, so need to have it as an else.
 #elseif canImport(IOKit)
 
     // MARK: MacOS
@@ -202,28 +227,6 @@ extension Device.UserInterfaceIdiom.RawValue: CaseIterable {}
         var description: String {
             "\(majorVersion).\(minorVersion).\(patchVersion)"
         }
-    }
-
-#endif
-
-#if canImport(WatchKit)
-
-    // MARK: WatchKit
-
-    import WatchKit
-
-    extension Device {
-        @MainActor
-        public static let current: Device = {
-            let device = WKInterfaceDevice.current
-            return Device(
-                identifierForVendor: device.identifierForVendor,
-                model: device.model,
-                systemName: device.systemName,
-                systemVersion: device.systemVersion,
-                userInterfaceIdiom: .watch
-            )
-        }()
     }
 
 #endif
