@@ -4,6 +4,8 @@ import SwiftData
 public import SwiftUI
 
 public struct LogsView: View {
+    public init() {}
+
     public var body: some View {
         LogsViewContent()
             .modelContainer(for: LogEntity.self)

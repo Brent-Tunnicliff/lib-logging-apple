@@ -5,8 +5,9 @@ import SwiftData
 
 @Model
 final class LogEntity {
+    var device: Device
     @Attribute(.unique)
-    var id = UUID()
+    var id: UUID
     var level: LogLevel
     var message: String
     var packageName: String
@@ -15,6 +16,8 @@ final class LogEntity {
     var error: Error?
 
     init(
+        device: Device,
+        id: UUID = UUID(),
         level: LogLevel,
         message: String,
         packageName: String,
@@ -22,6 +25,8 @@ final class LogEntity {
         timestampCreated: Date,
         error: Error?
     ) {
+        self.device = device
+        self.id = id
         self.level = level
         self.message = message
         self.packageName = packageName
@@ -29,7 +34,6 @@ final class LogEntity {
         self.timestampCreated = timestampCreated
         self.error = error
     }
-
 }
 
 // MARK: - Nested Types
@@ -43,17 +47,9 @@ extension LogEntity {
         case warning
     }
 
-    // Defined as a class to avoid infinite `Self` references in struct.
-    final class Error: Codable {
+    struct Error: Codable {
         let type: String
         let message: String?
-        let cause: Error?
-
-        init(type: String, message: String?, cause: Error?) {
-            self.type = type
-            self.message = message
-            self.cause = cause
-        }
     }
 }
 
@@ -62,6 +58,7 @@ extension LogEntity {
 #if DEBUG
     extension LogEntity {
         static func mock(
+            device: Device = .mock(),
             level: LogLevel = .debug,
             message: String = "Mock log",
             packageName: String = "Logging",
@@ -70,6 +67,7 @@ extension LogEntity {
             error: Error? = nil
         ) -> LogEntity {
             LogEntity(
+                device: device,
                 level: level,
                 message: message,
                 packageName: packageName,
@@ -102,9 +100,6 @@ extension LogEntity {
                         """
                 ),
                 .mock(
-                    error: .mock(cause: nil)
-                ),
-                .mock(
                     error: .mock()
                 ),
                 .mock(
@@ -114,8 +109,7 @@ extension LogEntity {
                             Now we are testing out a very long error message name to see how it handles
                             wrapping and truncating values.
                             This could potentially be quite long as some system errors might be long.
-                            """,
-                        cause: .mock(cause: .mock(cause: .mock(cause: .mock())))
+                            """
                     )
                 ),
             ]
@@ -140,13 +134,11 @@ extension LogEntity {
     extension LogEntity.Error {
         static func mock(
             type: String = "Mock",
-            message: String? = "Something went wrong (not really)",
-            cause: LogEntity.Error? = .mock(message: "Hehe, this is the cause", cause: nil)
+            message: String? = "Something went wrong (not really)"
         ) -> LogEntity.Error {
             LogEntity.Error(
                 type: type,
-                message: message,
-                cause: cause
+                message: message
             )
         }
     }
