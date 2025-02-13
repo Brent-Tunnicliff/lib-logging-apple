@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set Xcode version
         run: sudo xcode-select -s /Applications/Xcode_16.2.app
-      - name: Build Package
+      - name: Build Package Debug
         run: xcodebuild build
           -workspace "Package.xcworkspace"
           -scheme "Package"
@@ -42,13 +42,32 @@ jobs:
           -destination "${{ inputs.destination }}"
           CODE_SIGN_IDENTITY=""
           CODE_SIGNING_REQUIRED=NO
-      - name: Build Demo
+      - name: Build Demo Debug
         if: ${{ ! contains(inputs.destination, 'watchOS') }}
         run: xcodebuild build
           -workspace "Package.xcworkspace"
           -scheme "Demo"
           -destination "${{ inputs.destination }}"
           -configuration "Debug"
+          -skipPackagePluginValidation
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+      - name: Build Package Release
+        run: xcodebuild build
+          -workspace "Package.xcworkspace"
+          -scheme "Package"
+          -destination "${{ inputs.destination }}"
+          -configuration "Release"
+          -skipPackagePluginValidation
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+      - name: Build Demo Release
+        if: ${{ ! contains(inputs.destination, 'watchOS') }}
+        run: xcodebuild build
+          -workspace "Package.xcworkspace"
+          -scheme "Demo"
+          -destination "${{ inputs.destination }}"
+          -configuration "Release"
           -skipPackagePluginValidation
           CODE_SIGN_IDENTITY=""
           CODE_SIGNING_REQUIRED=NO
