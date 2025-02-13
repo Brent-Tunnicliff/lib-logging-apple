@@ -22,9 +22,11 @@ private struct LogsViewContent: View {
     }
 }
 
-#Preview {
-    let container = LogEntity.previewContainer()
+#if DEBUG
+    #Preview {
+        let container = LogEntity.previewContainer()
 
-    LogsViewContent()
-        .modelContainer(container)
-}
+        LogsViewContent()
+            .modelContainer(container)
+    }
+#endif
