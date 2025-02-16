@@ -3,66 +3,30 @@
 import Foundation
 import SwiftData
 
-@Model
-final class LogEntity {
-    var device: Device
-    @Attribute(.unique)
-    var id: UUID
-    var level: LogLevel
-    var message: String
-    var packageName: String
-    var tag: String
-    var timestampCreated: Date
-    var error: Error?
+typealias LogEntitySchema = LogEntitySchemaV1
+typealias LogEntity = LogEntitySchema.LogEntity
 
-    init(
-        device: Device,
-        id: UUID = UUID(),
-        level: LogLevel,
-        message: String,
-        packageName: String,
-        tag: String,
-        timestampCreated: Date,
-        error: Error?
-    ) {
-        self.device = device
-        self.id = id
-        self.level = level
-        self.message = message
-        self.packageName = packageName
-        self.tag = tag
-        self.timestampCreated = timestampCreated
-        self.error = error
-    }
-}
-
-// MARK: - Nested Types
+// MARK: - ModelContainer
 
 extension LogEntity {
-    enum LogLevel: Codable {
-        case critical
-        case debug
-        case error
-        case info
-        case warning
-    }
-
-    struct Error: Codable {
-        let type: String
-        let message: String?
+    static func defaultContainer() throws -> ModelContainer {
+        try ModelContainer(
+            for: LogEntity.self,
+            migrationPlan: LogEntityMigrationPlan.self
+        )
     }
 }
 
-// MARK: - Preview
-
 #if DEBUG
+    // MARK: - Mock
+
     extension LogEntity {
         static func mock(
             device: Device = .mock(),
             level: LogLevel = .debug,
             message: String = "Mock log",
             packageName: String = "Logging",
-            tag: String = "Tag",
+            tag: LogEntity.Tag = .mock(),
             timestampCreated: Date = Date(),
             error: Error? = nil
         ) -> LogEntity {
@@ -76,7 +40,55 @@ extension LogEntity {
                 error: error
             )
         }
+    }
 
+    extension LogEntity.Device {
+        static func mock(
+            identifierForVendor: UUID? = UUID(),
+            model: String? = "iPhone",
+            systemName: String? = "iOS",
+            systemVersion: String? = "18.3",
+            userInterfaceIdiom: LogEntity.UserInterfaceIdiom = .phone
+        ) -> LogEntity.Device {
+            LogEntity.Device(
+                identifierForVendor: identifierForVendor,
+                model: model,
+                systemName: systemName,
+                systemVersion: systemVersion,
+                userInterfaceIdiom: userInterfaceIdiom
+            )
+        }
+    }
+
+    extension LogEntity.Error {
+        static func mock(
+            type: String = "Mock",
+            message: String = "Something went wrong (not really)"
+        ) -> LogEntity.Error {
+            LogEntity.Error(
+                type: type,
+                message: message
+            )
+        }
+    }
+
+    extension LogEntity.Tag {
+        static func mock(
+            file: String = "Logging/LogEntity.swift",
+            function: String = "mock(file:function:line:)",
+            line: UInt = 76
+        ) -> LogEntity.Tag {
+            LogEntity.Tag(
+                file: file,
+                function: function,
+                line: line
+            )
+        }
+    }
+
+    // MARK: - Preview
+
+    extension LogEntity {
         @MainActor
         static func previewContainer(
             logs: [LogEntity] = [
@@ -84,7 +96,6 @@ extension LogEntity {
                 .mock(level: .debug),
                 .mock(level: .error),
                 .mock(level: .info),
-                .mock(level: .warning),
                 .mock(
                     message: """
                         This message is very long, so that we can test out wrapping and truncating logic.
@@ -93,11 +104,14 @@ extension LogEntity {
                         """
                 ),
                 .mock(
-                    tag: """
-                        Wow, look at this very long tag. This probably should not every be this long.
-                        I imagine a tag will be a single word or class name or something.
-                        A long value like this is way too much.
-                        """
+                    tag: .mock(
+                        file: """
+                            Wow, look at this very long tag. This probably should not every be this long.
+                            I imagine a tag will be a single word or class name or something.
+                            """,
+                        function: "A long value like this is way too much.",
+                        line: UInt.max
+                    )
                 ),
                 .mock(
                     error: .mock()
@@ -128,18 +142,6 @@ extension LogEntity {
             } catch {
                 preconditionFailure("Error creating preview model container for \(LogEntity.self)")
             }
-        }
-    }
-
-    extension LogEntity.Error {
-        static func mock(
-            type: String = "Mock",
-            message: String? = "Something went wrong (not really)"
-        ) -> LogEntity.Error {
-            LogEntity.Error(
-                type: type,
-                message: message
-            )
         }
     }
 #endif
