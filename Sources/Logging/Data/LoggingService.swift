@@ -8,7 +8,7 @@ protocol LoggingService: Sendable {
 
     func storeLog(
         error: (any Error)?,
-        loglevel: LogLevel,
+        logLevel: LogLevel,
         message: String,
         packageName: String,
         tag: LogTag,
@@ -20,12 +20,15 @@ actor DefaultLoggingService: LoggingService {
     private let context: ModelContext?
     private let modelMapper: any ModelMapper
     private let userDefaults: UserDefaults
+    private let deviceProvider: any DeviceProvider
 
     init(
+        deviceProvider: any DeviceProvider,
         modelContainer: ModelContainer?,
         modelMapper: any ModelMapper,
         userDefaults: UserDefaults
     ) {
+        self.deviceProvider = deviceProvider
         self.context = modelContainer.map(ModelContext.init)
         self.modelMapper = modelMapper
         self.userDefaults = userDefaults
@@ -42,6 +45,7 @@ actor DefaultLoggingService: LoggingService {
         }
 
         self.init(
+            deviceProvider: DefaultDeviceProvider(),
             modelContainer: modelContainer,
             modelMapper: DefaultModelMapper(),
             userDefaults: UserDefaults.standard
@@ -55,14 +59,14 @@ actor DefaultLoggingService: LoggingService {
 
     func storeLog(
         error: (any Error)?,
-        loglevel: LogLevel,
+        logLevel: LogLevel,
         message: String,
         packageName: String,
         tag: LogTag,
         timestamp: Date
     ) async throws {
         // TODO: Build minimum log level logic to only store the levels desired.
-        guard userDefaults.logLevel >= loglevel.wrapped else {
+        guard userDefaults.logLevel <= logLevel.wrapped else {
             return
         }
 
@@ -70,10 +74,10 @@ actor DefaultLoggingService: LoggingService {
             return
         }
 
-        let device = await Device.current
+        let device = await deviceProvider.current()
         let model = LogEntity(
             device: modelMapper.toEntity(device),
-            level: modelMapper.toEntity(loglevel),
+            level: modelMapper.toEntity(logLevel),
             message: message,
             packageName: packageName,
             tag: modelMapper.toEntity(tag),

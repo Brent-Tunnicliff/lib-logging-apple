@@ -1,6 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-protocol ModelMapper {
+protocol ModelMapper: Sendable {
     func toEntity(_ model: Device) -> LogEntity.Device
     func toEntity(_ model: Device.UserInterfaceIdiom) -> LogEntity.UserInterfaceIdiom
     func toEntity(_ model: any Error) -> LogEntity.Error
@@ -8,7 +8,7 @@ protocol ModelMapper {
     func toEntity(_ model: LogTag) -> LogEntity.Tag
 }
 
-class DefaultModelMapper: ModelMapper {
+final class DefaultModelMapper: ModelMapper {
     func toEntity(_ model: Device) -> LogEntity.Device {
         LogEntity.Device(
             identifierForVendor: model.identifierForVendor,

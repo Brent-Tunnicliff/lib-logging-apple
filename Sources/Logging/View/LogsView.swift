@@ -3,6 +3,7 @@
 import SwiftData
 public import SwiftUI
 
+/// Displays all logs captured.
 public struct LogsView: View {
     public init() {}
 
@@ -24,7 +25,7 @@ private struct LogsViewContent: View {
 
 #if DEBUG
     #Preview {
-        let container = LogEntity.previewContainer()
+        let container = LogEntity.mockContainer()
 
         LogsViewContent()
             .modelContainer(container)

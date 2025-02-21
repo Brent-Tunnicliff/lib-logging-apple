@@ -86,11 +86,9 @@ extension LogEntity {
         }
     }
 
-    // MARK: - Preview
-
     extension LogEntity {
         @MainActor
-        static func previewContainer(
+        static func mockContainer(
             logs: [LogEntity] = [
                 .mock(level: .critical),
                 .mock(level: .debug),

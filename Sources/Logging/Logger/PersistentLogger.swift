@@ -5,15 +5,27 @@ import Foundation
 final class PersistentLogger {
     private let loggingService: any LoggingService
     private let packageName: String
-    private let systemLogger: SystemLogger
+    private let systemLogger: any Logger
 
-    init(
+    convenience init(
         loggingService: any LoggingService = DefaultLoggingService(),
         packageName: String
     ) {
+        self.init(
+            loggingService: loggingService,
+            packageName: packageName,
+            systemLogger: SystemLogger(packageName: packageName)
+        )
+    }
+
+    init(
+        loggingService: any LoggingService,
+        packageName: String,
+        systemLogger: any Logger
+    ) {
         self.loggingService = loggingService
         self.packageName = packageName
-        self.systemLogger = SystemLogger(packageName: packageName)
+        self.systemLogger = systemLogger
     }
 }
 
@@ -28,16 +40,14 @@ extension PersistentLogger: Logger {
             do {
                 try await loggingService.storeLog(
                     error: error,
-                    loglevel: level,
+                    logLevel: level,
                     message: message,
                     packageName: packageName,
                     tag: tag,
                     timestamp: timestamp
                 )
             } catch {
-                let catchMessage = "Storing log failed: \(error)"
-                assertionFailure(catchMessage)
-                systemLogger.critical(catchMessage, error: error)
+                systemLogger.critical("Storing log failed: \(error)", error: error)
             }
         }
     }

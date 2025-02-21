@@ -15,7 +15,7 @@ enum LogEntitySchemaV1: VersionedSchema {
 
 extension LogEntitySchemaV1 {
     @Model
-    final class LogEntity {
+    final class LogEntity: Equatable, Identifiable {
         var device: Device
         @Attribute(.unique)
         var id: UUID
@@ -51,12 +51,12 @@ extension LogEntitySchemaV1 {
 // MARK: - Nested Types
 
 extension LogEntitySchemaV1.LogEntity {
-    struct Error: Codable {
+    struct Error: Codable, Equatable {
         let type: String
         let message: String
     }
 
-    struct Device: Codable {
+    struct Device: Codable, Equatable {
         public let identifierForVendor: UUID?
         public let model: String?
         public let systemName: String?
@@ -64,20 +64,20 @@ extension LogEntitySchemaV1.LogEntity {
         public let userInterfaceIdiom: UserInterfaceIdiom
     }
 
-    enum LogLevel: Codable {
+    enum LogLevel: Codable, Equatable {
         case debug
         case info
         case error
         case critical
     }
 
-    struct Tag: Codable {
+    struct Tag: Codable, Equatable {
         let file: String
         let function: String
         let line: UInt
     }
 
-    enum UserInterfaceIdiom: Codable {
+    enum UserInterfaceIdiom: Codable, Equatable {
         case carPlay
         case mac
         case pad
