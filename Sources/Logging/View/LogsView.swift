@@ -14,11 +14,12 @@ public struct LogsView: View {
 }
 
 private struct LogsViewContent: View {
-    @Query var logs: [LogEntity]
+    @Query(sort: \LogEntity.timestampCreated, order: .reverse) var logs: [LogEntity]
+    @State var isExpanded = false
 
     public var body: some View {
-        List(logs) { log in
-            Text(log.message)
+        List(logs) {
+            LogItemView(log: $0)
         }
     }
 }

@@ -1,0 +1,215 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "device_model_%@" : {
+      "comment" : "Specifies the model of device. E.g. iPhone 13.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model: %1$@"
+          }
+        }
+      }
+    },
+    "device_model_unknown" : {
+      "comment" : "Specifies the model of device is unknown.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model: Unknown"
+          }
+        }
+      }
+    },
+    "device_system_unknown" : {
+      "comment" : "Specifies the model of device system is unknown. E.g. a known device system will appear like 'iOS 16'.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device System Unknown"
+          }
+        }
+      }
+    },
+    "device_user_interface_idiom_carPlay" : {
+      "comment" : "Specifies the device's user interface is CarPlay.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface: CarPlay"
+          }
+        }
+      }
+    },
+    "device_user_interface_idiom_mac" : {
+      "comment" : "Specifies the device's user interface is Mac.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface: Mac"
+          }
+        }
+      }
+    },
+    "device_user_interface_idiom_pad" : {
+      "comment" : "Specifies the device's user interface is Pad/Tablet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface: Pad"
+          }
+        }
+      }
+    },
+    "device_user_interface_idiom_phone" : {
+      "comment" : "Specifies the device's user interface is Phone.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface: Phone"
+          }
+        }
+      }
+    },
+    "device_user_interface_idiom_tv" : {
+      "comment" : "Specifies the device's user interface is TV.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface: TV"
+          }
+        }
+      }
+    },
+    "device_user_interface_idiom_unspecified" : {
+      "comment" : "Specifies the device's user interface is unknown.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface: Unknown"
+          }
+        }
+      }
+    },
+    "device_user_interface_idiom_vision" : {
+      "comment" : "Specifies the device's user interface is Vision, for example Apple Vision Pro.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface: Vision"
+          }
+        }
+      }
+    },
+    "device_user_interface_idiom_watch" : {
+      "comment" : "Specifies the device's user interface is Watch.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User Interface: Watch"
+          }
+        }
+      }
+    },
+    "identifier_for_vendor_%@" : {
+      "comment" : "Displays the unique device identifier that the app is installed on",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device ID: %1$@"
+          }
+        }
+      }
+    },
+    "identifier_for_vendor_unknown" : {
+      "comment" : "The unique device identifier was unable to be determined",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device ID: Unknown"
+          }
+        }
+      }
+    },
+    "log_error_title_%@_%@" : {
+      "comment" : "Displays the error details associated with the log",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: (%1$@) %2$@"
+          }
+        }
+      }
+    },
+    "log_id_%@" : {
+      "comment" : "Displays the unique device identifier of that log",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log ID: %1$@"
+          }
+        }
+      }
+    },
+    "log_level_critical" : {
+      "comment" : "The log severity level - critical issue",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Critical"
+          }
+        }
+      }
+    },
+    "log_level_debug" : {
+      "comment" : "The log severity level - debug information",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug"
+          }
+        }
+      }
+    },
+    "log_level_error" : {
+      "comment" : "The log severity level - error happened",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        }
+      }
+    },
+    "log_level_info" : {
+      "comment" : "The log severity level - informative",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -13,6 +13,7 @@ private let lintBuildPlugin: Target.PluginUsage = .plugin(name: "LintBuildPlugin
 
 let package = Package(
     name: "Logging",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v17),
         .macOS(.v14),

@@ -64,7 +64,7 @@ extension LogEntitySchemaV1.LogEntity {
         public let userInterfaceIdiom: UserInterfaceIdiom
     }
 
-    enum LogLevel: Codable, Equatable {
+    enum LogLevel: Codable, Equatable, CaseIterable {
         case debug
         case info
         case error
@@ -77,7 +77,7 @@ extension LogEntitySchemaV1.LogEntity {
         let line: UInt
     }
 
-    enum UserInterfaceIdiom: Codable, Equatable {
+    enum UserInterfaceIdiom: Codable, Equatable, CaseIterable {
         case carPlay
         case mac
         case pad
