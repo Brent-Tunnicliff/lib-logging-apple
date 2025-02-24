@@ -6,7 +6,7 @@ extension UserDefaults {
     static func forTest(
         file: StaticString = #file,
         function: StaticString = #function,
-        line: UInt8 = #line
+        line: UInt = #line
     ) -> UserDefaults {
         let suiteName = "\(UUID().uuidString)-\(file)-\(function)-\(line)"
         guard let userDefaults = UserDefaults(suiteName: suiteName) else {

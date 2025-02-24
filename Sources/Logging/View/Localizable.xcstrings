@@ -209,6 +209,28 @@
           }
         }
       }
+    },
+    "logs_view_empty" : {
+      "comment" : "Informs the user that there are no logs available to show",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No logs to show"
+          }
+        }
+      }
+    },
+    "logs_view_title" : {
+      "comment" : "The title of the view that lists all logs.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logs"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

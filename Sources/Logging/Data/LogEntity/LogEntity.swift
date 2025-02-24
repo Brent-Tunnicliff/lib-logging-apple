@@ -108,7 +108,7 @@ extension LogEntity {
                             I imagine a tag will be a single word or class name or something.
                             """,
                         function: "A long value like this is way too much.",
-                        line: UInt.max
+                        line: 1_000_000
                     )
                 ),
                 .mock(
