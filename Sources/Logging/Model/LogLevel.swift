@@ -20,6 +20,14 @@ extension LogLevel {
     }
 }
 
+extension LogLevel.Wrapped {
+    var allowedLevels: [LogLevel.Wrapped] {
+        LogLevel.Wrapped.allCases.filter {
+            $0.rawValue >= self.rawValue
+        }
+    }
+}
+
 // MARK: - CaseIterable
 
 extension LogLevel: CaseIterable {

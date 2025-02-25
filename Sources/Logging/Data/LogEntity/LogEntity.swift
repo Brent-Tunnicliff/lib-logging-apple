@@ -88,44 +88,45 @@ extension LogEntity {
 
     extension LogEntity {
         @MainActor
-        static func mockContainer(
-            logs: [LogEntity] = [
-                .mock(level: .critical),
-                .mock(level: .debug),
-                .mock(level: .error),
-                .mock(level: .info),
-                .mock(
+        static let defaultMocks: [LogEntity] = [
+            .mock(level: .critical),
+            .mock(level: .debug),
+            .mock(level: .error),
+            .mock(level: .info),
+            .mock(
+                message: """
+                    This message is very long, so that we can test out wrapping and truncating logic.
+                    Blah, blah, blah. How about this weather huh? It has been raining lots tonight.
+                    Luckily it was not raining while I was outside.
+                    """
+            ),
+            .mock(
+                tag: .mock(
+                    file: """
+                        Wow, look at this very long tag. This probably should not every be this long.
+                        I imagine a tag will be a single word or class name or something.
+                        """,
+                    function: "A long value like this is way too much.",
+                    line: 1_000_000
+                )
+            ),
+            .mock(
+                error: .mock()
+            ),
+            .mock(
+                error: .mock(
+                    type: "Wow, this error has a very long type name :O",
                     message: """
-                        This message is very long, so that we can test out wrapping and truncating logic.
-                        Blah, blah, blah. How about this weather huh? It has been raining lots tonight.
-                        Luckily it was not raining while I was outside.
+                        Now we are testing out a very long error message name to see how it handles
+                        wrapping and truncating values.
+                        This could potentially be quite long as some system errors might be long.
                         """
-                ),
-                .mock(
-                    tag: .mock(
-                        file: """
-                            Wow, look at this very long tag. This probably should not every be this long.
-                            I imagine a tag will be a single word or class name or something.
-                            """,
-                        function: "A long value like this is way too much.",
-                        line: 1_000_000
-                    )
-                ),
-                .mock(
-                    error: .mock()
-                ),
-                .mock(
-                    error: .mock(
-                        type: "Wow, this error has a very long type name :O",
-                        message: """
-                            Now we are testing out a very long error message name to see how it handles
-                            wrapping and truncating values.
-                            This could potentially be quite long as some system errors might be long.
-                            """
-                    )
-                ),
-            ]
-        ) -> ModelContainer {
+                )
+            ),
+        ]
+
+        @MainActor
+        static func mockContainer(logs: [LogEntity] = defaultMocks) -> ModelContainer {
             do {
                 let container = try ModelContainer(
                     for: LogEntity.self,

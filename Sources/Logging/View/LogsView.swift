@@ -7,17 +7,33 @@ public import SwiftUI
 public struct LogsView: View {
     public init() {}
 
+    @UserDefault(key: \.logLevel) var logLevel
+
     public var body: some View {
-        LogsViewContent()
-            .modelContainer(for: LogEntity.self)
+        LogsViewContent(logLevel: $logLevel)
     }
 }
 
 private struct LogsViewContent: View {
-    @Query(sort: \LogEntity.timestampCreated, order: .reverse) private var logs: [LogEntity]
-    @State private var isFilterSheetShowing = false
+    private static var logLevel: LogLevel.Wrapped {
+        UserDefaults.standard.logLevel
+    }
 
-    @UserDefault(key: \.logLevel) var logLevel
+    @Query private var logs: [LogEntity]
+    @State private var isFilterSheetShowing = false
+    @Binding private var logLevel: LogLevel.Wrapped
+
+    init(logLevel: Binding<LogLevel.Wrapped>) {
+        self._logLevel = logLevel
+        let filteredLogLevels = logLevel.wrappedValue.allowedLevels.map(\.asEntity.rawValue)
+        self._logs = Query(
+            filter: #Predicate<LogEntity> { log in
+                filteredLogLevels.contains(log.levelRawValue)
+            },
+            sort: \LogEntity.timestampCreated,
+            order: .reverse
+        )
+    }
 
     public var body: some View {
         Group {
@@ -46,7 +62,7 @@ private struct LogsViewContent: View {
             Picker(selection: $logLevel) {
                 ForEach(LogLevel.Wrapped.allCases, id: \.self) {
                     Text($0.label, bundle: .module)
-                        .id($0)
+                        .tag($0)
                 }
             } label: {
                 Text(logLevel.label, bundle: .module)
@@ -66,24 +82,33 @@ extension LogLevel.Wrapped {
         case .critical: "log_level_critical"
         }
     }
+
+    fileprivate var asEntity: LogEntity.LogLevel {
+        switch self {
+        case .debug: .debug
+        case .info: .info
+        case .error: .error
+        case .critical: .critical
+        }
+    }
 }
 
 #if DEBUG
     #Preview("Default") {
-        let container = LogEntity.mockContainer()
+        @Previewable @State var logLevel: LogLevel.Wrapped = .debug
 
         NavigationStack {
-            LogsViewContent()
-                .modelContainer(container)
+            LogsViewContent(logLevel: $logLevel)
+                .mockedLoggingModelContainer()
         }
     }
 
     #Preview("Empty") {
-        let container = LogEntity.mockContainer(logs: [])
+        @Previewable @State var logLevel: LogLevel.Wrapped = .debug
 
         NavigationStack {
-            LogsViewContent()
-                .modelContainer(container)
+            LogsViewContent(logLevel: $logLevel)
+                .mockedLoggingModelContainer(state: .empty)
         }
     }
 #endif

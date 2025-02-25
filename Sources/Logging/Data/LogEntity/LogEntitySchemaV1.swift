@@ -16,15 +16,18 @@ enum LogEntitySchemaV1: VersionedSchema {
 extension LogEntitySchemaV1 {
     @Model
     final class LogEntity: Equatable, Identifiable {
-        var device: Device
+        private(set) var device: Device
         @Attribute(.unique)
-        var id: UUID
-        var level: LogLevel
-        var message: String
-        var packageName: String
-        var tag: Tag
-        var timestampCreated: Date
-        var error: Error?
+        private(set) var id: UUID
+        private(set) var level: LogLevel
+        private(set) var message: String
+        private(set) var packageName: String
+        private(set) var tag: Tag
+        private(set) var timestampCreated: Date
+        private(set) var error: Error?
+
+        /// Stores the rawValue of `level` so can be used for filtering.
+        private(set) var levelRawValue: String
 
         init(
             device: Device,
@@ -39,6 +42,7 @@ extension LogEntitySchemaV1 {
             self.device = device
             self.id = id
             self.level = level
+            self.levelRawValue = level.rawValue
             self.message = message
             self.packageName = packageName
             self.tag = tag
@@ -64,7 +68,7 @@ extension LogEntitySchemaV1.LogEntity {
         public let userInterfaceIdiom: UserInterfaceIdiom
     }
 
-    enum LogLevel: Codable, Equatable, CaseIterable {
+    enum LogLevel: String, Codable, Equatable, CaseIterable {
         case debug
         case info
         case error
@@ -77,7 +81,7 @@ extension LogEntitySchemaV1.LogEntity {
         let line: UInt
     }
 
-    enum UserInterfaceIdiom: Codable, Equatable, CaseIterable {
+    enum UserInterfaceIdiom: String, Codable, Equatable, CaseIterable {
         case carPlay
         case mac
         case pad
