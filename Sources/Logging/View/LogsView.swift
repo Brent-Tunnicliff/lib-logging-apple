@@ -58,17 +58,55 @@ private struct LogsViewContent: View {
 
     @ViewBuilder
     private var filterToolBarItem: some View {
-        Menu {
-            Picker(selection: $logLevel) {
-                ForEach(LogLevel.Wrapped.allCases, id: \.self) {
-                    Text($0.label, bundle: .module)
-                        .tag($0)
-                }
+        #if os(watchOS)
+            filterToolBarItemWatchOS
+        #else
+            filterToolBarItemDefault
+        #endif
+    }
+
+    #if os(watchOS)
+
+        @State private var showPickerSheet: Bool = false
+
+        @ViewBuilder
+        private var filterToolBarItemWatchOS: some View {
+            Button {
+                showPickerSheet = true
             } label: {
-                Text(logLevel.label, bundle: .module)
+                filterIcon
+            }
+            .sheet(isPresented: $showPickerSheet) {
+                filterPicker
+            }
+        }
+
+    #else
+
+        @ViewBuilder
+        private var filterToolBarItemDefault: some View {
+            Menu {
+                filterPicker
+            } label: {
+                filterIcon
+            }
+        }
+    #endif
+
+    @ViewBuilder
+    private var filterIcon: some View {
+        Image(systemName: "line.3.horizontal.decrease.circle")
+    }
+
+    @ViewBuilder
+    private var filterPicker: some View {
+        Picker(selection: $logLevel) {
+            ForEach(LogLevel.Wrapped.allCases, id: \.self) {
+                Text($0.label, bundle: .module)
+                    .tag($0)
             }
         } label: {
-            Image(systemName: "line.3.horizontal.decrease.circle")
+            Text(logLevel.label, bundle: .module)
         }
     }
 }
