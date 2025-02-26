@@ -3,18 +3,20 @@
 import Foundation
 import os
 
-final class SystemLogger {
+/// Logger that captures to the OS logger.
+public final class SystemLogger {
     private let logger: os.Logger
 
-    init(packageName: String) {
+    public init(packageName: String) {
         self.logger = os.Logger(subsystem: Bundle.main.bundleIdentifier ?? "unknown", category: packageName)
     }
 }
 
-// MARK: - Logger
+// MARK: - LoggerType
 
-extension SystemLogger: Logger {
-    func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
+extension SystemLogger: LoggerType {
+    /// Captures  the inputs as a log.
+    public func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
         let errorMessage = error.map { ", error: \($0) (\($0.localizedDescription))" } ?? ""
 
         logger.log(

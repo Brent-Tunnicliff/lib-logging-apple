@@ -17,6 +17,8 @@ protocol LoggingService: Sendable {
 }
 
 actor DefaultLoggingService: LoggingService {
+    static let shared = DefaultLoggingService()
+
     private let context: ModelContext?
     private let modelMapper: any ModelMapper
     private let userDefaults: UserDefaults
@@ -34,7 +36,7 @@ actor DefaultLoggingService: LoggingService {
         self.userDefaults = userDefaults
     }
 
-    init() {
+    private init() {
         let modelContainer: ModelContainer?
 
         do {

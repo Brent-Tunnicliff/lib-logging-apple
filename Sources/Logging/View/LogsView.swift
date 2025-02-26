@@ -15,10 +15,6 @@ public struct LogsView: View {
 }
 
 private struct LogsViewContent: View {
-    private static var logLevel: LogLevel.Wrapped {
-        UserDefaults.standard.logLevel
-    }
-
     @Query private var logs: [LogEntity]
     @State private var isFilterSheetShowing = false
     @Binding private var logLevel: LogLevel.Wrapped
@@ -51,47 +47,15 @@ private struct LogsViewContent: View {
         .navigationTitle(Text("logs_view_title", bundle: .module))
         .toolbar {
             ToolbarItem {
-                filterToolBarItem
+                ToolBarMenuButton {
+                    filterIcon
+                } label: {
+                    filterPicker
+                }
+
             }
         }
     }
-
-    @ViewBuilder
-    private var filterToolBarItem: some View {
-        #if os(watchOS)
-            filterToolBarItemWatchOS
-        #else
-            filterToolBarItemDefault
-        #endif
-    }
-
-    #if os(watchOS)
-
-        @State private var showPickerSheet: Bool = false
-
-        @ViewBuilder
-        private var filterToolBarItemWatchOS: some View {
-            Button {
-                showPickerSheet = true
-            } label: {
-                filterIcon
-            }
-            .sheet(isPresented: $showPickerSheet) {
-                filterPicker
-            }
-        }
-
-    #else
-
-        @ViewBuilder
-        private var filterToolBarItemDefault: some View {
-            Menu {
-                filterPicker
-            } label: {
-                filterIcon
-            }
-        }
-    #endif
 
     @ViewBuilder
     private var filterIcon: some View {

@@ -2,17 +2,15 @@
 
 import Foundation
 
-final class PersistentLogger {
+/// Logger that persists logs to disk.
+public final class PersistentLogger {
     private let loggingService: any LoggingService
     private let packageName: String
-    private let systemLogger: any Logger
+    private let systemLogger: any LoggerType
 
-    convenience init(
-        loggingService: any LoggingService = DefaultLoggingService(),
-        packageName: String
-    ) {
+    public convenience init(packageName: String) {
         self.init(
-            loggingService: loggingService,
+            loggingService: DefaultLoggingService.shared,
             packageName: packageName,
             systemLogger: SystemLogger(packageName: packageName)
         )
@@ -21,7 +19,7 @@ final class PersistentLogger {
     init(
         loggingService: any LoggingService,
         packageName: String,
-        systemLogger: any Logger
+        systemLogger: any LoggerType
     ) {
         self.loggingService = loggingService
         self.packageName = packageName
@@ -29,10 +27,11 @@ final class PersistentLogger {
     }
 }
 
-// MARK: - Logger
+// MARK: - LoggerType
 
-extension PersistentLogger: Logger {
-    func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
+extension PersistentLogger: LoggerType {
+    /// Captures  the inputs as a log.
+    public func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
         let timestamp = Date()
         systemLogger.log(level: level, message, tag: tag, error: error)
 

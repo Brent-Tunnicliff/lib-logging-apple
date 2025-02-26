@@ -3,7 +3,7 @@
 @testable import Logging
 
 @MainActor
-final class MockLogger: Logger {
+final class MockLogger: LoggerType {
     var logCompletionHandler: @Sendable () -> Void = {}
     var logCalled: Bool { !logInputs.isEmpty }
     typealias LogInputsType = (

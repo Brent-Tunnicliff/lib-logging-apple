@@ -4,10 +4,10 @@
 public struct LogLevel {
     let wrapped: LogLevel.Wrapped
 
-    static let debug = LogLevel(wrapped: .debug)
-    static let info = LogLevel(wrapped: .info)
-    static let error = LogLevel(wrapped: .error)
-    static let critical = LogLevel(wrapped: .critical)
+    public static let debug = LogLevel(wrapped: .debug)
+    public static let info = LogLevel(wrapped: .info)
+    public static let error = LogLevel(wrapped: .error)
+    public static let critical = LogLevel(wrapped: .critical)
 }
 
 extension LogLevel {
