@@ -8,16 +8,60 @@
 
 /* Begin PBXBuildFile section */
 		847B56952D5CC445001C7B81 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = 847B56942D5CC445001C7B81 /* Logging */; };
+		84CE21CD2D707FA800960F13 /* DemoWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 84CE21C02D707FA700960F13 /* DemoWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		84CE21EF2D70832D00960F13 /* DemoCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 84CE21EE2D70832D00960F13 /* DemoCommon */; };
+		84CE21F12D70833900960F13 /* DemoCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 84CE21F02D70833900960F13 /* DemoCommon */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		84CE21CB2D707FA800960F13 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 845797642C9EED48001B833D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 84CE21BF2D707FA700960F13;
+			remoteInfo = DemoWatch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		84CE21A32D707D5400960F13 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				84CE21CD2D707FA800960F13 /* DemoWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84CE21BA2D707E7300960F13 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		8457976C2C9EED48001B833D /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84CE21BB2D707F5F00960F13 /* DemoCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DemoCommon; sourceTree = "<group>"; };
+		84CE21C02D707FA700960F13 /* DemoWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DemoWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8457976E2C9EED48001B833D /* Demo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Demo;
+			sourceTree = "<group>";
+		};
+		84CE21C12D707FA700960F13 /* DemoWatch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DemoWatch;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -27,7 +71,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84CE21F12D70833900960F13 /* DemoCommon in Frameworks */,
 				847B56952D5CC445001C7B81 /* Logging in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84CE21BD2D707FA700960F13 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84CE21EF2D70832D00960F13 /* DemoCommon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -37,7 +90,9 @@
 		845797632C9EED48001B833D = {
 			isa = PBXGroup;
 			children = (
+				84CE21BB2D707F5F00960F13 /* DemoCommon */,
 				8457976E2C9EED48001B833D /* Demo */,
+				84CE21C12D707FA700960F13 /* DemoWatch */,
 				847B56932D5CC445001C7B81 /* Frameworks */,
 				8457976D2C9EED48001B833D /* Products */,
 			);
@@ -47,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				8457976C2C9EED48001B833D /* Demo.app */,
+				84CE21C02D707FA700960F13 /* DemoWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,11 +124,14 @@
 				845797682C9EED48001B833D /* Sources */,
 				845797692C9EED48001B833D /* Frameworks */,
 				8457976A2C9EED48001B833D /* Resources */,
+				84CE21A32D707D5400960F13 /* Embed Watch Content */,
+				84CE21BA2D707E7300960F13 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				84AA7F572D563950006598D6 /* PBXTargetDependency */,
+				84CE21CC2D707FA800960F13 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				8457976E2C9EED48001B833D /* Demo */,
@@ -80,9 +139,33 @@
 			name = Demo;
 			packageProductDependencies = (
 				847B56942D5CC445001C7B81 /* Logging */,
+				84CE21F02D70833900960F13 /* DemoCommon */,
 			);
 			productName = Demo;
 			productReference = 8457976C2C9EED48001B833D /* Demo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		84CE21BF2D707FA700960F13 /* DemoWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 84CE21CE2D707FA800960F13 /* Build configuration list for PBXNativeTarget "DemoWatch" */;
+			buildPhases = (
+				84CE21BC2D707FA700960F13 /* Sources */,
+				84CE21BD2D707FA700960F13 /* Frameworks */,
+				84CE21BE2D707FA700960F13 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				84CE21C12D707FA700960F13 /* DemoWatch */,
+			);
+			name = DemoWatch;
+			packageProductDependencies = (
+				84CE21EE2D70832D00960F13 /* DemoCommon */,
+			);
+			productName = DemoWatch;
+			productReference = 84CE21C02D707FA700960F13 /* DemoWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -92,11 +175,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					8457976B2C9EED48001B833D = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					84CE21BF2D707FA700960F13 = {
+						CreatedOnToolsVersion = 16.2;
 					};
 				};
 			};
@@ -118,12 +204,20 @@
 			projectRoot = "";
 			targets = (
 				8457976B2C9EED48001B833D /* Demo */,
+				84CE21BF2D707FA700960F13 /* DemoWatch */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8457976A2C9EED48001B833D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84CE21BE2D707FA700960F13 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -140,12 +234,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		84CE21BC2D707FA700960F13 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		84AA7F572D563950006598D6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 84AA7F562D563950006598D6 /* LintBuildPlugin */;
+		};
+		84CE21CC2D707FA800960F13 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 84CE21BF2D707FA700960F13 /* DemoWatch */;
+			targetProxy = 84CE21CB2D707FA800960F13 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -357,6 +463,65 @@
 			};
 			name = Release;
 		};
+		84CE21CF2D707FA800960F13 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"DemoWatch/Preview Content\"";
+				DEVELOPMENT_TEAM = 346UN3W7D8;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = DemoWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = dev.tunnicliff.Logging.Demo;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tunnicliff.Logging.Demo.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		84CE21D02D707FA800960F13 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"DemoWatch/Preview Content\"";
+				DEVELOPMENT_TEAM = 346UN3W7D8;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = DemoWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = dev.tunnicliff.Logging.Demo;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tunnicliff.Logging.Demo.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -374,6 +539,15 @@
 			buildConfigurations = (
 				8457977C2C9EED49001B833D /* Debug */,
 				8457977D2C9EED49001B833D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		84CE21CE2D707FA800960F13 /* Build configuration list for PBXNativeTarget "DemoWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84CE21CF2D707FA800960F13 /* Debug */,
+				84CE21D02D707FA800960F13 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -400,6 +574,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */;
 			productName = "plugin:LintBuildPlugin";
+		};
+		84CE21EE2D70832D00960F13 /* DemoCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DemoCommon;
+		};
+		84CE21F02D70833900960F13 /* DemoCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DemoCommon;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
