@@ -7,9 +7,9 @@ public struct LogTag {
     let line: UInt
 
     public init(
-        file: StaticString = #file,
-        function: StaticString = #function,
-        line: UInt = #line
+        file: StaticString,
+        function: StaticString,
+        line: UInt
     ) {
         self.file = file
         self.function = function

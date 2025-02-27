@@ -8,22 +8,82 @@ public protocol LoggerType: Sendable {
 
 extension LoggerType {
     /// Convenient wrapper to capture a debug log.
-    public func debug(_ message: String, tag: LogTag = LogTag(), error: (any Error)? = nil) {
-        log(level: .debug, message, tag: tag, error: error)
+    public func debug(
+        _ message: String,
+        error: (any Error)? = nil,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .debug,
+            message,
+            tag: LogTag(
+                file: file,
+                function: function,
+                line: line
+            ),
+            error: error
+        )
     }
 
     /// Convenient wrapper to capture a info log.
-    public func info(_ message: String, tag: LogTag = LogTag(), error: (any Error)? = nil) {
-        log(level: .info, message, tag: tag, error: error)
+    public func info(
+        _ message: String,
+        error: (any Error)? = nil,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .info,
+            message,
+            tag: LogTag(
+                file: file,
+                function: function,
+                line: line
+            ),
+            error: error
+        )
     }
 
     /// Convenient wrapper to capture a error log.
-    public func error(_ message: String, tag: LogTag = LogTag(), error: (any Error)? = nil) {
-        log(level: .error, message, tag: tag, error: error)
+    public func error(
+        _ message: String,
+        error: (any Error)? = nil,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .error,
+            message,
+            tag: LogTag(
+                file: file,
+                function: function,
+                line: line
+            ),
+            error: error
+        )
     }
 
     /// Convenient wrapper to capture a critical log.
-    public func critical(_ message: String, tag: LogTag = LogTag(), error: (any Error)? = nil) {
-        log(level: .critical, message, tag: tag, error: error)
+    public func critical(
+        _ message: String,
+        error: (any Error)? = nil,
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .critical,
+            message,
+            tag: LogTag(
+                file: file,
+                function: function,
+                line: line
+            ),
+            error: error
+        )
     }
 }

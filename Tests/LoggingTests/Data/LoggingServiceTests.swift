@@ -15,7 +15,11 @@ struct LoggingServiceTests {
 
     private let message = "This message should be sent to the places"
     private let packageName = "LoggingTests"
-    private let tag = LogTag()
+    private let tag = LogTag(
+        file: "file",
+        function: "function",
+        line: 1
+    )
     private let timestamp = Date()
 
     init() async {

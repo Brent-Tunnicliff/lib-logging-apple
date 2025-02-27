@@ -22,7 +22,7 @@ struct PersistentLoggerTests {
 
     @Test(arguments: product(LogLevel.allCases, [true, false]))
     func logSendsExpectedDataToSystemLog(level: LogLevel, sendError: Bool) async {
-        let tag = LogTag()
+        let tag = LogTag(file: #file, function: #function, line: #line)
         let error = sendError ? MockError() : nil
 
         logger.log(level: level, message, tag: tag, error: error)
@@ -43,7 +43,7 @@ struct PersistentLoggerTests {
     @Test(arguments: product(LogLevel.allCases, [true, false]))
     func logSendsExpectedDataToLoggingService(level: LogLevel, sendError: Bool) async {
         let before = Date()
-        let tag = LogTag()
+        let tag = LogTag(file: #file, function: #function, line: #line)
         let error = sendError ? MockError() : nil
 
         await withCheckedContinuation { continuation in
@@ -84,7 +84,12 @@ struct PersistentLoggerTests {
                     continuation.resume()
                 })
 
-                logger.log(level: .debug, message, tag: LogTag(), error: nil)
+                logger.log(
+                    level: .debug,
+                    message,
+                    tag: LogTag(file: #file, function: #function, line: #line),
+                    error: nil
+                )
             }
         }
 

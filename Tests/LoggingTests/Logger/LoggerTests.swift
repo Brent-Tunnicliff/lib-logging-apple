@@ -9,34 +9,36 @@ import Testing
 struct LoggerTests {
     private let logger = MockLogger()
     private let message = "This message should be sent to the places"
-    private let tag = LogTag()
+    private let file: StaticString = "1"
+    private let function: StaticString = "2"
+    private let line: UInt = 3
     private let error = MockError()
 
     @Test
     func debug() async {
         await testLog(expectedLogLevel: .debug) {
-            logger.debug(message, tag: tag, error: error)
+            logger.debug(message, error: error, file: file, function: function, line: line)
         }
     }
 
     @Test
     func info() async {
         await testLog(expectedLogLevel: .info) {
-            logger.info(message, tag: tag, error: error)
+            logger.info(message, error: error, file: file, function: function, line: line)
         }
     }
 
     @Test
     func error() async {
         await testLog(expectedLogLevel: .error) {
-            logger.error(message, tag: tag, error: error)
+            logger.error(message, error: error, file: file, function: function, line: line)
         }
     }
 
     @Test
     func critical() async {
         await testLog(expectedLogLevel: .critical) {
-            logger.critical(message, tag: tag, error: error)
+            logger.critical(message, error: error, file: file, function: function, line: line)
         }
     }
 
@@ -62,9 +64,11 @@ struct LoggerTests {
             return
         }
 
+        let expectedTag = LogTag(file: file, function: function, line: line)
+
         #expect(result.level == expectedLogLevel, sourceLocation: sourceLocation)
         #expect(result.message == message, sourceLocation: sourceLocation)
-        #expect(result.tag == tag, sourceLocation: sourceLocation)
+        #expect(result.tag == expectedTag, sourceLocation: sourceLocation)
 
         guard let resultError = result.error else {
             Issue.record("result error nil", sourceLocation: sourceLocation)
