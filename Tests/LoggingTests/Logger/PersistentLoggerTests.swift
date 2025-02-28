@@ -8,11 +8,12 @@ import Testing
 struct PersistentLoggerTests {
     private let message = "This message should be sent to the places"
     private let packageName = "LoggingTests"
-    private let mockLoggingService = MockLoggingService()
+    private let mockLoggingService: MockLoggingService
     private let mockSystemLogger = MockLogger()
     private let logger: PersistentLogger
 
-    init() {
+    init() async {
+        self.mockLoggingService = await MockLoggingService()
         self.logger = PersistentLogger(
             loggingService: mockLoggingService,
             packageName: packageName,
@@ -73,16 +74,22 @@ struct PersistentLoggerTests {
         expectError(resultError: result.error, expectedError: error)
     }
 
-    @Test
+    @Test(.timeLimit(.minutes(1)))
     func logCapturesThrownErrorInSystemLog() async {
         let thrownError = MockError()
         await mockLoggingService.inject(storeLogThrow: thrownError)
 
         await withCheckedContinuation { continuation in
-            Task {
-                await mockLoggingService.inject(storeLogCompletionHandler: {
-                    continuation.resume()
-                })
+            Task { @MainActor in
+                var completed = false
+                mockSystemLogger.logCompletionHandler = {
+                    Task { @MainActor in
+                        if completed == false, mockSystemLogger.logInputs.count == 2 {
+                            continuation.resume()
+                            completed = true
+                        }
+                    }
+                }
 
                 logger.log(
                     level: .debug,

@@ -3,23 +3,13 @@
 import SwiftData
 public import SwiftUI
 
-private var container: ModelContainer {
-    do {
-        return try LogEntity.defaultContainer()
-    } catch {
-        preconditionFailure(
-            "Unable to create logging database container with error: '\(error)' ('\(error.localizedDescription)')"
-        )
-    }
-}
-
 extension Scene {
     /// Sets the logging model container for persistent storage of logs.
     ///
     /// - Warning: This needs to be called ASAP, so add it to the apps WindowGroup.
     /// Also, this will crash if creating the container fails.
     public func loggingModelContainer() -> some Scene {
-        modelContainer(container)
+        modelContainer(DefaultLoggingService.shared.modelContainer)
     }
 }
 

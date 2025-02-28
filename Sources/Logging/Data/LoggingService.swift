@@ -3,7 +3,7 @@
 import Foundation
 import SwiftData
 
-protocol LoggingService: Sendable {
+protocol LoggingService: Sendable, ModelActor {
     func deleteLogs(olderThan timestamp: Date) async throws
 
     func storeLog(
@@ -19,31 +19,35 @@ protocol LoggingService: Sendable {
 actor DefaultLoggingService: LoggingService {
     static let shared = DefaultLoggingService()
 
-    private let context: ModelContext?
+    nonisolated let modelContainer: SwiftData.ModelContainer
+    nonisolated let modelExecutor: any SwiftData.ModelExecutor
+
     private let modelMapper: any ModelMapper
     private let userDefaults: UserDefaults
     private let deviceProvider: any DeviceProvider
 
     init(
         deviceProvider: any DeviceProvider,
-        modelContainer: ModelContainer?,
+        modelContainer: ModelContainer,
         modelMapper: any ModelMapper,
         userDefaults: UserDefaults
     ) {
         self.deviceProvider = deviceProvider
-        self.context = modelContainer.map(ModelContext.init)
+        self.modelExecutor = DefaultSerialModelExecutor(
+            modelContext: ModelContext(modelContainer)
+        )
+        self.modelContainer = modelContainer
         self.modelMapper = modelMapper
         self.userDefaults = userDefaults
     }
 
     private init() {
-        let modelContainer: ModelContainer?
+        let modelContainer: ModelContainer
 
         do {
             modelContainer = try LogEntity.defaultContainer()
         } catch {
-            assertionFailure("Failed to initialise Logger with error: \(error) (\(error.localizedDescription))")
-            modelContainer = nil
+            preconditionFailure("Failed to initialise Logger with error: \(error) (\(error.localizedDescription))")
         }
 
         self.init(
@@ -72,10 +76,6 @@ actor DefaultLoggingService: LoggingService {
             return
         }
 
-        guard let context else {
-            return
-        }
-
         let device = await deviceProvider.current()
         let model = LogEntity(
             device: modelMapper.toEntity(device),
@@ -87,7 +87,7 @@ actor DefaultLoggingService: LoggingService {
             error: error.map(modelMapper.toEntity)
         )
 
-        context.insert(model)
-        try context.save()
+        modelExecutor.modelContext.insert(model)
+        try modelExecutor.modelContext.save()
     }
 }

@@ -1,10 +1,22 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
 import Foundation
+import SwiftData
 
 @testable import Logging
 
 actor MockLoggingService: LoggingService {
+    nonisolated let modelContainer: ModelContainer
+    nonisolated let modelExecutor: any ModelExecutor
+
+    @MainActor
+    init() {
+        self.modelContainer = LogEntity.mockContainer()
+        self.modelExecutor = DefaultSerialModelExecutor(
+            modelContext: ModelContext(modelContainer)
+        )
+    }
+
     var deleteLogsCalled: Bool { !deleteLogsInput.isEmpty }
     private(set) var deleteLogsInput: [Date] = []
     private var deleteLogsThrow: (any Error)? = nil
