@@ -4,7 +4,7 @@ import DemoCommon
 import SwiftUI
 
 @main
-struct DemoWatch_Watch_AppApp: App {
+struct Demo_Watch_App: App {
     var body: some Scene {
         CommonScene()
     }

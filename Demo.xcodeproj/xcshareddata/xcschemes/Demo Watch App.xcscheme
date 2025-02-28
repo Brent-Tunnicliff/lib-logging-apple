@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "84CE21BF2D707FA700960F13"
-               BuildableName = "DemoWatch.app"
-               BlueprintName = "DemoWatch"
+               BlueprintIdentifier = "84CE21FA2D71C3D100960F13"
+               BuildableName = "Demo Watch App.app"
+               BlueprintName = "Demo Watch App"
                ReferencedContainer = "container:Demo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -58,9 +58,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "84CE21BF2D707FA700960F13"
-            BuildableName = "DemoWatch.app"
-            BlueprintName = "DemoWatch"
+            BlueprintIdentifier = "84CE21FA2D71C3D100960F13"
+            BuildableName = "Demo Watch App.app"
+            BlueprintName = "Demo Watch App"
             ReferencedContainer = "container:Demo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -75,9 +75,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "84CE21BF2D707FA700960F13"
-            BuildableName = "DemoWatch.app"
-            BlueprintName = "DemoWatch"
+            BlueprintIdentifier = "84CE21FA2D71C3D100960F13"
+            BuildableName = "Demo Watch App.app"
+            BlueprintName = "Demo Watch App"
             ReferencedContainer = "container:Demo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
