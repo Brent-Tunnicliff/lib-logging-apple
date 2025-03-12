@@ -153,6 +153,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				84CE22252D71E16100960F13 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				84CE21FC2D71C3D100960F13 /* Demo Watch App */,
@@ -254,6 +255,10 @@
 			);
 			target = 84CE21FA2D71C3D100960F13 /* Demo Watch App */;
 			targetProxy = 84CE22062D71C3D200960F13 /* PBXContainerItemProxy */;
+		};
+		84CE22252D71E16100960F13 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 84CE22242D71E16100960F13 /* LintBuildPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -580,6 +585,11 @@
 		84CE221B2D71C50A00960F13 /* DemoCommon */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DemoCommon;
+		};
+		84CE22242D71E16100960F13 /* LintBuildPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */;
+			productName = "plugin:LintBuildPlugin";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
