@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		84CE21F12D70833900960F13 /* DemoCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 84CE21F02D70833900960F13 /* DemoCommon */; };
-		84CE22082D71C3D200960F13 /* Demo Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 84CE21FB2D71C3D100960F13 /* Demo Watch App.app */; platformFilters = (ios, macos, xros, ); settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		84CE22082D71C3D200960F13 /* Demo Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 84CE21FB2D71C3D100960F13 /* Demo Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		84CE221C2D71C50A00960F13 /* DemoCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 84CE221B2D71C50A00960F13 /* DemoCommon */; };
 /* End PBXBuildFile section */
 
@@ -248,11 +248,7 @@
 		};
 		84CE22072D71C3D200960F13 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			platformFilters = (
-				ios,
-				macos,
-				xros,
-			);
+			platformFilter = ios;
 			target = 84CE21FA2D71C3D100960F13 /* Demo Watch App */;
 			targetProxy = 84CE22062D71C3D200960F13 /* PBXContainerItemProxy */;
 		};
