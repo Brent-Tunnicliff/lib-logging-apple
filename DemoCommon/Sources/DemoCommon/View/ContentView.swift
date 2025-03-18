@@ -31,7 +31,7 @@ struct ContentView: View {
     #Preview {
         NavigationStack {
             ContentView()
-                .mockedLoggingModelContainer()
+                .loggingModelContainer(mocked: .populated)
         }
     }
 #endif

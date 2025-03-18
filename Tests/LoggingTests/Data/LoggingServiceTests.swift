@@ -23,7 +23,7 @@ struct LoggingServiceTests {
     private let timestamp = Date()
 
     init() async {
-        self.modelContainer = await LogEntity.mockContainer()
+        self.modelContainer = await .emptyInMemoryOnly()
         self.loggingService = DefaultLoggingService(
             deviceProvider: mockDeviceProvider,
             modelContainer: modelContainer,

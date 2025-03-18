@@ -5,12 +5,14 @@ public import SwiftUI
 
 /// Displays all logs captured.
 public struct LogsView: View {
-    public init() {}
+    @Environment(\.loggingModelContainer) private var loggingModelContainer
+    @UserDefault(key: \.logLevel) private var logLevel
 
-    @UserDefault(key: \.logLevel) var logLevel
+    public init() {}
 
     public var body: some View {
         LogsViewContent(logLevel: $logLevel)
+            .modelContainer(loggingModelContainer)
     }
 }
 
@@ -31,7 +33,7 @@ private struct LogsViewContent: View {
         )
     }
 
-    public var body: some View {
+    var body: some View {
         Group {
             List {
                 if logs.isEmpty {
@@ -101,7 +103,7 @@ extension LogLevel.Wrapped {
 
         NavigationStack {
             LogsViewContent(logLevel: $logLevel)
-                .mockedLoggingModelContainer()
+                .loggingModelContainer(mocked: .populated)
         }
     }
 
@@ -110,7 +112,7 @@ extension LogLevel.Wrapped {
 
         NavigationStack {
             LogsViewContent(logLevel: $logLevel)
-                .mockedLoggingModelContainer(state: .empty)
+                .loggingModelContainer(mocked: .empty)
         }
     }
 #endif

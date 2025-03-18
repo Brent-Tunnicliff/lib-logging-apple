@@ -2,9 +2,9 @@
 
 import SwiftData
 
-enum LogEntityMigrationPlan: SchemaMigrationPlan {
+enum MigrationPlan: SchemaMigrationPlan {
     static let schemas: [any VersionedSchema.Type] = [
-        LogEntitySchemaV1.self
+        SchemaV1.self
     ]
 
     static var stages: [MigrationStage] { [] }

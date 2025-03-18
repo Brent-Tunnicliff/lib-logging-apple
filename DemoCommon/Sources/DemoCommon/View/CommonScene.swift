@@ -2,6 +2,7 @@
 
 public import SwiftUI
 
+/// Common scene for both the demo app and the watch companion.
 public struct CommonScene: Scene {
     @Environment(\.scenePhase) private var scenePhase
 
@@ -13,7 +14,6 @@ public struct CommonScene: Scene {
                 ContentView()
             }
         }
-        .loggingModelContainer()
         .onChange(of: scenePhase) { oldPhase, newPhase in
             Logger.app.info("Scene transitioned from \(oldPhase.logName) to \(newPhase.logName)")
         }

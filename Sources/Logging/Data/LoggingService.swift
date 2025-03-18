@@ -42,17 +42,9 @@ actor DefaultLoggingService: LoggingService {
     }
 
     private init() {
-        let modelContainer: ModelContainer
-
-        do {
-            modelContainer = try LogEntity.defaultContainer()
-        } catch {
-            preconditionFailure("Failed to initialise Logger with error: \(error) (\(error.localizedDescription))")
-        }
-
         self.init(
             deviceProvider: DefaultDeviceProvider(),
-            modelContainer: modelContainer,
+            modelContainer: .shared,
             modelMapper: DefaultModelMapper(),
             userDefaults: UserDefaults.standard
         )

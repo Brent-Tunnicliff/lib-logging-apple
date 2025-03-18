@@ -11,7 +11,7 @@ actor MockLoggingService: LoggingService {
 
     @MainActor
     init() {
-        self.modelContainer = LogEntity.mockContainer()
+        self.modelContainer = .emptyInMemoryOnly()
         self.modelExecutor = DefaultSerialModelExecutor(
             modelContext: ModelContext(modelContainer)
         )
