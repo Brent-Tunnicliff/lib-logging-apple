@@ -27,3 +27,10 @@ jobs:
       scheme: "Demo"
       skip_tests: true
       workspace: "Package.xcworkspace"
+  demo_watch:
+    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1
+    with:
+      platform: "watchOS"
+      scheme: "Demo Watch App"
+      skip_tests: true
+      workspace: "Package.xcworkspace"
