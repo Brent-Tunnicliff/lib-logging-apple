@@ -7,9 +7,13 @@ public import SwiftUI
 extension ModelContainer {
     static let shared: ModelContainer = {
         do {
+            let schema = Schema(versionedSchema: LatestSchema.self)
+            // The configuration needs a name so it does not get applied to the app's default database.
+            let configuration = ModelConfiguration("logging", schema: schema)
             return try ModelContainer(
-                for: Schema(versionedSchema: LatestSchema.self),
-                migrationPlan: MigrationPlan.self
+                for: schema,
+                migrationPlan: MigrationPlan.self,
+                configurations: configuration
             )
         } catch {
             preconditionFailure("Failed to initialise Logger with error: '\(error.localizedDescription)' (\(error))")

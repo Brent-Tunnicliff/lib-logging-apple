@@ -14,6 +14,7 @@ public struct CommonScene: Scene {
                 ContentView()
             }
         }
+        .modelContainer(for: DemoEntity.self)
         .onChange(of: scenePhase) { oldPhase, newPhase in
             Logger.app.info("Scene transitioned from \(oldPhase.logName) to \(newPhase.logName)")
         }
