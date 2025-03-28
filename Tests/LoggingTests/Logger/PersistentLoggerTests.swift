@@ -13,9 +13,10 @@ struct PersistentLoggerTests {
     private let logger: PersistentLogger
 
     init() async {
-        self.mockLoggingService = await MockLoggingService()
+        let mockLoggingService = await MockLoggingService()
+        self.mockLoggingService = mockLoggingService
         self.logger = PersistentLogger(
-            loggingService: mockLoggingService,
+            loggingService: Task { mockLoggingService },
             packageName: packageName,
             systemLogger: mockSystemLogger
         )

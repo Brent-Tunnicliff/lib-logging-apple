@@ -3,7 +3,7 @@
 import Foundation
 import SwiftData
 
-protocol LoggingService: Sendable, ModelActor {
+protocol LoggingService: Actor {
     func deleteLogs(olderThan timestamp: Date) async throws
 
     func storeLog(
@@ -16,11 +16,14 @@ protocol LoggingService: Sendable, ModelActor {
     ) async throws
 }
 
-actor DefaultLoggingService: LoggingService {
-    static let shared = DefaultLoggingService()
+actor DefaultLoggingService: LoggingService, ModelActor {
+    // I read an article saying ModelActors are weird and run on the thread that creates them.
+    // Using `MainActor.assertIsolated()` showed it wasn't running on main thread.
+    // But decided on wrapping in task to be safe as I want these writes to all be set and forget in the background.
+    static let shared: Task<any LoggingService, Never> = Task.detached { DefaultLoggingService() }
 
-    nonisolated let modelContainer: SwiftData.ModelContainer
-    nonisolated let modelExecutor: any SwiftData.ModelExecutor
+    let modelContainer: ModelContainer
+    let modelExecutor: any ModelExecutor
 
     private let modelMapper: any ModelMapper
     private let userDefaults: UserDefaults

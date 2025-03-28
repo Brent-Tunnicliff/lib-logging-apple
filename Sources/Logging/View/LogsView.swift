@@ -2,11 +2,12 @@
 
 import SwiftData
 public import SwiftUI
+import UserDefaultsHelpers
 
 /// Displays all logs captured.
 public struct LogsView: View {
     @Environment(\.loggingModelContainer) private var loggingModelContainer
-    @UserDefault(key: \.logLevel) private var logLevel
+    @UserDefault(\.logLevel) private var logLevel
 
     public init() {}
 

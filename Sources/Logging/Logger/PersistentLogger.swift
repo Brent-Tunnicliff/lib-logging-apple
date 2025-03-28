@@ -4,7 +4,7 @@ import Foundation
 
 /// Logger that persists logs to disk.
 public final class PersistentLogger {
-    private let loggingService: any LoggingService
+    private let loggingService: Task<any LoggingService, Never>
     private let packageName: String
     private let systemLogger: any LoggerType
 
@@ -17,7 +17,7 @@ public final class PersistentLogger {
     }
 
     init(
-        loggingService: any LoggingService,
+        loggingService: Task<any LoggingService, Never>,
         packageName: String,
         systemLogger: any LoggerType
     ) {
@@ -35,9 +35,11 @@ extension PersistentLogger: LoggerType {
         let timestamp = Date()
         systemLogger.log(level: level, message, tag: tag, error: error)
 
-        Task {
+        // Using `detached` as we never want this to be canceled with a parent task.
+        // We always want logs to run until complete.
+        Task.detached { [loggingService, packageName, systemLogger] in
             do {
-                try await loggingService.storeLog(
+                try await loggingService.value.storeLog(
                     error: error,
                     logLevel: level,
                     message: message,
