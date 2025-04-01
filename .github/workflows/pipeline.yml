@@ -15,7 +15,7 @@ jobs:
         platform: ["iOS", "macOS", "tvOS", "watchOS", "visionOS"]
     with:
       platform: "${{ matrix.platform }}"
-      scheme: "Package"
+      scheme: "Logging"
       skip_tests: false
       workspace: "Package.xcworkspace"
   demo:
