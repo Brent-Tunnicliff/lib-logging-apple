@@ -67,7 +67,7 @@ actor DefaultLoggingService: LoggingService, ModelActor {
         timestamp: Date
     ) async throws {
         // TODO: Build minimum log level logic to only store the levels desired.
-        guard userDefaults.logLevel <= logLevel.wrapped else {
+        guard userDefaults.logLevel <= logLevel else {
             return
         }
 

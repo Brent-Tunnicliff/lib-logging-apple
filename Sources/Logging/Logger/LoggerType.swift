@@ -2,12 +2,58 @@
 
 /// Handles the management of logs in a Sendable, thread safe way.
 public protocol LoggerType: Sendable {
-    /// Captures  the inputs as a log.
-    func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?)
+    /// Captures the inputs as a debug level log.
+    ///
+    /// - Parameters:
+    ///     - message: message to log.
+    ///     - error: optional error object to include in the log.
+    ///     - file: File of where the log was triggered.
+    ///     - function: Function name where the log was triggered.
+    ///     - line: Line of where the log was triggered.
+    func debug(_ message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
+
+    /// Captures the inputs as a info level log.
+    ///
+    /// - Parameters:
+    ///     - message: message to log.
+    ///     - error: optional error object to include in the log.
+    ///     - file: File of where the log was triggered.
+    ///     - function: Function name where the log was triggered.
+    ///     - line: Line of where the log was triggered.
+    func info(_ message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
+
+    /// Captures the inputs as an error level log.
+    ///
+    /// - Parameters:
+    ///     - message: message to log.
+    ///     - error: optional error object to include in the log.
+    ///     - file: File of where the log was triggered.
+    ///     - function: Function name where the log was triggered.
+    ///     - line: Line of where the log was triggered.
+    func error(_ message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
+
+    /// Captures the inputs as a critical level log.
+    ///
+    /// - Parameters:
+    ///     - message: message to log.
+    ///     - error: optional error object to include in the log.
+    ///     - file: File of where the log was triggered.
+    ///     - function: Function name where the log was triggered.
+    ///     - line: Line of where the log was triggered.
+    func critical(_ message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
 }
 
+// MARK: - Default implementations
+
 extension LoggerType {
-    /// Convenient wrapper to capture a debug log.
+    /// Captures the inputs as a debug level log.
+    ///
+    /// - Parameters:
+    ///     - message: message to log.
+    ///     - error: optional error object to include in the log. Defaults to `nil`.
+    ///     - file: File of where the log was triggered. Defaults to `#file`.
+    ///     - function: Function name where the log was triggered. Defaults to `#function`.
+    ///     - line: Line of where the log was triggered. Defaults to `#line`.
     public func debug(
         _ message: String,
         error: (any Error)? = nil,
@@ -15,19 +61,17 @@ extension LoggerType {
         function: StaticString = #function,
         line: UInt = #line
     ) {
-        log(
-            level: .debug,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
+        debug(message, error: error, file: file, function: function, line: line)
     }
 
-    /// Convenient wrapper to capture a info log.
+    /// Captures the inputs as a info level log.
+    ///
+    /// - Parameters:
+    ///     - message: message to log.
+    ///     - error: optional error object to include in the log. Defaults to `nil`.
+    ///     - file: File of where the log was triggered. Defaults to `#file`.
+    ///     - function: Function name where the log was triggered. Defaults to `#function`.
+    ///     - line: Line of where the log was triggered. Defaults to `#line`.
     public func info(
         _ message: String,
         error: (any Error)? = nil,
@@ -35,19 +79,17 @@ extension LoggerType {
         function: StaticString = #function,
         line: UInt = #line
     ) {
-        log(
-            level: .info,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
+        info(message, error: error, file: file, function: function, line: line)
     }
 
-    /// Convenient wrapper to capture a error log.
+    /// Captures the inputs as an error level log.
+    ///
+    /// - Parameters:
+    ///     - message: message to log.
+    ///     - error: optional error object to include in the log. Defaults to `nil`.
+    ///     - file: File of where the log was triggered. Defaults to `#file`.
+    ///     - function: Function name where the log was triggered. Defaults to `#function`.
+    ///     - line: Line of where the log was triggered. Defaults to `#line`.
     public func error(
         _ message: String,
         error: (any Error)? = nil,
@@ -55,19 +97,17 @@ extension LoggerType {
         function: StaticString = #function,
         line: UInt = #line
     ) {
-        log(
-            level: .error,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
+        self.error(message, error: error, file: file, function: function, line: line)
     }
 
-    /// Convenient wrapper to capture a critical log.
+    /// Captures the inputs as a critical level log.
+    ///
+    /// - Parameters:
+    ///     - message: message to log.
+    ///     - error: optional error object to include in the log. Defaults to `nil`.
+    ///     - file: File of where the log was triggered. Defaults to `#file`.
+    ///     - function: Function name where the log was triggered. Defaults to `#function`.
+    ///     - line: Line of where the log was triggered. Defaults to `#line`.
     public func critical(
         _ message: String,
         error: (any Error)? = nil,
@@ -75,15 +115,6 @@ extension LoggerType {
         function: StaticString = #function,
         line: UInt = #line
     ) {
-        log(
-            level: .critical,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
+        critical(message, error: error, file: file, function: function, line: line)
     }
 }

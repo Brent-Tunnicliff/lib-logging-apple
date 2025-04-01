@@ -6,10 +6,19 @@ public import Foundation
 
 /// Information about the device.
 public struct Device {
+    /// Unique identifier of this app install. `nil` if unable to get the real value.
     public let identifierForVendor: UUID?
+
+    /// Device model identifier. `nil` if unable to get the real value.
     public let model: String?
+
+    /// Name of the OS system. `nil` if unable to get the real value.
     public let systemName: String?
+
+    /// Version of the OS system. `nil` if unable to get the real value.
     public let systemVersion: String?
+
+    /// Type of user interface of the device.
     public let userInterfaceIdiom: UserInterfaceIdiom
 
     private init(

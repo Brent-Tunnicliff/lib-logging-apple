@@ -40,7 +40,7 @@ final class DefaultModelMapper: ModelMapper {
     }
 
     func toEntity(_ model: LogLevel) -> LogEntity.LogLevel {
-        switch model.wrapped {
+        switch model {
         case .debug: .debug
         case .info: .info
         case .error: .error

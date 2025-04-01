@@ -40,7 +40,7 @@ struct LoggingServiceTests {
         let error = sendError ? MockError() : nil
         let expectedError = error.map(modelMapper.toEntity)
 
-        userDefaults.logLevel = level.wrapped
+        userDefaults.logLevel = level
         try await performStoreLog(error: error, logLevel: level)
         let results: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(results.count == 1)

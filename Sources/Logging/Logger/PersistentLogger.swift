@@ -6,8 +6,11 @@ import Foundation
 public final class PersistentLogger {
     private let loggingService: Task<any LoggingService, Never>
     private let packageName: String
-    private let systemLogger: any LoggerType
+    private let systemLogger: any InternalLoggerType
 
+    /// Initialises an instance of ``PersistentLogger`` with the defined package name.
+    ///
+    /// - Parameter packageName: Unique name to give the logger. Each log sent via this logger will be tagged with the packageName.
     public convenience init(packageName: String) {
         self.init(
             loggingService: DefaultLoggingService.shared,
@@ -19,7 +22,7 @@ public final class PersistentLogger {
     init(
         loggingService: Task<any LoggingService, Never>,
         packageName: String,
-        systemLogger: any LoggerType
+        systemLogger: any InternalLoggerType
     ) {
         self.loggingService = loggingService
         self.packageName = packageName
@@ -27,11 +30,11 @@ public final class PersistentLogger {
     }
 }
 
-// MARK: - LoggerType
+// MARK: - InternalLoggerType
 
-extension PersistentLogger: LoggerType {
+extension PersistentLogger: InternalLoggerType {
     /// Captures  the inputs as a log.
-    public func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
+    func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
         let timestamp = Date()
         systemLogger.log(level: level, message, tag: tag, error: error)
 
@@ -53,3 +56,7 @@ extension PersistentLogger: LoggerType {
         }
     }
 }
+
+// MARK: - LoggerType
+
+extension PersistentLogger: LoggerType {}

@@ -7,16 +7,19 @@ import os
 public final class SystemLogger {
     private let logger: os.Logger
 
+    /// Initialises an instance of ``SystemLogger`` with the defined package name.
+    ///
+    /// - Parameter packageName: Unique name to give the logger. Each log sent via this logger will be tagged with the packageName.
     public init(packageName: String) {
         self.logger = os.Logger(subsystem: Bundle.main.bundleIdentifier ?? "unknown", category: packageName)
     }
 }
 
-// MARK: - LoggerType
+// MARK: - InternalLoggerType
 
-extension SystemLogger: LoggerType {
+extension SystemLogger: InternalLoggerType {
     /// Captures  the inputs as a log.
-    public func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
+    func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
         let errorMessage = error.map { ", error: \($0) (\($0.localizedDescription))" } ?? ""
 
         logger.log(
@@ -26,11 +29,15 @@ extension SystemLogger: LoggerType {
     }
 }
 
+// MARK: - LoggerType
+
+extension SystemLogger: LoggerType {}
+
 // MARK: - Helpers
 
 extension LogLevel {
     fileprivate var osLogType: OSLogType {
-        switch wrapped {
+        switch self {
         case .debug: .debug
         case .info: .default
         case .error: .error

@@ -31,7 +31,10 @@ extension EnvironmentValues {
 
     /// Represents how to populate the mocked logging container.
     public struct MockedLoggingModelContainerState: Sendable {
+        /// Container to be created empty.
         public static let empty = MockedLoggingModelContainerState(wrapped: .empty)
+
+        /// Container to be populated with a variety of entities.
         public static let populated = MockedLoggingModelContainerState(wrapped: .populated)
 
         let wrapped: Wrapped

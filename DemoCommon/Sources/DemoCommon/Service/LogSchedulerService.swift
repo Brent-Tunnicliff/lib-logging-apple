@@ -23,8 +23,6 @@ actor DefaultLogSchedulerService: LogSchedulerService {
         case .info: Logger.other.info(message, error: error)
         case .error: Logger.other.error(message, error: error)
         case .critical: Logger.other.critical(message, error: error)
-        default:
-            preconditionFailure("Unsupported log level: \(logLevel)")
         }
     }
 

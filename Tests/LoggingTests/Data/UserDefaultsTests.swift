@@ -8,8 +8,8 @@ import Testing
 struct UserDefaultsTests {
     private let userDefaults = UserDefaults.forTest()
 
-    @Test(arguments: LogLevel.Wrapped.allCases)
-    func logLevel(_ value: LogLevel.Wrapped) {
+    @Test(arguments: LogLevel.allCases)
+    func logLevel(_ value: LogLevel) {
         #expect(userDefaults.logLevel == .default)
         userDefaults.logLevel = value
         #expect(userDefaults.logLevel == value)

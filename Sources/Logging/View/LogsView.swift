@@ -7,12 +7,14 @@ import UserDefaultsHelpers
 /// Displays all logs captured.
 public struct LogsView: View {
     @Environment(\.loggingModelContainer) private var loggingModelContainer
-    @UserDefault(\.logLevel) private var logLevel
+    @State private var filteredLogLevel = LogLevel.default
 
+    /// Initialise an instance of `LogsView`.
     public init() {}
 
+    /// The content and behavior of the view.
     public var body: some View {
-        LogsViewContent(logLevel: $logLevel)
+        LogsViewContent(logLevel: $filteredLogLevel)
             .modelContainer(loggingModelContainer)
     }
 }
@@ -20,9 +22,9 @@ public struct LogsView: View {
 private struct LogsViewContent: View {
     @Query private var logs: [LogEntity]
     @State private var isFilterSheetShowing = false
-    @Binding private var logLevel: LogLevel.Wrapped
+    @Binding private var logLevel: LogLevel
 
-    init(logLevel: Binding<LogLevel.Wrapped>) {
+    init(logLevel: Binding<LogLevel>) {
         self._logLevel = logLevel
         let filteredLogLevels = logLevel.wrappedValue.allowedLevels.map(\.asEntity.rawValue)
         self._logs = Query(
@@ -68,7 +70,7 @@ private struct LogsViewContent: View {
     @ViewBuilder
     private var filterPicker: some View {
         Picker(selection: $logLevel) {
-            ForEach(LogLevel.Wrapped.allCases, id: \.self) {
+            ForEach(LogLevel.allCases, id: \.self) {
                 Text($0.label, bundle: .module)
                     .tag($0)
             }
@@ -78,7 +80,7 @@ private struct LogsViewContent: View {
     }
 }
 
-extension LogLevel.Wrapped {
+extension LogLevel {
     fileprivate var label: LocalizedStringKey {
         switch self {
         case .debug: "log_level_debug"
@@ -100,7 +102,7 @@ extension LogLevel.Wrapped {
 
 #if DEBUG
     #Preview("Default") {
-        @Previewable @State var logLevel: LogLevel.Wrapped = .debug
+        @Previewable @State var logLevel: LogLevel = .debug
 
         NavigationStack {
             LogsViewContent(logLevel: $logLevel)
@@ -109,7 +111,7 @@ extension LogLevel.Wrapped {
     }
 
     #Preview("Empty") {
-        @Previewable @State var logLevel: LogLevel.Wrapped = .debug
+        @Previewable @State var logLevel: LogLevel = .debug
 
         NavigationStack {
             LogsViewContent(logLevel: $logLevel)

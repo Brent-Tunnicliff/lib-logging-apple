@@ -49,11 +49,11 @@ extension LogEntityV1 {
     }
 
     struct Device: Codable, Equatable {
-        public let identifierForVendor: UUID?
-        public let model: String?
-        public let systemName: String?
-        public let systemVersion: String?
-        public let userInterfaceIdiom: UserInterfaceIdiom
+        let identifierForVendor: UUID?
+        let model: String?
+        let systemName: String?
+        let systemVersion: String?
+        let userInterfaceIdiom: UserInterfaceIdiom
     }
 
     enum LogLevel: String, Codable, Equatable, CaseIterable {

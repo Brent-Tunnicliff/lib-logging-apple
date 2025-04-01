@@ -1,28 +1,17 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-/// Represents the importance level of the log.
-public struct LogLevel {
-    let wrapped: LogLevel.Wrapped
-
-    public static let debug = LogLevel(wrapped: .debug)
-    public static let info = LogLevel(wrapped: .info)
-    public static let error = LogLevel(wrapped: .error)
-    public static let critical = LogLevel(wrapped: .critical)
+// Needs to be `@objc` so UserDefaults can make it a publisher.
+@objc
+enum LogLevel: Int {
+    case debug = 0
+    case info = 1
+    case error = 2
+    case critical = 3
 }
 
 extension LogLevel {
-    @objc
-    enum Wrapped: Int {
-        case debug = 0
-        case info = 1
-        case error = 2
-        case critical = 3
-    }
-}
-
-extension LogLevel.Wrapped {
-    var allowedLevels: [LogLevel.Wrapped] {
-        LogLevel.Wrapped.allCases.filter {
+    var allowedLevels: [LogLevel] {
+        LogLevel.allCases.filter {
             $0.rawValue >= self.rawValue
         }
     }
@@ -30,25 +19,12 @@ extension LogLevel.Wrapped {
 
 // MARK: - CaseIterable
 
-extension LogLevel: CaseIterable {
-    /// A collection of all values of this type.
-    public static let allCases: [LogLevel] = LogLevel.Wrapped.allCases.map(LogLevel.init)
-}
-
-extension LogLevel.Wrapped: CaseIterable {}
+extension LogLevel: CaseIterable {}
 
 // MARK: - Comparable
 
 extension LogLevel: Comparable {
-    /// Returns a Boolean value indicating whether the value of the first
-    /// argument is less than that of the second argument.
-    public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
-        lhs.wrapped < rhs.wrapped
-    }
-}
-
-extension LogLevel.Wrapped: Comparable {
-    static func < (lhs: LogLevel.Wrapped, rhs: LogLevel.Wrapped) -> Bool {
+    static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }
@@ -56,13 +32,6 @@ extension LogLevel.Wrapped: Comparable {
 // MARK: - CustomStringConvertible
 
 extension LogLevel: CustomStringConvertible {
-    /// A textual representation of this instance.
-    public var description: String {
-        wrapped.description
-    }
-}
-
-extension LogLevel.Wrapped: CustomStringConvertible {
     var description: String {
         switch self {
         case .debug: "debug"
@@ -76,31 +45,21 @@ extension LogLevel.Wrapped: CustomStringConvertible {
 // MARK: - Default
 
 extension LogLevel {
-    /// Default log level captured by the system.
-    ///
-    /// Debug builds will return `debug`, all others will return `info`.
-    public static let `default` = LogLevel(wrapped: .default)
-}
-
-extension LogLevel.Wrapped {
     #if DEBUG
-        static let `default` = LogLevel.Wrapped.debug
+        static let `default` = LogLevel.debug
     #else
-        static let `default` = LogLevel.Wrapped.info
+        static let `default` = LogLevel.info
     #endif
 }
 
 // MARK: - Equatable
 
 extension LogLevel: Equatable {}
-extension LogLevel.Wrapped: Equatable {}
 
 // MARK: - Hashable
 
 extension LogLevel: Hashable {}
-extension LogLevel.Wrapped: Hashable {}
 
 // MARK: - Sendable
 
 extension LogLevel: Sendable {}
-extension LogLevel.Wrapped: Sendable {}
