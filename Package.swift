@@ -28,7 +28,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple", exact: "1.0.0-beta.1"),
+        .package(url: "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple", exact: "1.0.0-beta.2"),
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
     ],
     targets: [
