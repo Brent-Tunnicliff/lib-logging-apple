@@ -1,25 +1,25 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-public import Foundation
+import Foundation
 
 // MARK: - Device
 
 /// Information about the device.
-public struct Device {
+struct Device {
     /// Unique identifier of this app install. `nil` if unable to get the real value.
-    public let identifierForVendor: UUID?
+    let identifierForVendor: UUID?
 
     /// Device model identifier. `nil` if unable to get the real value.
-    public let model: String?
+    let model: String?
 
     /// Name of the OS system. `nil` if unable to get the real value.
-    public let systemName: String?
+    let systemName: String?
 
     /// Version of the OS system. `nil` if unable to get the real value.
-    public let systemVersion: String?
+    let systemVersion: String?
 
     /// Type of user interface of the device.
-    public let userInterfaceIdiom: UserInterfaceIdiom
+    let userInterfaceIdiom: UserInterfaceIdiom
 
     private init(
         identifierForVendor: UUID?,
@@ -43,7 +43,7 @@ extension Device: Sendable {}
 extension Device {
     /// Returns the details of the current device.
     @MainActor
-    public static let current: Device = {
+    static let current: Device = {
         #if canImport(WatchKit)
             currentWatchKit()
         #elseif canImport(UIKit)
@@ -57,7 +57,7 @@ extension Device {
 #if DEBUG
     extension Device {
         /// Create a mock instance of ``Device``.
-        public static func mock(
+        static func mock(
             identifierForVendor: UUID? = UUID(),
             model: String? = "iPhone",
             systemName: String? = "iOS",
@@ -78,8 +78,7 @@ extension Device {
 // MARK: - UserInterfaceIdiom
 
 extension Device {
-    /// User interface type of the device.
-    public struct UserInterfaceIdiom {
+    struct UserInterfaceIdiom {
         let rawValue: RawValue
 
         fileprivate init(rawValue: RawValue) {
@@ -94,41 +93,39 @@ extension Device.UserInterfaceIdiom: Hashable {}
 extension Device.UserInterfaceIdiom: Sendable {}
 
 extension Device.UserInterfaceIdiom: CustomStringConvertible {
-    /// Returns the string representation.
-    public var description: String {
+    var description: String {
         "\(rawValue)"
     }
 }
 
 extension Device.UserInterfaceIdiom {
     /// CarPlay user interface type.
-    public static let carPlay = Device.UserInterfaceIdiom(rawValue: .carPlay)
+    static let carPlay = Device.UserInterfaceIdiom(rawValue: .carPlay)
 
     /// Mac user interface type.
-    public static let mac = Device.UserInterfaceIdiom(rawValue: .mac)
+    static let mac = Device.UserInterfaceIdiom(rawValue: .mac)
 
     /// Tablet user interface type.
-    public static let pad = Device.UserInterfaceIdiom(rawValue: .pad)
+    static let pad = Device.UserInterfaceIdiom(rawValue: .pad)
 
     /// Phone user interface type.
-    public static let phone = Device.UserInterfaceIdiom(rawValue: .phone)
+    static let phone = Device.UserInterfaceIdiom(rawValue: .phone)
 
     /// TV user interface type.
-    public static let tv = Device.UserInterfaceIdiom(rawValue: .tv)
+    static let tv = Device.UserInterfaceIdiom(rawValue: .tv)
 
     /// Unknown user interface type.
-    public static let unspecified = Device.UserInterfaceIdiom(rawValue: .unspecified)
+    static let unspecified = Device.UserInterfaceIdiom(rawValue: .unspecified)
 
     /// Vision user interface type.
-    public static let vision = Device.UserInterfaceIdiom(rawValue: .vision)
+    static let vision = Device.UserInterfaceIdiom(rawValue: .vision)
 
     /// Watch user interface type.
-    public static let watch = Device.UserInterfaceIdiom(rawValue: .watch)
+    static let watch = Device.UserInterfaceIdiom(rawValue: .watch)
 }
 
 extension Device.UserInterfaceIdiom: CaseIterable {
-    /// Returns all known user interface types.
-    public static let allCases: [Device.UserInterfaceIdiom] = RawValue.allCases.compactMap {
+    static let allCases: [Device.UserInterfaceIdiom] = RawValue.allCases.compactMap {
         Device.UserInterfaceIdiom(rawValue: $0)
     }
 }
