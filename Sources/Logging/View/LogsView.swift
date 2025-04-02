@@ -57,7 +57,6 @@ private struct LogsViewContent: View {
                 } label: {
                     filterPicker
                 }
-
             }
         }
     }

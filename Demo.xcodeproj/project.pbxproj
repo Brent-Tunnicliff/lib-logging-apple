@@ -121,6 +121,7 @@
 			buildPhases = (
 				845797682C9EED48001B833D /* Sources */,
 				845797692C9EED48001B833D /* Frameworks */,
+				844D857A2D9D291B00ED7818 /* Copy logging settings */,
 				8457976A2C9EED48001B833D /* Resources */,
 				84CE21A32D707D5400960F13 /* Embed Watch Content */,
 				84CE21BA2D707E7300960F13 /* Embed Frameworks */,
@@ -174,7 +175,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					8457976B2C9EED48001B833D = {
 						CreatedOnToolsVersion = 16.0;
@@ -223,6 +224,31 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		844D857A2D9D291B00ED7818 /* Copy logging settings */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${BUILT_PRODUCTS_DIR}/Logging_Logging.bundle/Logging.plist",
+				"${BUILT_PRODUCTS_DIR}/Logging_Logging.bundle/en.lproj/Logging.strings",
+			);
+			name = "Copy logging settings";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${PROJECT_DIR}/${PROJECT_NAME}/Settings.bundle/Logging.plist",
+				"${PROJECT_DIR}/${PROJECT_NAME}/Settings.bundle//en.lproj/Logging.strings",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"BRENT_TEST\"\nFILE_NAME=\"Logging\"\nBUNDLE_PATH=\"${BUILT_PRODUCTS_DIR}/Logging_Logging.bundle\"\nSETTINGS_FILE=\"${BUNDLE_PATH}/${FILE_NAME}.plist\"\nif [ ! -f ${SETTINGS_FILE} ]; then\n    echo \"error: file missing: '${SETTINGS_FILE}'\"\n    exit 1\nfi\n\nENGLISH_STRINGS_FILE=\"${BUNDLE_PATH}/en.lproj/${FILE_NAME}.strings\"\nif [ ! -f ${ENGLISH_STRINGS_FILE} ]; then\n    echo \"error: file missing: '${ENGLISH_STRINGS_FILE}'\"\n    exit 1\nfi\n\nOUTPUT=\"${PROJECT_DIR}/${PROJECT_NAME}/Settings.bundle\"\nif [ ! -d ${OUTPUT} ]; then\n    echo \"error: file missing: '${OUTPUT}'\"\n    exit 1\nfi\n\ncp -fr \"${SETTINGS_FILE}\" \"${OUTPUT}/${FILE_NAME}.plist\"\ncp -fr \"${ENGLISH_STRINGS_FILE}\" \"${OUTPUT}/en.lproj/${FILE_NAME}.strings\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		845797682C9EED48001B833D /* Sources */ = {
@@ -296,6 +322,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 346UN3W7D8;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -369,6 +396,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 346UN3W7D8;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -404,7 +432,6 @@
 				CODE_SIGN_ENTITLEMENTS = Demo/Demo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/Preview Content\"";
-				DEVELOPMENT_TEAM = 346UN3W7D8;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -439,7 +466,6 @@
 				CODE_SIGN_ENTITLEMENTS = Demo/Demo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/Preview Content\"";
-				DEVELOPMENT_TEAM = 346UN3W7D8;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -474,7 +500,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 346UN3W7D8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = DemoWatch;
@@ -503,7 +528,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 346UN3W7D8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = DemoWatch;

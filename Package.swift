@@ -37,6 +37,10 @@ let package = Package(
             dependencies: [
                 .product(name: "UserDefaultsHelpers", package: "lib-userdefaults-apple")
             ],
+            resources: [
+                .copy("Settings/Logging.plist"),
+                .copy("Settings/en.lproj/Logging.strings")
+            ],
             swiftSettings: swiftSettings,
             plugins: [
                 lintBuildPlugin

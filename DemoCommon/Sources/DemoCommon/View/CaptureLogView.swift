@@ -101,7 +101,6 @@ extension LogLevel {
         case .info: "Info"
         case .error: "Error"
         case .critical: "Critical"
-        default: "Unknown"
         }
     }
 }
