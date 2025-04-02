@@ -10,8 +10,8 @@ struct UserDefaultsTests {
 
     @Test(arguments: LogLevel.allCases)
     func logLevel(_ value: LogLevel) {
-        #expect(userDefaults.logLevel == .default)
-        userDefaults.logLevel = value
-        #expect(userDefaults.logLevel == value)
+        #expect(userDefaults.minimalLogLevel == .default)
+        userDefaults.minimalLogLevel = value
+        #expect(userDefaults.minimalLogLevel == value)
     }
 }

@@ -40,7 +40,7 @@ struct LoggingServiceTests {
         let error = sendError ? MockError() : nil
         let expectedError = error.map(modelMapper.toEntity)
 
-        userDefaults.logLevel = level
+        userDefaults.minimalLogLevel = level
         try await performStoreLog(error: error, logLevel: level)
         let results: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(results.count == 1)
@@ -61,7 +61,7 @@ struct LoggingServiceTests {
 
     @Test
     func storeLogLowerThanDefinedLogLevelIsIgnored() async throws {
-        userDefaults.logLevel = .info
+        userDefaults.minimalLogLevel = .info
         try await performStoreLog(logLevel: .debug)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(result.isEmpty)
@@ -69,7 +69,7 @@ struct LoggingServiceTests {
 
     @Test
     func storeLogEqualToDefinedLogLevelIsStored() async throws {
-        userDefaults.logLevel = .info
+        userDefaults.minimalLogLevel = .info
         try await performStoreLog(logLevel: .info)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(!result.isEmpty)
