@@ -1,5 +1,7 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import LoggingCore
+
 /// Handles the management of logs in a Sendable, thread safe way.
 public protocol LoggerType: Sendable {
     /// Captures the inputs as a debug level log.
@@ -10,7 +12,7 @@ public protocol LoggerType: Sendable {
     ///     - file: File of where the log was triggered.
     ///     - function: Function name where the log was triggered.
     ///     - line: Line of where the log was triggered.
-    func debug(_ message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
+    func debug(message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
 
     /// Captures the inputs as a info level log.
     ///
@@ -20,7 +22,7 @@ public protocol LoggerType: Sendable {
     ///     - file: File of where the log was triggered.
     ///     - function: Function name where the log was triggered.
     ///     - line: Line of where the log was triggered.
-    func info(_ message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
+    func info(message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
 
     /// Captures the inputs as an error level log.
     ///
@@ -30,7 +32,7 @@ public protocol LoggerType: Sendable {
     ///     - file: File of where the log was triggered.
     ///     - function: Function name where the log was triggered.
     ///     - line: Line of where the log was triggered.
-    func error(_ message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
+    func error(message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
 
     /// Captures the inputs as a critical level log.
     ///
@@ -40,7 +42,7 @@ public protocol LoggerType: Sendable {
     ///     - file: File of where the log was triggered.
     ///     - function: Function name where the log was triggered.
     ///     - line: Line of where the log was triggered.
-    func critical(_ message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
+    func critical(message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt)
 }
 
 // MARK: - Default implementations
@@ -61,7 +63,7 @@ extension LoggerType {
         function: StaticString = #function,
         line: UInt = #line
     ) {
-        debug(message, error: error, file: file, function: function, line: line)
+        debug(message: message, error: error, file: file, function: function, line: line)
     }
 
     /// Captures the inputs as a info level log.
@@ -79,7 +81,7 @@ extension LoggerType {
         function: StaticString = #function,
         line: UInt = #line
     ) {
-        info(message, error: error, file: file, function: function, line: line)
+        info(message: message, error: error, file: file, function: function, line: line)
     }
 
     /// Captures the inputs as an error level log.
@@ -97,7 +99,7 @@ extension LoggerType {
         function: StaticString = #function,
         line: UInt = #line
     ) {
-        self.error(message, error: error, file: file, function: function, line: line)
+        self.error(message: message, error: error, file: file, function: function, line: line)
     }
 
     /// Captures the inputs as a critical level log.
@@ -115,6 +117,6 @@ extension LoggerType {
         function: StaticString = #function,
         line: UInt = #line
     ) {
-        critical(message, error: error, file: file, function: function, line: line)
+        critical(message: message, error: error, file: file, function: function, line: line)
     }
 }

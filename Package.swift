@@ -25,7 +25,11 @@ let package = Package(
         .library(
             name: "Logging",
             targets: ["Logging"]
-        )
+        ),
+        .library(
+            name: "LoggingUI",
+            targets: ["LoggingUI"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple", exact: "1.0.0-beta.2"),
@@ -33,13 +37,33 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Logging",
+            name: "LoggingCore",
             dependencies: [
                 .product(name: "UserDefaultsHelpers", package: "lib-userdefaults-apple")
             ],
+            swiftSettings: swiftSettings,
+            plugins: [
+                lintBuildPlugin
+            ]
+        ),
+        .target(
+            name: "Logging",
+            dependencies: ["LoggingCore"],
+            swiftSettings: swiftSettings,
+            plugins: [
+                lintBuildPlugin
+            ]
+        ),
+        .target(
+            name: "LoggingUI",
+            dependencies: [
+                "LoggingCore",
+                .product(name: "UserDefaultsHelpers", package: "lib-userdefaults-apple")
+            ],
             resources: [
-                .copy("Settings/Logging.plist"),
-                .copy("Settings/en.lproj/Logging.strings")
+                .copy("Resources/Settings.bundle"),
+                .copy("Resources/InputFileList.xcfilelist"),
+                .copy("Resources/OutputFileList.xcfilelist"),
             ],
             swiftSettings: swiftSettings,
             plugins: [
@@ -49,6 +73,14 @@ let package = Package(
         .testTarget(
             name: "LoggingTests",
             dependencies: ["Logging"],
+            swiftSettings: swiftSettings,
+            plugins: [
+                lintBuildPlugin
+            ]
+        ),
+        .testTarget(
+            name: "LoggingCoreTests",
+            dependencies: ["LoggingCore"],
             swiftSettings: swiftSettings,
             plugins: [
                 lintBuildPlugin

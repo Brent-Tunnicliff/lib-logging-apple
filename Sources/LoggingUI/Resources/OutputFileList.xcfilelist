@@ -1,0 +1,12 @@
+#  Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
+
+# This file may be set as an input or output file list for a shell script build phase.
+# List file paths below; one per line. These paths will be considered inputs or outputs for the script phase.
+# Build settings will be expanded, e.g. $(SRCROOT)/fileName
+
+# Defines all the locations we want to copy the contents of 'Settings.bundle' to.
+# You can define your own list if desired, but easier to keep the app 'Settings.bundle'
+# at this path so the list is always in sync.
+
+${PROJECT_DIR}/${PROJECT_NAME}/Settings.bundle/Logging.plist
+${PROJECT_DIR}/${PROJECT_NAME}/Settings.bundle/en.lproj/Logging.strings

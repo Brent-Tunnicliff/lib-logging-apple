@@ -1,5 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import LoggingCore
 import Testing
 
 @testable import Logging
