@@ -9,14 +9,6 @@ package enum LogLevel: Int {
     case critical = 3
 }
 
-extension LogLevel {
-    package var allowedLevels: [LogLevel] {
-        LogLevel.allCases.filter {
-            $0.rawValue >= self.rawValue
-        }
-    }
-}
-
 // MARK: - CaseIterable
 
 extension LogLevel: CaseIterable {}
@@ -40,16 +32,6 @@ extension LogLevel: CustomStringConvertible {
         case .critical: "critical"
         }
     }
-}
-
-// MARK: - Default
-
-extension LogLevel {
-    #if DEBUG
-        static let `default` = LogLevel.debug
-    #else
-        static let `default` = LogLevel.info
-    #endif
 }
 
 // MARK: - Equatable

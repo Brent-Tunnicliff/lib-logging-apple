@@ -13,16 +13,22 @@ package struct LogTag {
     }
 }
 
-extension LogTag: Equatable {
-    package static func == (lhs: LogTag, rhs: LogTag) -> Bool {
-        lhs.description == rhs.description
-    }
-}
-
-extension LogTag: Sendable {}
+// MARK: - CustomStringConvertible
 
 extension LogTag: CustomStringConvertible {
     package var description: String {
         "\(file):\(function):\(line)"
     }
 }
+
+// MARK: - Equatable
+
+extension LogTag: Equatable {
+    package static func == (lhs: LogTag, rhs: LogTag) -> Bool {
+        lhs.description == rhs.description
+    }
+}
+
+// MARK: - Sendable
+
+extension LogTag: Sendable {}

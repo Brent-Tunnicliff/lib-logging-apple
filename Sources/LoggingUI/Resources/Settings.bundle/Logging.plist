@@ -12,7 +12,7 @@
 			<key>Title</key>
 			<string>minimal_log_level_description</string>
 			<key>Key</key>
-			<string>minimal_log_level</string>
+			<string>logging_minimal_log_level</string>
 			<key>DefaultValue</key>
 			<string>1</string>
 			<key>Values</key>

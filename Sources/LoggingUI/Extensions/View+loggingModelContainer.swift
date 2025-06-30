@@ -1,12 +1,11 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
 import LoggingCore
-public import SwiftData
+import SwiftData
 public import SwiftUI
 
 extension EnvironmentValues {
-    /// Model container used by logging views.
-    @Entry public var loggingModelContainer: ModelContainer = .shared
+    @Entry var loggingModelContainer: ModelContainer = .shared
 }
 
 #if DEBUG

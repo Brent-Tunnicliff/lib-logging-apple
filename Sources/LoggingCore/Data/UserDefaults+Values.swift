@@ -3,7 +3,8 @@
 import Foundation
 
 extension UserDefaults {
-    static let minimalLogLevelKey = "minimal_log_level"
+    // This key needs to match the one defined in `LoggingUI/Settings.bundle`.
+    private static let minimalLogLevelKey = "logging_minimal_log_level"
     @objc dynamic var minimalLogLevel: LogLevel {
         get {
             // not using `integer(forKey:)` as we do not want it to default to 0.
@@ -11,7 +12,8 @@ extension UserDefaults {
                 let value = value(forKey: Self.minimalLogLevelKey) as? Int,
                 let logLevel = LogLevel(rawValue: value)
             else {
-                return .default
+                // This default value needs to match the one defined in `LoggingUI/Settings.bundle`.
+                return .info
             }
 
             return logLevel

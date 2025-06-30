@@ -36,6 +36,7 @@ struct LogItemView: View {
             backgroundColor
                 .opacity(0.2)
         )
+        .padding(.bottom, 4)
         .contentShape(Rectangle())
         .onTapGesture {
             isExpanded.toggle()
@@ -45,7 +46,7 @@ struct LogItemView: View {
     private var backgroundColor: Color {
         switch log.level {
         case .critical: .red
-        case .debug, .info: .white
+        case .debug, .info: .clear
         case .error: .orange
         }
     }
@@ -68,6 +69,7 @@ struct LogItemView: View {
                 deviceSystemLabel
                 deviceUserInterfaceIdiomLabel
             }
+            .padding(.leading, 8)
         }
     }
 

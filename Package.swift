@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
@@ -32,15 +32,11 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple", exact: "1.0.0-beta.2"),
-        .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
+        .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0"))
     ],
     targets: [
         .target(
             name: "LoggingCore",
-            dependencies: [
-                .product(name: "UserDefaultsHelpers", package: "lib-userdefaults-apple")
-            ],
             swiftSettings: swiftSettings,
             plugins: [
                 lintBuildPlugin
@@ -57,8 +53,7 @@ let package = Package(
         .target(
             name: "LoggingUI",
             dependencies: [
-                "LoggingCore",
-                .product(name: "UserDefaultsHelpers", package: "lib-userdefaults-apple")
+                "LoggingCore"
             ],
             resources: [
                 .copy("Resources/Settings.bundle"),
