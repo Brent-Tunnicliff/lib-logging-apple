@@ -35,7 +35,8 @@ final class DefaultModelMapper: ModelMapper {
     func toEntity(_ model: any Error) -> LogEntity.Error {
         LogEntity.Error(
             type: "\(model.self)",
-            message: model.localizedDescription
+            message: "\(model)",
+            localizedDescription: model.localizedDescription
         )
     }
 

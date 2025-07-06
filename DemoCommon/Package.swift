@@ -10,6 +10,7 @@ private let swiftSettings: [PackageDescription.SwiftSetting] = [
 
 let package = Package(
     name: "DemoCommon",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v17),
         .macOS(.v14),
@@ -34,7 +35,8 @@ let package = Package(
         .target(
             name: "DemoCommon",
             dependencies: [
-                .product(name: "Logging", package: "lib-logging-apple")
+                .product(name: "Logging", package: "lib-logging-apple"),
+                .product(name: "LoggingUI", package: "lib-logging-apple"),
             ],
             swiftSettings: swiftSettings,
             plugins: [

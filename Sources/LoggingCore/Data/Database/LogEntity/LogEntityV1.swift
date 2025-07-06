@@ -46,6 +46,7 @@ extension LogEntityV1 {
     package struct Error: Codable, Equatable {
         package let type: String
         package let message: String
+        package let localizedDescription: String
     }
 
     package struct Device: Codable, Equatable {

@@ -10,12 +10,12 @@ struct ConfigurationPicker<Option: Hashable, Label: View>: View {
 
     private let label: Label
     private let options: [Option]
-    private let textProvider: (Option) -> String
+    private let textProvider: (Option) -> Text
 
     init(
         options: [Option],
         selectedLogLevel: Binding<Option>,
-        textProvider: @escaping (Option) -> String,
+        textProvider: @escaping (Option) -> Text,
         @ViewBuilder label: () -> Label
     ) {
         self.options = options
@@ -35,12 +35,13 @@ struct ConfigurationPicker<Option: Hashable, Label: View>: View {
     private var commonLogLevelPicker: some View {
         Picker(selection: $selectedOption) {
             ForEach(options, id: \.self) { option in
-                Text(textProvider(option))
+                textProvider(option)
                     .tag(option)
             }
         } label: {
             label
         }
+        .pickerStyle(.navigationLink)
     }
 
     #if os(watchOS)

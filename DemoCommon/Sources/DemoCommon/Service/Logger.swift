@@ -12,6 +12,6 @@ enum Logger {
         return bundleIdentifier
     }
 
-    static let app: any LoggerType = PersistentLogger(packageName: bundleIdentifier)
-    static let other: any LoggerType = PersistentLogger(packageName: "other")
+    static let app: any LoggerType = DefaultLogger(packageName: bundleIdentifier)
+    static let other: any LoggerType = DefaultLogger(packageName: "other")
 }

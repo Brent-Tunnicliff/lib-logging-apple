@@ -4,75 +4,103 @@ import Logging
 import SwiftUI
 
 /// Triggers logs to populate the database.
-struct CaptureLogView: View {
+struct CaptureLogSection: View {
     @Environment(\.logSchedulerService) var logSchedulerService
 
     @State private var captureError = false
     @State private var message = "Example message"
     @State private var selectedLogLevel = LogLevel.debug
-    @State private var selectedCaptureType = CaptureLogView.LogCaptureType.once
+    @State private var selectedCaptureType = LogCaptureType.once
+    @State private var scheduledLogs: [ScheduledLog] = []
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                ConfigurationPicker(
-                    options: LogLevel.allCases,
-                    selectedLogLevel: $selectedLogLevel,
-                    textProvider: \.label
-                ) {
-                    Text("Select Log Level")
-                }
+        Section {
+            ConfigurationPicker(
+                options: LogLevel.allCases,
+                selectedLogLevel: $selectedLogLevel,
+                textProvider: \.label
+            ) {
+                Text(
+                    "select_log_level",
+                    bundle: .module,
+                    comment: "Instructs the user to select a log level in the related picker."
+                )
+            }
 
-                ConfigurationPicker(
-                    options: CaptureLogView.LogCaptureType.allCases,
-                    selectedLogLevel: $selectedCaptureType,
-                    textProvider: \.label
-                ) {
-                    Text("Select Log Level")
-                }
+            ConfigurationPicker(
+                options: LogCaptureType.allCases,
+                selectedLogLevel: $selectedCaptureType,
+                textProvider: \.label
+            ) {
+                Text(
+                    "select_trigger_type",
+                    bundle: .module,
+                    comment: "Instructs the user to the trigger type in the related picker."
+                )
+            }
 
-                TextField(text: $message) {
-                    Text("Message")
-                }
+            TextField(text: $message) {
+                Text(
+                    "message_title",
+                    bundle: .module,
+                    comment: "Title of the text field a user can use to input a message for the log."
+                )
+            }
 
-                Toggle(isOn: $captureError) {
-                    Text("Capture error")
-                }
+            Toggle(isOn: $captureError) {
+                Text(
+                    "include_error_title",
+                    bundle: .module,
+                    comment: "Title of toggle for enabling or disabling if an error object is attached to the log."
+                )
+            }
 
-                Button(action: captureLog) {
-                    Text("Capture log")
-                }
+            Button(action: captureLog) {
+                Text(
+                    "capture_log_button_title",
+                    bundle: .module,
+                    comment: "Title of button to trigger log to be send."
+                )
             }
         }
-        .padding()
-        .task {
-            await logSchedulerService.stopCaptures()
-        }
+
+//        Section {
+//
+//        } header: {
+//            <#code#>
+//        }
     }
 
     private func captureLog() {
         let error = captureError ? ExampleError() : nil
 
-        Task {
-            switch selectedCaptureType {
-            case .once:
-                await logSchedulerService.capture(
+        switch selectedCaptureType {
+        case .once:
+            logSchedulerService.capture(
+                logLevel: selectedLogLevel,
+                message: message,
+                error: error
+            )
+        case .scheduled:
+            let id = logSchedulerService.scheduleCaptures(
+                logLevel: selectedLogLevel,
+                message: message,
+                error: error
+            )
+
+            scheduledLogs.append(
+                ScheduledLog(
+                    id: id,
                     logLevel: selectedLogLevel,
                     message: message,
                     error: error
                 )
-            case .scheduled:
-                await logSchedulerService.scheduleCaptures(
-                    logLevel: selectedLogLevel,
-                    message: message,
-                    error: error
-                )
-            }
+            )
         }
     }
 }
 
-extension CaptureLogView {
+extension CaptureLogSection {
     fileprivate enum LogCaptureType: CaseIterable, Hashable {
         case once
         case scheduled
@@ -83,28 +111,49 @@ extension CaptureLogView {
             "ExampleError: Something went wrong! \(UUID().uuidString)"
         }
     }
+
+    fileprivate struct ScheduledLog: Identifiable {
+        let id: UUID
+        let logLevel: LogLevel
+        let message: String
+        let error: (any Error)?
+    }
 }
 
-extension CaptureLogView.LogCaptureType {
-    var label: String {
+extension CaptureLogSection.LogCaptureType {
+    var label: Text {
         switch self {
-        case .once: "Once"
-        case .scheduled: "Every second"
+        case .once:
+            Text(
+                "log_capture_type_label_once",
+                bundle: .module,
+                comment: "The log will only be sent one time."
+            )
+        case .scheduled:
+            Text(
+                "log_capture_type_label_scheduled",
+                bundle: .module,
+                comment: "The log will be scheduled to happen on a loop."
+            )
         }
     }
 }
 
 extension LogLevel {
-    fileprivate var label: String {
+    fileprivate var label: Text {
         switch self {
-        case .debug: "Debug"
-        case .info: "Info"
-        case .error: "Error"
-        case .critical: "Critical"
+        case .debug: .LogLevel.debug
+        case .info: .LogLevel.info
+        case .error: .LogLevel.error
+        case .critical: .LogLevel.critical
         }
     }
 }
 
 #Preview {
-    CaptureLogView()
+    NavigationStack {
+        List {
+            CaptureLogSection()
+        }
+    }
 }

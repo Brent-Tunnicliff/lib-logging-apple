@@ -5,15 +5,17 @@ import Logging
 import SwiftUI
 
 protocol LogSchedulerService: Sendable {
-    func capture(logLevel: LogLevel, message: String, error: (any Error)?) async
-    func scheduleCaptures(logLevel: LogLevel, message: String, error: (any Error)?) async
-    func stopCaptures() async
+    func capture(logLevel: LogLevel, message: String, error: (any Error)?)
+    func scheduleCaptures(logLevel: LogLevel, message: String, error: (any Error)?) -> UUID
+    func cancelCaptures(id: UUID)
 }
 
 actor DefaultLogSchedulerService: LogSchedulerService {
-    private var task: Task<Void, Never>?
+    static let shared = DefaultLogSchedulerService()
 
-    func capture(
+    private var tasks: [UUID: Task<Void, Never>] = [:]
+
+    nonisolated func capture(
         logLevel: LogLevel,
         message: String,
         error: (any Error)?
@@ -26,20 +28,18 @@ actor DefaultLogSchedulerService: LogSchedulerService {
         }
     }
 
-    func scheduleCaptures(
+    nonisolated func scheduleCaptures(
         logLevel: LogLevel,
         message: String,
         error: (any Error)?
-    ) {
-        // cancel any the previous schedule
-        stopCaptures()
-
-        task = Task {
+    ) -> UUID {
+        let id = UUID()
+        let task = Task.detached { [weak self] in
             do {
                 // Trigger a log every second.
                 for await _ in Timer.publish(every: 1, on: .main, in: .common).autoconnect().values {
                     try Task.checkCancellation()
-                    capture(
+                    self?.capture(
                         logLevel: logLevel,
                         message: "[\(Date())] trigger loop: \(message)",
                         error: error
@@ -49,22 +49,34 @@ actor DefaultLogSchedulerService: LogSchedulerService {
                 Logger.app.info("Scheduled captures stopped due to error", error: error)
             }
         }
+
+        Task.detached { [weak self] in
+            await self?.store(task: task, id: id)
+        }
+
+        return id
     }
 
-    func stopCaptures() {
-        Logger.app.info("Stopping captures")
-        task?.cancel()
+    nonisolated func cancelCaptures(id: UUID) {
+        Task.detached { [weak self] in
+            await self?.cancel(id: id)
+        }
     }
-}
 
-actor MockLogSchedulerService: LogSchedulerService {
-    func capture(logLevel: LogLevel, message: String, error: (any Error)?) async {}
-    func scheduleCaptures(logLevel: LogLevel, message: String, error: (any Error)?) async {}
-    func stopCaptures() async {}
+    private func cancel(id: UUID) {
+        tasks[id]?.cancel()
+        tasks[id] = nil
+    }
+
+    private func store(task: Task<Void, Never>, id: UUID) {
+        // In the very unlikely chance of id already being in use, lets just cancel the old one.
+        tasks[id]?.cancel()
+        tasks[id] = task
+    }
 }
 
 extension EnvironmentValues {
-    @Entry var logSchedulerService: any LogSchedulerService = DefaultLogSchedulerService()
+    @Entry var logSchedulerService: any LogSchedulerService = DefaultLogSchedulerService.shared
 }
 
 extension View {

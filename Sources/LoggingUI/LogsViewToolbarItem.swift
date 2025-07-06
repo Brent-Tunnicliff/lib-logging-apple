@@ -5,46 +5,59 @@ public import SwiftUI
 /// The toolbar item used for navigating to ``LogsView``.
 public struct LogsViewToolbarItem: ToolbarContent {
     @Environment(\.logsViewPresentingStyle) var presentingStyle
-    @State private var isLogsViewPresented = false
+    @State private var isNavigationDestinationPresented = false
+    @State private var isSheetPresented = false
+
+    #if os(macOS)
+        @Environment(\.openWindow) private var openWindow
+    #endif
+
+    /// Initialise an instance of ``LogsViewToolbarItem``.
+    public init() {}
 
     /// The composition of content that comprise the toolbar content.
     public var body: some ToolbarContent {
         ToolbarItem {
-            applyingPresentingStyle(isPresented: $isLogsViewPresented) {
-                Button {
-                    isLogsViewPresented = true
-                } label: {
-                    Image(systemName: "rectangle.and.text.magnifyingglass")
+            Button {
+                switch presentingStyle.wrapped {
+                case .navigationDestination: performNavigationDestination()
+                case .modal:
+                    isSheetPresented = true
                 }
-            } destination: {
-                LogsView()
+            } label: {
+                Image(systemName: "rectangle.and.text.magnifyingglass")
             }
+            .navigationDestination(
+                isPresented: $isNavigationDestinationPresented,
+                destination: logsView
+            )
+            .sheet(
+                isPresented: $isSheetPresented,
+                content: logsView
+            )
         }
     }
 
-    @ViewBuilder
-    private func applyingPresentingStyle<Content: View, Destination: View>(
-        isPresented: Binding<Bool>,
-        @ViewBuilder content: () -> Content,
-        @ViewBuilder destination: @escaping () -> Destination
-    ) -> some View {
-        switch presentingStyle.wrapped {
-        case .navigationDestination:
-            content()
-                .navigationDestination(isPresented: isPresented) {
-                    destination()
-                }
-        case .sheet:
-            content()
-                .sheet(isPresented: isPresented) {
-                    destination()
-                }
-        }
+    private func logsView() -> some View {
+        LogsView()
+    }
+
+    private func performNavigationDestination() {
+        isNavigationDestinationPresented = true
+    }
+
+    private func performModal() {
+        #if os(macOS)
+            openWindow.logsWindow()
+        #else
+            isNavigationDestinationPresented = true
+        #endif
     }
 }
 
 extension View {
-    func logsViewPresentingStyle(_ presentingStyle: LogsViewPresentingStyle) -> some View {
+    /// Define the way clicking on ``LogsViewToolbarItem`` will present ``LogsView``.
+    public func logsViewPresentingStyle(_ presentingStyle: LogsViewPresentingStyle) -> some View {
         environment(\.logsViewPresentingStyle, presentingStyle)
     }
 }
@@ -60,8 +73,11 @@ public struct LogsViewPresentingStyle: Sendable {
     /// This must be wrapped within a `NavigationStack` or `NavigationView`. This is the default option.
     public static let navigationDestination = LogsViewPresentingStyle(wrapped: .navigationDestination)
 
-    /// Presents ``LogsView`` via a sheet.
-    public static let sheet = LogsViewPresentingStyle(wrapped: .sheet)
+    /// Presents ``LogsView`` modally.
+    ///
+    /// MacOS presents it as a Window, which requires adding ``LogsWindow`` to the app Scene.
+    /// All other platforms present it as a sheet.
+    public static let modal = LogsViewPresentingStyle(wrapped: .modal)
 
     let wrapped: Wrapped
 
@@ -71,31 +87,12 @@ public struct LogsViewPresentingStyle: Sendable {
 
     enum Wrapped: Sendable {
         case navigationDestination
-        case sheet
+        case modal
     }
 }
 
-#if DEBUG
-    #Preview("navigationDestination") {
-        NavigationStack {
-            List {
-                Text(verbatim: "Hello world!")
-            }
-            .toolbar {
-                LogsViewToolbarItem()
-
-                ToolbarItem {
-                    Button {
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
-                }
-            }
-        }
-        .loggingModelContainer(mocked: .populated)
-    }
-
-    #Preview("sheet") {
+#Preview("navigationDestination") {
+    NavigationStack {
         List {
             Text(verbatim: "Hello world!")
         }
@@ -109,7 +106,24 @@ public struct LogsViewPresentingStyle: Sendable {
                 }
             }
         }
-        .loggingModelContainer(mocked: .populated)
-        .logsViewPresentingStyle(.sheet)
     }
-#endif
+    .loggingModelContainer(mocked: .populated)
+}
+
+#Preview("sheet") {
+    List {
+        Text(verbatim: "Hello world!")
+    }
+    .toolbar {
+        LogsViewToolbarItem()
+
+        ToolbarItem {
+            Button {
+            } label: {
+                Image(systemName: "gearshape")
+            }
+        }
+    }
+    .loggingModelContainer(mocked: .populated)
+    .logsViewPresentingStyle(.modal)
+}

@@ -54,26 +54,24 @@ extension Device {
     }()
 }
 
-#if DEBUG
-    extension Device {
-        /// Create a mock instance of ``Device``.
-        static func mock(
-            identifierForVendor: UUID? = UUID(),
-            model: String? = "iPhone",
-            systemName: String? = "iOS",
-            systemVersion: String? = "18.3",
-            userInterfaceIdiom: UserInterfaceIdiom = .phone
-        ) -> Device {
-            Device(
-                identifierForVendor: identifierForVendor,
-                model: model,
-                systemName: systemName,
-                systemVersion: systemVersion,
-                userInterfaceIdiom: userInterfaceIdiom
-            )
-        }
+extension Device {
+    /// Create a mock instance of ``Device``.
+    static func mock(
+        identifierForVendor: UUID? = UUID(),
+        model: String? = "iPhone",
+        systemName: String? = "iOS",
+        systemVersion: String? = "18.3",
+        userInterfaceIdiom: UserInterfaceIdiom = .phone
+    ) -> Device {
+        Device(
+            identifierForVendor: identifierForVendor,
+            model: model,
+            systemName: systemName,
+            systemVersion: systemVersion,
+            userInterfaceIdiom: userInterfaceIdiom
+        )
     }
-#endif
+}
 
 // MARK: - UserInterfaceIdiom
 

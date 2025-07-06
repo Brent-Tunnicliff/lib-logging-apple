@@ -20,34 +20,32 @@ extension ModelContainer {
     }()
 }
 
-#if DEBUG
-    // MARK: - Mock
+// MARK: - Mock
 
-    extension ModelContainer {
-        @MainActor
-        package static func emptyInMemoryOnly(name: String = #function) -> ModelContainer {
-            do {
-                let container = try ModelContainer(
-                    for: Schema(versionedSchema: LatestSchema.self),
-                    configurations: ModelConfiguration(
-                        "\(name)_\(UUID().uuidString)",
-                        isStoredInMemoryOnly: true
-                    )
+extension ModelContainer {
+    @MainActor
+    package static func emptyInMemoryOnly(name: String = #function) -> ModelContainer {
+        do {
+            let container = try ModelContainer(
+                for: Schema(versionedSchema: LatestSchema.self),
+                configurations: ModelConfiguration(
+                    "\(name)_\(UUID().uuidString)",
+                    isStoredInMemoryOnly: true
                 )
+            )
 
-                return container
-            } catch {
-                preconditionFailure("Error creating preview model container for \(LogEntity.self)")
-            }
-        }
-
-        @MainActor
-        package func injectingMocks(logs: [LogEntity] = LogEntity.defaultMocks()) -> ModelContainer {
-            for log in logs {
-                mainContext.insert(log)
-            }
-
-            return self
+            return container
+        } catch {
+            preconditionFailure("Error creating preview model container for \(LogEntity.self)")
         }
     }
-#endif
+
+    @MainActor
+    package func injectingMocks(logs: [LogEntity] = LogEntity.defaultMocks()) -> ModelContainer {
+        for log in logs {
+            mainContext.insert(log)
+        }
+
+        return self
+    }
+}

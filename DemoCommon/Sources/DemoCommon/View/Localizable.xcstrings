@@ -1,0 +1,94 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "capture_log_button_title" : {
+      "comment" : "Title of button to trigger log to be send.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture log"
+          }
+        }
+      }
+    },
+    "default_database_id_%@" : {
+      "comment" : "Specifies the latest id from the default database.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID from default database: %1$@"
+          }
+        }
+      }
+    },
+    "include_error_title" : {
+      "comment" : "Title of toggle for enabling or disabling if an error object is attached to the log.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Include Error"
+          }
+        }
+      }
+    },
+    "log_capture_type_label_once" : {
+      "comment" : "The log will only be sent one time.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once"
+          }
+        }
+      }
+    },
+    "log_capture_type_label_scheduled" : {
+      "comment" : "The log will be scheduled to happen on a loop.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every Second"
+          }
+        }
+      }
+    },
+    "message_title" : {
+      "comment" : "Title of the text field a user can use to input a message for the log.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message"
+          }
+        }
+      }
+    },
+    "select_log_level" : {
+      "comment" : "Instructs the user to select a log level in the related picker.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Log Level"
+          }
+        }
+      }
+    },
+    "select_trigger_type" : {
+      "comment" : "Instructs the user to the trigger type in the related picker.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Trigger Type"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -8,6 +8,9 @@ struct LogItemView: View {
     @Environment(\.layoutDirection) private var layoutDirection
     @State private var isExpanded: Bool
 
+    /// String to be injected if there is no real value to use.
+    private let unknown = "???"
+
     private let log: LogEntity
 
     init(log: LogEntity, initialExpandedValue: Bool = false) {
@@ -77,25 +80,21 @@ struct LogItemView: View {
 
     @ViewBuilder
     private var deviceIdentifierForVendorLabel: some View {
-        Group {
-            if let identifierForVendor = log.device.identifierForVendor {
-                Text("identifier_for_vendor_\(identifierForVendor)", bundle: .module)
-            } else {
-                Text("identifier_for_vendor_unknown", bundle: .module)
-            }
-        }
+        Text(
+            "identifier_for_vendor_\(log.device.identifierForVendor?.uuidString ?? unknown)",
+            bundle: .module,
+            comment: "Displays the unique device identifier that the app is installed on."
+        )
         .font(.caption2)
     }
 
     @ViewBuilder
     private var deviceModelLabel: some View {
-        Group {
-            if let model = log.device.model {
-                Text("device_model_\(model)", bundle: .module)
-            } else {
-                Text("device_model_unknown", bundle: .module)
-            }
-        }
+        Text(
+            "device_model_\(log.device.model ?? unknown)",
+            bundle: .module,
+            comment: "Specifies the model of device. E.g. iPhone 18."
+        )
         .font(.caption2)
     }
 
@@ -103,10 +102,28 @@ struct LogItemView: View {
     private var deviceSystemLabel: some View {
         Group {
             switch (log.device.systemName, log.device.systemVersion) {
-            case (nil, nil): Text("device_system_unknown", bundle: .module)
-            case let (nil, systemVersion): Text(systemVersion ?? "")
-            case let (systemName, nil): Text(systemName ?? "")
-            case let (systemName, systemVersion): Text(verbatim: "\(systemName ?? "") \(systemVersion ?? "")")
+            case (nil, nil):
+                // Unable to determine either.
+                Text(
+                    "device_system_unknown",
+                    bundle: .module,
+                    comment: """
+                        Specifies the model of device system is unknown. \
+                        E.g. a known device system would have appeared like 'iOS 16'.
+                        """
+                )
+            case let (nil, systemVersion):
+                // Only show the system version.
+                Text(verbatim: systemVersion ?? unknown)
+            case let (systemName, nil):
+                // Only show the system name.
+                Text(verbatim: systemName ?? unknown)
+            case let (systemName, systemVersion):
+                // Show both system name and version, e.g. 'iOS 18.5'.
+                // Seems even right-to-left languages show this combo in this order,
+                // I checked the iPhone system settings and how they show it when in Arabic.
+                // So should be fine.
+                Text(verbatim: "\(systemName ?? unknown) \(systemVersion ?? unknown)")
             }
         }
         .font(.caption2)
@@ -115,16 +132,11 @@ struct LogItemView: View {
     @ViewBuilder
     private var deviceUserInterfaceIdiomLabel: some View {
         Group {
-            switch log.device.userInterfaceIdiom {
-            case .carPlay: Text("device_user_interface_idiom_carPlay", bundle: .module)
-            case .mac: Text("device_user_interface_idiom_mac", bundle: .module)
-            case .pad: Text("device_user_interface_idiom_pad", bundle: .module)
-            case .phone: Text("device_user_interface_idiom_phone", bundle: .module)
-            case .tv: Text("device_user_interface_idiom_tv", bundle: .module)
-            case .unspecified: Text("device_user_interface_idiom_unspecified", bundle: .module)
-            case .vision: Text("device_user_interface_idiom_vision", bundle: .module)
-            case .watch: Text("device_user_interface_idiom_watch", bundle: .module)
-            }
+            Text(
+                "device_user_interface_idiom_label_\(log.device.userInterfaceIdiom.label ?? unknown)",
+                bundle: .module,
+                comment: "Specifies the device's user interface."
+            )
         }
         .font(.caption2)
     }
@@ -132,25 +144,28 @@ struct LogItemView: View {
     @ViewBuilder
     private var errorLabel: some View {
         if let error = log.error {
-            Text("log_error_title_\(error.type)_\(error.message)", bundle: .module)
+            Text(
+                "log_error_title_\(error.type)_\(error.message)_\(error.localizedDescription)",
+                bundle: .module,
+                comment: "Displays the error details associated with the log."
+            )
         }
     }
 
     @ViewBuilder
     private var logIdLabel: some View {
-        Text("log_id_\(log.id.uuidString)", bundle: .module)
-            .font(.caption2)
+        Text(
+            "log_id_\(log.id.uuidString)",
+            bundle: .module,
+            comment: "Displays the unique device identifier of that log."
+        )
+        .font(.caption2)
     }
 
     @ViewBuilder
     private var logLevelLabel: some View {
         Group {
-            switch log.level {
-            case .critical: Text("log_level_critical", bundle: .module)
-            case .debug: Text("log_level_debug", bundle: .module)
-            case .info: Text("log_level_info", bundle: .module)
-            case .error: Text("log_level_error", bundle: .module)
-            }
+            log.level.label
         }
         .font(.footnote)
     }
@@ -160,19 +175,19 @@ struct LogItemView: View {
         // No current plans to have our log messages localized as that will be difficult to maintain,
         // so will just be what ever the message the developer wrote.
         // Unfortunate if any non-english speakers use this.
-        Text(log.message)
+        Text(verbatim: log.message)
     }
 
     @ViewBuilder
     private var packageNameLabel: some View {
-        Text(log.packageName)
+        Text(verbatim: log.packageName)
             .font(.caption2)
     }
 
     @ViewBuilder
     private var tagLabel: some View {
         Text(
-            layoutDirectionBasedText(
+            verbatim: layoutDirectionBasedText(
                 inputs: [
                     log.tag.file,
                     log.tag.function,
@@ -196,48 +211,61 @@ struct LogItemView: View {
     }
 }
 
-#if DEBUG
-    #Preview {
-        let longMessage = """
-            This message is very long, so that we can test out wrapping and truncating logic. \
-            Blah, blah, blah. How about this weather huh? It has been raining lots tonight. \
-            Luckily it was not raining while I was outside.
-            """
-        List {
-            Section("Expanded") {
+extension LogEntity.UserInterfaceIdiom {
+    fileprivate var label: String? {
+        switch self {
+        case .carPlay: "CarPlay"
+        case .mac: "Mac"
+        case .pad: "iPad"
+        case .phone: "iPhone"
+        case .tv: "TV"
+        case .unspecified: nil
+        case .vision: "Vision"
+        case .watch: "Watch"
+        }
+    }
+}
+
+#Preview {
+    let longMessage = """
+        This message is very long, so that we can test out wrapping and truncating logic. \
+        Blah, blah, blah. How about this weather huh? It has been raining lots tonight. \
+        Luckily it was not raining while I was outside.
+        """
+    List {
+        Section("Expanded") {
+            LogItemView(
+                log: .mock(),
+                initialExpandedValue: true
+            )
+        }
+
+        Section("Log levels") {
+            ForEach(LogEntity.LogLevel.allCases, id: \.self) {
+                LogItemView(log: .mock(level: $0))
+            }
+        }
+
+        Section("Truncating") {
+            LogItemView(log: .mock(message: longMessage))
+
+            LogItemView(log: .mock(error: .mock(message: longMessage)))
+
+            LogItemView(
+                log: .mock(
+                    message: longMessage,
+                    error: .mock(message: longMessage)
+                )
+            )
+        }
+
+        Section("User Interface Idiom") {
+            ForEach(LogEntity.UserInterfaceIdiom.allCases, id: \.self) {
                 LogItemView(
-                    log: .mock(),
+                    log: .mock(device: .mock(userInterfaceIdiom: $0)),
                     initialExpandedValue: true
                 )
             }
-
-            Section("Log levels") {
-                ForEach(LogEntity.LogLevel.allCases, id: \.self) {
-                    LogItemView(log: .mock(level: $0))
-                }
-            }
-
-            Section("Truncating") {
-                LogItemView(log: .mock(message: longMessage))
-
-                LogItemView(log: .mock(error: .mock(message: longMessage)))
-
-                LogItemView(
-                    log: .mock(
-                        message: longMessage,
-                        error: .mock(message: longMessage)
-                    )
-                )
-            }
-
-            Section("User Interface Idiom") {
-                ForEach(LogEntity.UserInterfaceIdiom.allCases, id: \.self) {
-                    LogItemView(
-                        log: .mock(device: .mock(userInterfaceIdiom: $0)),
-                        initialExpandedValue: true
-                    )
-                }
-            }
         }
     }
-#endif
+}
