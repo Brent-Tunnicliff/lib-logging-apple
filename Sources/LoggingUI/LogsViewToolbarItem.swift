@@ -17,24 +17,32 @@ public struct LogsViewToolbarItem: ToolbarContent {
 
     /// The composition of content that comprise the toolbar content.
     public var body: some ToolbarContent {
-        ToolbarItem {
+        ToolbarItem(placement: .logsViewPlacement) {
             Button {
                 switch presentingStyle.wrapped {
-                case .navigationDestination: performNavigationDestination()
+                case .navigationDestination:
+                    performNavigationDestination()
                 case .modal:
-                    isSheetPresented = true
+                    performModal()
                 }
             } label: {
                 Image(systemName: "rectangle.and.text.magnifyingglass")
             }
-            .navigationDestination(
-                isPresented: $isNavigationDestinationPresented,
-                destination: logsView
-            )
-            .sheet(
-                isPresented: $isSheetPresented,
-                content: logsView
-            )
+            .navigationDestination(isPresented: $isNavigationDestinationPresented) {
+                LogsView()
+            }
+            .sheet(isPresented: $isSheetPresented) {
+                NavigationStack {
+                    LogsView()
+                        .toolbar {
+                            Button {
+                                isSheetPresented = false
+                            } label: {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                }
+            }
         }
     }
 
@@ -50,7 +58,19 @@ public struct LogsViewToolbarItem: ToolbarContent {
         #if os(macOS)
             openWindow.logsWindow()
         #else
-            isNavigationDestinationPresented = true
+            isSheetPresented = true
+        #endif
+    }
+}
+
+extension ToolbarItemPlacement {
+    fileprivate static var logsViewPlacement: ToolbarItemPlacement {
+        #if os(watchOS)
+            // There is a bug where WatchOS will not show the button,
+            // so manually setting one that does work.
+            .topBarTrailing
+        #else
+            .automatic
         #endif
     }
 }
@@ -63,11 +83,11 @@ extension View {
 }
 
 extension EnvironmentValues {
-    @Entry fileprivate var logsViewPresentingStyle: LogsViewPresentingStyle = .navigationDestination
+    @Entry fileprivate var logsViewPresentingStyle: LogsViewPresentingStyle = .modal
 }
 
 /// Defines the method used to present the ``LogsView``.
-public struct LogsViewPresentingStyle: Sendable {
+public struct LogsViewPresentingStyle: Sendable, Hashable {
     /// Presents ``LogsView`` via navigation.
     ///
     /// This must be wrapped within a `NavigationStack` or `NavigationView`. This is the default option.
@@ -85,10 +105,22 @@ public struct LogsViewPresentingStyle: Sendable {
         self.wrapped = wrapped
     }
 
-    enum Wrapped: Sendable {
+    enum Wrapped: Sendable, CaseIterable, Hashable {
         case navigationDestination
         case modal
     }
+}
+
+extension LogsViewPresentingStyle: CaseIterable {
+    /// A type that provides a collection of all of its values.
+    public static let allCases: [LogsViewPresentingStyle] = LogsViewPresentingStyle.Wrapped
+        .allCases
+        .map {
+            switch $0 {
+            case .modal: .modal
+            case .navigationDestination: .navigationDestination
+            }
+        }
 }
 
 #Preview("navigationDestination") {

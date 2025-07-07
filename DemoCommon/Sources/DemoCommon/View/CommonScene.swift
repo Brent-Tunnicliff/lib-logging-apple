@@ -6,6 +6,7 @@ public import SwiftUI
 /// Common scene for both the demo app and the watch companion.
 public struct CommonScene: Scene {
     @Environment(\.scenePhase) private var scenePhase
+    @State private var presentingStyle: LogsViewPresentingStyle = .modal
 
     /// Initialise an instance of ``CommonScene``.
     public init() {}
@@ -14,8 +15,9 @@ public struct CommonScene: Scene {
     public var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ContentView()
+                ContentView(presentingStyle: $presentingStyle)
             }
+            .logsViewPresentingStyle(presentingStyle)
         }
         .modelContainer(for: DemoEntity.self)
         .onChange(of: scenePhase) { oldPhase, newPhase in

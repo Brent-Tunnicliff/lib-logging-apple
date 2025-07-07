@@ -67,13 +67,35 @@
         }
       }
     },
+    "presenting_type_modal" : {
+      "comment" : "Sets the presenting option to a modal sheet or window",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modal"
+          }
+        }
+      }
+    },
+    "presenting_type_navigation_destination" : {
+      "comment" : "Sets the presenting option to default navigation",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigate"
+          }
+        }
+      }
+    },
     "select_log_level" : {
       "comment" : "Instructs the user to select a log level in the related picker.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select Log Level"
+            "value" : "Log Level"
           }
         }
       }
@@ -84,7 +106,18 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select Trigger Type"
+            "value" : "Trigger Type"
+          }
+        }
+      }
+    },
+    "select_way_to_present_logs" : {
+      "comment" : "Instructs the user to select how to present the logs view in the related picker.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presenting logs style"
           }
         }
       }

@@ -5,9 +5,14 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
+    @Binding private var presentingStyle: LogsViewPresentingStyle
     @Environment(\.modelContext) private var modelContext
-    @State private var showSendLogsSheet = false
     @Query(sort: \DemoEntity.id) private var demoEntities: [DemoEntity]
+    @State private var showSendLogsSheet = false
+
+    init(presentingStyle: Binding<LogsViewPresentingStyle>) {
+        self._presentingStyle = presentingStyle
+    }
 
     var body: some View {
         List {
@@ -20,8 +25,9 @@ struct ContentView: View {
                 )
             }
 
-            CaptureLogSection()
+            CaptureLogSection(presentingStyle: $presentingStyle)
         }
+        .logsViewPresentingStyle(presentingStyle)
         .toolbar {
             LogsViewToolbarItem()
         }
@@ -39,8 +45,10 @@ struct ContentView: View {
 }
 
 #Preview {
+    @Previewable @State var presentingStyle = LogsViewPresentingStyle.modal
+
     NavigationStack {
-        ContentView()
+        ContentView(presentingStyle: $presentingStyle)
             .loggingModelContainer(mocked: .populated)
     }
 }

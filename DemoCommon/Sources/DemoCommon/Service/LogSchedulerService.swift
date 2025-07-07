@@ -75,6 +75,12 @@ actor DefaultLogSchedulerService: LogSchedulerService {
     }
 }
 
+final class MockLogSchedulerService: LogSchedulerService {
+    func capture(logLevel: LogLevel, message: String, error: (any Error)?) {}
+    func scheduleCaptures(logLevel: LogLevel, message: String, error: (any Error)?) -> UUID { UUID() }
+    func cancelCaptures(id: UUID) {}
+}
+
 extension EnvironmentValues {
     @Entry var logSchedulerService: any LogSchedulerService = DefaultLogSchedulerService.shared
 }

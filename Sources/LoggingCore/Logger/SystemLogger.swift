@@ -19,7 +19,7 @@ package final class SystemLogger {
 
 extension SystemLogger: InternalLogger {
     package func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
-        let errorMessage = error.map { ", error: \($0) (\($0.localizedDescription))" } ?? ""
+        let errorMessage = error.map { ", error: \($0.localizedDescription) (\($0))" } ?? ""
 
         logger.log(
             level: level.osLogType,
