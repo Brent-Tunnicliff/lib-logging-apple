@@ -140,19 +140,22 @@ extension LogsViewPresentingStyle: CaseIterable {
         }
     }
     .loggingModelContainer(mocked: .populated)
+    .logsViewPresentingStyle(.navigationDestination)
 }
 
 #Preview("sheet") {
-    List {
-        Text(verbatim: "Hello world!")
-    }
-    .toolbar {
-        LogsViewToolbarItem()
-
-        ToolbarItem {
-            Button {
-            } label: {
-                Image(systemName: "gearshape")
+    NavigationStack {
+        List {
+            Text(verbatim: "Hello world!")
+        }
+        .toolbar {
+            LogsViewToolbarItem()
+            
+            ToolbarItem {
+                Button {
+                } label: {
+                    Image(systemName: "gearshape")
+                }
             }
         }
     }
