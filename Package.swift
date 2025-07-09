@@ -30,14 +30,14 @@ let package = Package(
             name: "LoggingUI",
             targets: ["LoggingUI"]
         ),
-        .plugin(
-            name: "LoggingSettingsGeneratorBuildPlugin",
-            targets: ["LoggingSettingsGeneratorBuildPlugin"]
-        ),
-        .plugin(
-            name: "LoggingSettingsGeneratorCommandPlugin",
-            targets: ["LoggingSettingsGeneratorCommandPlugin"]
-        ),
+//        .plugin(
+//            name: "LoggingSettingsGeneratorBuildPlugin",
+//            targets: ["LoggingSettingsGeneratorBuildPlugin"]
+//        ),
+//        .plugin(
+//            name: "LoggingSettingsGeneratorCommandPlugin",
+//            targets: ["LoggingSettingsGeneratorCommandPlugin"]
+//        ),
     ],
     dependencies: [
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0"))
@@ -96,22 +96,22 @@ let package = Package(
                 lintBuildPlugin
             ]
         ),
-        .plugin(
-            name: "LoggingSettingsGeneratorBuildPlugin",
-            capability: .buildTool,
-            dependencies: [
-                "LoggingSettingsGenerator"
-            ]
-        ),
-        .plugin(
-            name: "LoggingSettingsGeneratorCommandPlugin",
-            capability: .command(
-                intent: .custom(
-                    verb: "generate-logging-settings",
-                    description: "Generates Logging settings and injects them into the app 'Settings.bundle'"
-                ),
-                permissions: []
-            )
-        ),
+//        .plugin(
+//            name: "LoggingSettingsGeneratorBuildPlugin",
+//            capability: .buildTool,
+//            dependencies: [
+//                "LoggingSettingsGenerator"
+//            ]
+//        ),
+//        .plugin(
+//            name: "LoggingSettingsGeneratorCommandPlugin",
+//            capability: .command(
+//                intent: .custom(
+//                    verb: "generate-logging-settings",
+//                    description: "Generates Logging settings and injects them into the app 'Settings.bundle'"
+//                ),
+//                permissions: []
+//            )
+//        ),
     ]
 )

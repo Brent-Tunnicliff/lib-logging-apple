@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 90;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -20,29 +20,32 @@
 			remoteGlobalIDString = 84CE21FA2D71C3D100960F13;
 			remoteInfo = "Demo Watch App";
 		};
+		84DE35792E11430500A5326A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 845797642C9EED48001B833D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8457976B2C9EED48001B833D;
+			remoteInfo = Demo;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		84CE21A32D707D5400960F13 /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
-			dstSubfolderSpec = 16;
+			dstSubfolder = Product;
 			files = (
 				84CE22082D71C3D200960F13 /* Demo Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		84CE21BA2D707E7300960F13 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstSubfolder = Frameworks;
 			files = (
 			);
 			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -50,6 +53,7 @@
 		8457976C2C9EED48001B833D /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84CE21BB2D707F5F00960F13 /* DemoCommon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = DemoCommon; sourceTree = "<group>"; };
 		84CE21FB2D71C3D100960F13 /* Demo Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Demo Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		84DE35732E11430500A5326A /* SettingsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SettingsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -63,24 +67,30 @@
 			path = "Demo Watch App";
 			sourceTree = "<group>";
 		};
+		84DE35742E11430500A5326A /* SettingsUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SettingsUITests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		845797692C9EED48001B833D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				84CE21F12D70833900960F13 /* DemoCommon in Frameworks */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		84CE21F82D71C3D100960F13 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				84CE221C2D71C50A00960F13 /* DemoCommon in Frameworks */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84DE35702E11430500A5326A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -91,6 +101,7 @@
 				84CE21BB2D707F5F00960F13 /* DemoCommon */,
 				8457976E2C9EED48001B833D /* Demo */,
 				84CE21FC2D71C3D100960F13 /* Demo Watch App */,
+				84DE35742E11430500A5326A /* SettingsUITests */,
 				847B56932D5CC445001C7B81 /* Frameworks */,
 				8457976D2C9EED48001B833D /* Products */,
 			);
@@ -101,6 +112,7 @@
 			children = (
 				8457976C2C9EED48001B833D /* Demo.app */,
 				84CE21FB2D71C3D100960F13 /* Demo Watch App.app */,
+				84DE35732E11430500A5326A /* SettingsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -121,7 +133,6 @@
 			buildPhases = (
 				845797682C9EED48001B833D /* Sources */,
 				845797692C9EED48001B833D /* Frameworks */,
-				844D857A2D9D291B00ED7818 /* Copy logging settings */,
 				8457976A2C9EED48001B833D /* Resources */,
 				84CE21A32D707D5400960F13 /* Embed Watch Content */,
 				84CE21BA2D707E7300960F13 /* Embed Frameworks */,
@@ -167,6 +178,28 @@
 			productReference = 84CE21FB2D71C3D100960F13 /* Demo Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		84DE35722E11430500A5326A /* SettingsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 84DE357B2E11430500A5326A /* Build configuration list for PBXNativeTarget "SettingsUITests" */;
+			buildPhases = (
+				84DE356F2E11430500A5326A /* Sources */,
+				84DE35702E11430500A5326A /* Frameworks */,
+				84DE35712E11430500A5326A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				84DE388D2E1EAD6100A5326A /* PBXTargetDependency */,
+				84DE357A2E11430500A5326A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				84DE35742E11430500A5326A /* SettingsUITests */,
+			);
+			name = SettingsUITests;
+			productName = SettingsUITests;
+			productReference = 84DE35732E11430500A5326A /* SettingsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -174,7 +207,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					8457976B2C9EED48001B833D = {
@@ -182,6 +215,10 @@
 					};
 					84CE21FA2D71C3D100960F13 = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					84DE35722E11430500A5326A = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 8457976B2C9EED48001B833D;
 					};
 				};
 			};
@@ -196,14 +233,16 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */,
+				84501A072DA40A2C0007AE9C /* XCLocalSwiftPackageReference "../lib-logging-apple" */,
 			);
-			preferredProjectObjectVersion = 77;
+			preferredProjectObjectVersion = 90;
 			productRefGroup = 8457976D2C9EED48001B833D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				8457976B2C9EED48001B833D /* Demo */,
 				84CE21FA2D71C3D100960F13 /* Demo Watch App */,
+				84DE35722E11430500A5326A /* SettingsUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -211,59 +250,36 @@
 /* Begin PBXResourcesBuildPhase section */
 		8457976A2C9EED48001B833D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		84CE21F92D71C3D100960F13 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84DE35712E11430500A5326A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		844D857A2D9D291B00ED7818 /* Copy logging settings */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${BUILT_PRODUCTS_DIR}/Logging_Logging.bundle/Logging.plist",
-				"${BUILT_PRODUCTS_DIR}/Logging_Logging.bundle/en.lproj/Logging.strings",
-			);
-			name = "Copy logging settings";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"${PROJECT_DIR}/${PROJECT_NAME}/Settings.bundle/Logging.plist",
-				"${PROJECT_DIR}/${PROJECT_NAME}/Settings.bundle//en.lproj/Logging.strings",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo \"BRENT_TEST\"\nFILE_NAME=\"Logging\"\nBUNDLE_PATH=\"${BUILT_PRODUCTS_DIR}/Logging_Logging.bundle\"\nSETTINGS_FILE=\"${BUNDLE_PATH}/${FILE_NAME}.plist\"\nif [ ! -f ${SETTINGS_FILE} ]; then\n    echo \"error: file missing: '${SETTINGS_FILE}'\"\n    exit 1\nfi\n\nENGLISH_STRINGS_FILE=\"${BUNDLE_PATH}/en.lproj/${FILE_NAME}.strings\"\nif [ ! -f ${ENGLISH_STRINGS_FILE} ]; then\n    echo \"error: file missing: '${ENGLISH_STRINGS_FILE}'\"\n    exit 1\nfi\n\nOUTPUT=\"${PROJECT_DIR}/${PROJECT_NAME}/Settings.bundle\"\nif [ ! -d ${OUTPUT} ]; then\n    echo \"error: file missing: '${OUTPUT}'\"\n    exit 1\nfi\n\ncp -fr \"${SETTINGS_FILE}\" \"${OUTPUT}/${FILE_NAME}.plist\"\ncp -fr \"${ENGLISH_STRINGS_FILE}\" \"${OUTPUT}/en.lproj/${FILE_NAME}.strings\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		845797682C9EED48001B833D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		84CE21F72D71C3D100960F13 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+		};
+		84DE356F2E11430500A5326A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -282,10 +298,19 @@
 			isa = PBXTargetDependency;
 			productRef = 84CE22242D71E16100960F13 /* LintBuildPlugin */;
 		};
+		84DE357A2E11430500A5326A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8457976B2C9EED48001B833D /* Demo */;
+			targetProxy = 84DE35792E11430500A5326A /* PBXContainerItemProxy */;
+		};
+		84DE388D2E1EAD6100A5326A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 84DE388C2E1EAD6100A5326A /* LintBuildPlugin */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		845797792C9EED49001B833D /* Debug */ = {
+		845797792C9EED49001B833D /* Debug configuration for PBXProject "Demo" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -340,6 +365,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -351,6 +377,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
 				SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TVOS_DEPLOYMENT_TARGET = 17.0;
 				VERSION_INFO_SUFFIX = debug;
@@ -359,7 +386,7 @@
 			};
 			name = Debug;
 		};
-		8457977A2C9EED49001B833D /* Release */ = {
+		8457977A2C9EED49001B833D /* Release configuration for PBXProject "Demo" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -408,6 +435,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -417,6 +445,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_UPCOMING_FEATURE_EXISTENTIAL_ANY = YES;
 				SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 6.0;
 				TVOS_DEPLOYMENT_TARGET = 17.0;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
@@ -424,7 +453,7 @@
 			};
 			name = Release;
 		};
-		8457977C2C9EED49001B833D /* Debug */ = {
+		8457977C2C9EED49001B833D /* Debug configuration for PBXNativeTarget "Demo" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -436,8 +465,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -458,7 +485,7 @@
 			};
 			name = Debug;
 		};
-		8457977D2C9EED49001B833D /* Release */ = {
+		8457977D2C9EED49001B833D /* Release configuration for PBXNativeTarget "Demo" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -470,8 +497,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
@@ -492,7 +517,7 @@
 			};
 			name = Release;
 		};
-		84CE220A2D71C3D200960F13 /* Debug */ = {
+		84CE220A2D71C3D200960F13 /* Debug configuration for PBXNativeTarget "Demo Watch App" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -520,7 +545,7 @@
 			};
 			name = Debug;
 		};
-		84CE220B2D71C3D200960F13 /* Release */ = {
+		84CE220B2D71C3D200960F13 /* Release configuration for PBXNativeTarget "Demo Watch App" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -549,37 +574,88 @@
 			};
 			name = Release;
 		};
+		84DE357C2E11430500A5326A /* Debug configuration for PBXNativeTarget "SettingsUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 346UN3W7D8;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tunnicliff.SettingsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Demo;
+			};
+			name = Debug;
+		};
+		84DE357D2E11430500A5326A /* Release configuration for PBXNativeTarget "SettingsUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 346UN3W7D8;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.tunnicliff.SettingsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Demo;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
 		845797672C9EED48001B833D /* Build configuration list for PBXProject "Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				845797792C9EED49001B833D /* Debug */,
-				8457977A2C9EED49001B833D /* Release */,
+				845797792C9EED49001B833D /* Debug configuration for PBXProject "Demo" */,
+				8457977A2C9EED49001B833D /* Release configuration for PBXProject "Demo" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		8457977B2C9EED49001B833D /* Build configuration list for PBXNativeTarget "Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				8457977C2C9EED49001B833D /* Debug */,
-				8457977D2C9EED49001B833D /* Release */,
+				8457977C2C9EED49001B833D /* Debug configuration for PBXNativeTarget "Demo" */,
+				8457977D2C9EED49001B833D /* Release configuration for PBXNativeTarget "Demo" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		84CE22092D71C3D200960F13 /* Build configuration list for PBXNativeTarget "Demo Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				84CE220A2D71C3D200960F13 /* Debug */,
-				84CE220B2D71C3D200960F13 /* Release */,
+				84CE220A2D71C3D200960F13 /* Debug configuration for PBXNativeTarget "Demo Watch App" */,
+				84CE220B2D71C3D200960F13 /* Release configuration for PBXNativeTarget "Demo Watch App" */,
 			);
-			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		84DE357B2E11430500A5326A /* Build configuration list for PBXNativeTarget "SettingsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84DE357C2E11430500A5326A /* Debug configuration for PBXNativeTarget "SettingsUITests" */,
+				84DE357D2E11430500A5326A /* Release configuration for PBXNativeTarget "SettingsUITests" */,
+			);
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		84501A072DA40A2C0007AE9C /* XCLocalSwiftPackageReference "../lib-logging-apple" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../lib-logging-apple";
+		};
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
 		84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */ = {
@@ -607,6 +683,11 @@
 			productName = DemoCommon;
 		};
 		84CE22242D71E16100960F13 /* LintBuildPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */;
+			productName = "plugin:LintBuildPlugin";
+		};
+		84DE388C2E1EAD6100A5326A /* LintBuildPlugin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */;
 			productName = "plugin:LintBuildPlugin";
