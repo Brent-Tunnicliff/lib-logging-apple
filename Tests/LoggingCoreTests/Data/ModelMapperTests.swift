@@ -48,7 +48,10 @@ struct ModelMapperTests {
         let error = MockError()
         let result = modelMapper.toEntity(error)
         #expect(result.type == "MockError()")
-        #expect(result.message == "The operation couldn’t be completed. (LoggingTests.MockError error 1.)")
+        #expect(result.message == "MockError()")
+        #expect(
+            result.localizedDescription == "The operation couldn’t be completed. (LoggingCoreTests.MockError error 1.)"
+        )
     }
 
     @Test(arguments: LogLevel.allCases)
