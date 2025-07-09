@@ -5,14 +5,10 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @Binding private var presentingStyle: LogsViewPresentingStyle
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \DemoEntity.id) private var demoEntities: [DemoEntity]
+    @State private var presentingStyle: LogsViewPresentingStyle = .default
     @State private var showSendLogsSheet = false
-
-    init(presentingStyle: Binding<LogsViewPresentingStyle>) {
-        self._presentingStyle = presentingStyle
-    }
 
     var body: some View {
         List {
@@ -27,10 +23,11 @@ struct ContentView: View {
 
             CaptureLogSection(presentingStyle: $presentingStyle)
         }
-        .logsViewPresentingStyle(presentingStyle)
         .toolbar {
             LogsViewToolbarItem()
         }
+        // We need to set `logsViewPresentingStyle` after the toolbar, otherwise it won't apply.
+        .logsViewPresentingStyle(presentingStyle)
         .onAppear {
             // The only reason for this database is to make sure it does not conflict with the logging one.
             modelContext.insert(DemoEntity())
@@ -48,7 +45,7 @@ struct ContentView: View {
     @Previewable @State var presentingStyle = LogsViewPresentingStyle.modal
 
     NavigationStack {
-        ContentView(presentingStyle: $presentingStyle)
+        ContentView()
             .loggingModelContainer(mocked: .populated)
     }
 }

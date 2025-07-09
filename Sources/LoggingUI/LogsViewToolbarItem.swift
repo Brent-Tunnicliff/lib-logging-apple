@@ -8,8 +8,16 @@ public struct LogsViewToolbarItem: ToolbarContent {
     @State private var isNavigationDestinationPresented = false
     @State private var isSheetPresented = false
 
-    #if os(macOS)
+    #if os(macOS) || os(iOS)
         @Environment(\.openWindow) private var openWindow
+
+        private var supportsWindow: Bool {
+            #if os(iOS)
+                UIApplication.shared.supportsMultipleScenes
+            #elseif os(macOS)
+                true
+            #endif
+        }
     #endif
 
     /// Initialise an instance of ``LogsViewToolbarItem``.
@@ -55,8 +63,12 @@ public struct LogsViewToolbarItem: ToolbarContent {
     }
 
     private func performModal() {
-        #if os(macOS)
-            openWindow.logsWindow()
+        #if os(iOS) || os(macOS)
+            if supportsWindow {
+                openWindow.logsWindow()
+            } else {
+                isSheetPresented = true
+            }
         #else
             isSheetPresented = true
         #endif
@@ -66,8 +78,8 @@ public struct LogsViewToolbarItem: ToolbarContent {
 extension ToolbarItemPlacement {
     fileprivate static var logsViewPlacement: ToolbarItemPlacement {
         #if os(watchOS)
-            // There is a bug where WatchOS will not show the button,
-            // so manually setting one that does work.
+            // WatchOS does not show the button by default for some reason,
+            // so manually setting it.
             .topBarTrailing
         #else
             .automatic
@@ -83,7 +95,7 @@ extension View {
 }
 
 extension EnvironmentValues {
-    @Entry fileprivate var logsViewPresentingStyle: LogsViewPresentingStyle = .modal
+    @Entry fileprivate var logsViewPresentingStyle: LogsViewPresentingStyle = .default
 }
 
 /// Defines the method used to present the ``LogsView``.
@@ -123,6 +135,11 @@ extension LogsViewPresentingStyle: CaseIterable {
         }
 }
 
+extension LogsViewPresentingStyle {
+    /// Default presentation style.
+    public static let `default`: LogsViewPresentingStyle = .modal
+}
+
 #Preview("navigationDestination") {
     NavigationStack {
         List {
@@ -150,7 +167,7 @@ extension LogsViewPresentingStyle: CaseIterable {
         }
         .toolbar {
             LogsViewToolbarItem()
-            
+
             ToolbarItem {
                 Button {
                 } label: {

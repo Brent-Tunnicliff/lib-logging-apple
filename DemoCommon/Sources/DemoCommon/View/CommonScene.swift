@@ -6,7 +6,6 @@ public import SwiftUI
 /// Common scene for both the demo app and the watch companion.
 public struct CommonScene: Scene {
     @Environment(\.scenePhase) private var scenePhase
-    @State private var presentingStyle: LogsViewPresentingStyle = .modal
 
     /// Initialise an instance of ``CommonScene``.
     public init() {}
@@ -15,9 +14,8 @@ public struct CommonScene: Scene {
     public var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ContentView(presentingStyle: $presentingStyle)
+                ContentView()
             }
-            .logsViewPresentingStyle(presentingStyle)
         }
         .modelContainer(for: DemoEntity.self)
         .onChange(of: scenePhase) { oldPhase, newPhase in
@@ -25,7 +23,7 @@ public struct CommonScene: Scene {
         }
 
         // We must define this here in order to navigate to `LogsView` in MacOS.
-        LogsWindow()
+        LogsWindowGroup()
     }
 }
 
