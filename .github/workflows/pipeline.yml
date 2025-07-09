@@ -8,7 +8,7 @@ on:
 
 jobs:
   package:
-    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1.0.2-SNAPSHOT
+    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1
     name: Package
     strategy:
       matrix:
@@ -19,7 +19,7 @@ jobs:
       skip_tests: false
       workspace: "Package.xcworkspace"
   demo:
-    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1.0.2-SNAPSHOT
+    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1
     name: Demo
     strategy:
       matrix:
@@ -30,7 +30,7 @@ jobs:
       skip_tests: true
       workspace: "Package.xcworkspace"
   demo_watch:
-    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1.0.2-SNAPSHOT
+    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1
     name: Demo (watchOS)
     with:
       platform: "watchOS"
