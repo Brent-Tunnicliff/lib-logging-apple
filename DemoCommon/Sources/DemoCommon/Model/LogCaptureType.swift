@@ -1,6 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import SwiftUICore
+import SwiftUI
 
 enum LogCaptureType: CaseIterable, Hashable {
     case once
