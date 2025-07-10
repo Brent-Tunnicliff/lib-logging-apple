@@ -34,6 +34,39 @@
         }
       }
     },
+    "log_capture_type_label_every_five_seconds" : {
+      "comment" : "The log will be scheduled to happen on a loop every 5 seconds.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every 5 Seconds"
+          }
+        }
+      }
+    },
+    "log_capture_type_label_every_second" : {
+      "comment" : "The log will be scheduled to happen on a loop every 1 second.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every Second"
+          }
+        }
+      }
+    },
+    "log_capture_type_label_every_ten_seconds" : {
+      "comment" : "The log will be scheduled to happen on a loop every 5 seconds.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every 10 Seconds"
+          }
+        }
+      }
+    },
     "log_capture_type_label_once" : {
       "comment" : "The log will only be sent one time.",
       "localizations" : {
@@ -41,17 +74,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Once"
-          }
-        }
-      }
-    },
-    "log_capture_type_label_scheduled" : {
-      "comment" : "The log will be scheduled to happen on a loop.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Every Second"
           }
         }
       }

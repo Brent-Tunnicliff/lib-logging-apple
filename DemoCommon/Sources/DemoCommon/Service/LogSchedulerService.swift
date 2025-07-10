@@ -6,7 +6,7 @@ import SwiftUI
 
 protocol LogSchedulerService: Sendable {
     func capture(logLevel: LogLevel, message: String, error: (any Error)?)
-    func scheduleCaptures(logLevel: LogLevel, message: String, error: (any Error)?) -> UUID
+    func scheduleCaptures(every seconds: TimeInterval, logLevel: LogLevel, message: String, error: (any Error)?) -> UUID
     func cancelCaptures(id: UUID)
 }
 
@@ -29,6 +29,7 @@ actor DefaultLogSchedulerService: LogSchedulerService {
     }
 
     nonisolated func scheduleCaptures(
+        every seconds: TimeInterval,
         logLevel: LogLevel,
         message: String,
         error: (any Error)?
@@ -37,7 +38,7 @@ actor DefaultLogSchedulerService: LogSchedulerService {
         let task = Task.detached { [weak self] in
             do {
                 // Trigger a log every second.
-                for await _ in Timer.publish(every: 1, on: .main, in: .common).autoconnect().values {
+                for await _ in Timer.publish(every: seconds, on: .main, in: .common).autoconnect().values {
                     try Task.checkCancellation()
                     self?.capture(
                         logLevel: logLevel,
@@ -77,7 +78,16 @@ actor DefaultLogSchedulerService: LogSchedulerService {
 
 final class MockLogSchedulerService: LogSchedulerService {
     func capture(logLevel: LogLevel, message: String, error: (any Error)?) {}
-    func scheduleCaptures(logLevel: LogLevel, message: String, error: (any Error)?) -> UUID { UUID() }
+
+    func scheduleCaptures(
+        every seconds: TimeInterval,
+        logLevel: LogLevel,
+        message: String,
+        error: (any Error)?
+    ) -> UUID {
+        UUID()
+    }
+
     func cancelCaptures(id: UUID) {}
 }
 

@@ -18,6 +18,10 @@ struct CaptureLogSection: View {
 
     private let scheduledLogSortComparator = ScheduledLogSortComparator()
 
+    private var errorToLog: (any Error)? {
+        captureError ? ExampleError() : nil
+    }
+
     init(presentingStyle: Binding<LogsViewPresentingStyle>) {
         self._presentingStyle = presentingStyle
         scheduledLogs = [:]
@@ -173,30 +177,33 @@ struct CaptureLogSection: View {
     // MARK: - Actions
 
     private func captureLog() {
-        let error = captureError ? ExampleError() : nil
+        let error = errorToLog
+        let message = message
+        let selectedLogLevel = selectedLogLevel
 
-        switch selectedCaptureType {
-        case .once:
+        guard let seconds = selectedCaptureType.scheduledSeconds else {
             logSchedulerService.capture(
                 logLevel: selectedLogLevel,
                 message: message,
                 error: error
             )
-        case .scheduled:
-            let id = logSchedulerService.scheduleCaptures(
-                logLevel: selectedLogLevel,
-                message: message,
-                error: error
-            )
-
-            scheduledLogs[id] = ScheduledLog(
-                id: id,
-                logLevel: selectedLogLevel,
-                message: message,
-                error: error,
-                timestamp: Date()
-            )
+            return
         }
+
+        let id = logSchedulerService.scheduleCaptures(
+            every: seconds,
+            logLevel: selectedLogLevel,
+            message: message,
+            error: error
+        )
+
+        scheduledLogs[id] = ScheduledLog(
+            id: id,
+            logLevel: selectedLogLevel,
+            message: message,
+            error: error,
+            timestamp: Date()
+        )
     }
 
     private func cancelSchedule(log: ScheduledLog) {
