@@ -50,6 +50,7 @@ public struct LogsViewToolbarItem: ToolbarContent {
                             }
                         }
                 }
+                .presentationDragIndicator(.visible)
             }
         }
     }
