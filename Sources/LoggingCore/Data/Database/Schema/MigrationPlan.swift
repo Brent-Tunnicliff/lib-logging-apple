@@ -3,9 +3,9 @@
 import SwiftData
 
 enum MigrationPlan: SchemaMigrationPlan {
-    static let schemas: [any VersionedSchema.Type] = [
-        SchemaV1.self
-    ]
+    static var schemas: [any VersionedSchema.Type] {
+        [SchemaV1.self]
+    }
 
     static var stages: [MigrationStage] { [] }
 }
