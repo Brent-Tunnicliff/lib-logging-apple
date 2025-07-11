@@ -15,9 +15,6 @@ package final class LogEntityV1: Equatable, Identifiable {
     package private(set) var timestampCreated: Date
     package private(set) var error: Error?
 
-    /// Stores the rawValue of `level` so can be used for filtering.
-    package private(set) var levelRawValue: String
-
     init(
         device: Device,
         id: UUID = UUID(),
@@ -31,7 +28,6 @@ package final class LogEntityV1: Equatable, Identifiable {
         self.device = device
         self.id = id
         self.level = level
-        self.levelRawValue = level.rawValue
         self.message = message
         self.packageName = packageName
         self.tag = tag
