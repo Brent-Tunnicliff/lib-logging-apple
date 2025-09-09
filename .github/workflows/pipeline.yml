@@ -6,34 +6,139 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  DEMO_PROJECT: "Demo.xcodeproj"
+  DEMO_SCHEME: "Demo"
+  DEMO_WATCH_SCHEME: "Demo Watch App"
+  PACKAGE_SCHEME: "Logging-Package"
+
 jobs:
-  package:
-    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1
-    name: Package
+  test:
+    runs-on: macos-15
     strategy:
+      # Don't fail the other matrix values if one fails.
+      fail-fast: false
       matrix:
-        platform: ["iOS", "macOS", "tvOS", "watchOS", "visionOS"]
-    with:
-      platform: "${{ matrix.platform }}"
-      scheme: "Logging"
-      skip_tests: false
-      workspace: "Package.xcworkspace"
-  demo:
-    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1
-    name: Demo
-    strategy:
-      matrix:
-        platform: ["iOS", "macOS", "tvOS", "visionOS"]
-    with:
-      platform: "${{ matrix.platform }}"
-      scheme: "Demo"
-      skip_tests: true
-      workspace: "Package.xcworkspace"
-  demo_watch:
-    uses: Brent-Tunnicliff/workflow-common-apple/.github/workflows/common.yml@v1
-    name: Demo (watchOS)
-    with:
-      platform: "watchOS"
-      scheme: "Demo Watch App"
-      skip_tests: true
-      workspace: "Package.xcworkspace"
+        target: [
+          { platform: "iOS", simulator_version: "18" },
+          { platform: "tvOS", simulator_version: "18" },
+          { platform: "watchOS", simulator_version: "11" },
+          { platform: "visionOS", simulator_version: "2" },
+
+          # macOS runs on the host and doesn't need a simulator.
+          { platform: "macOS", simulator_version: "" }
+        ]
+    steps:
+      # ---------------------------
+      # Setup
+      # ---------------------------
+
+      - name: Setup pipeline
+        id: setup
+        uses: Brent-Tunnicliff/action-setup-apple@v1
+        with:
+          platform: "${{ matrix.target.platform }}"
+          simulator_version: "${{ matrix.target.simulator_version }}"
+          xcode_path: "/Applications/Xcode_16.4.app"
+
+      # ---------------------------
+      # Build and test package
+      # ---------------------------
+
+      - name: Build package debug
+        env:
+          DESTINATION: ${{ steps.setup.outputs.destination }}
+        run: xcodebuild build
+          -scheme "$PACKAGE_SCHEME"
+          -destination "$DESTINATION"
+          -configuration "Debug"
+          -skipPackagePluginValidation
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+
+      - name: Build package tests
+        env:
+          DESTINATION: ${{ steps.setup.outputs.destination }}
+        run: xcodebuild build-for-testing
+          -scheme "$PACKAGE_SCHEME"
+          -destination "$DESTINATION"
+          -skipPackagePluginValidation
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+
+      - name: Run package tests
+        env:
+          DESTINATION: ${{ steps.setup.outputs.destination }}
+          RESULTS_BUNDLE_PATH: ${{ steps.setup.outputs.test_results_path }}
+        run: xcodebuild test-without-building
+          -scheme "$PACKAGE_SCHEME"
+          -destination "$DESTINATION"
+          -resultBundlePath "$RESULTS_BUNDLE_PATH"
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+
+      - name: Upload test results
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ steps.setup.outputs.test_results_file_name }}"
+          path: "${{ steps.setup.outputs.test_results_path }}"
+          if-no-files-found: error
+
+      # Lets make sure it also builds in release configuration in case there are conditionals.
+      - name: Build package release
+        env:
+          DESTINATION: ${{ steps.setup.outputs.destination }}
+        run: xcodebuild build
+          -scheme "$PACKAGE_SCHEME"
+          -destination "$DESTINATION"
+          -configuration "Release"
+          -skipPackagePluginValidation
+          CODE_SIGN_IDENTITY=""
+          CODE_SIGNING_REQUIRED=NO
+
+      # ---------------------------
+      # Build demo
+      # ---------------------------
+
+      - name: Configure demo scheme
+        id: demo_scheme
+        env:
+          PLATFORM: ${{ matrix.target.platform }}
+        run: |
+          if [[ "$PLATFORM" == "watchOS" ]]; then
+            SCHEME="$DEMO_WATCH_SCHEME"
+          else
+            SCHEME="$DEMO_SCHEME"
+          fi
+
+          if [[ $SCHEME == "" ]]; then
+            echo "SCHEME missing"
+            exit 1
+          fi
+
+          echo $SCHEME
+          echo "scheme=$SCHEME" >> "$GITHUB_OUTPUT"
+
+      # We don't release demo, so only build the debug configuration.
+      - name: Build demo
+        working-directory: ./Demo
+        env:
+          DESTINATION: ${{ steps.setup.outputs.destination }}
+          SCHEME: ${{ steps.demo_scheme.outputs.scheme }}
+        run: xcodebuild build
+            -project "$DEMO_PROJECT"
+            -scheme "$SCHEME"
+            -destination "$DESTINATION"
+            -configuration "Debug"
+            -skipPackagePluginValidation
+            CODE_SIGN_IDENTITY=""
+            CODE_SIGNING_REQUIRED=NO
+
+      # ---------------------------
+      # Final checks
+      # ---------------------------
+
+      # Make sure there are no local changes as any auto generated changes must be checked into git.
+      - name: Check git status
+        uses: Brent-Tunnicliff/action-git-status@v1
