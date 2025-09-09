@@ -1,35 +1,47 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import Logging
-import LoggingCore
+package import LoggingCore
+import Synchronization
 
-@MainActor
-final class MockLogger: LoggerType, InternalLogger {
-    var logCompletionHandler: @Sendable () -> Void = {}
-    var logCalled: Bool { !logInputs.isEmpty }
-    typealias LogInputsType = (
-        level: LogLevel,
-        message: String,
-        tag: LogTag,
-        error: (any Error)?
-    )
-    private(set) var logInputs: [LogInputsType] = []
-    nonisolated func log(
+/// Mock Logger for use in tests and previews or where needed.
+package final class MockLogger: InternalLogger {
+    package init() {}
+
+    // MARK: - log
+
+    package struct LogInput {
+        package let level: LogLevel
+        package let message: String
+        package let tag: LogTag
+        package let error: (any Error)?
+    }
+    package typealias LogResponse = @Sendable (LogInput) -> Void
+    private let logResponseMutex = Mutex<LogResponse>({ _ in })
+    package var logResponse: LogResponse {
+        get { logResponseMutex.withLock { $0 } }
+        set { logResponseMutex.withLock { $0 = newValue } }
+    }
+    package func log(
         level: LogLevel,
         _ message: String,
         tag: LogTag,
         error: (any Error)?
     ) {
-        Task { @MainActor in
-            defer {
-                logCompletionHandler()
-            }
-
-            logInputs.append((level, message, tag, error))
-        }
+        logResponse(
+            LogInput(
+                level: level,
+                message: message,
+                tag: tag,
+                error: error
+            )
+        )
     }
+}
 
-    nonisolated func debug(
+// MARK: - LoggerType
+
+extension MockLogger: LoggerType {
+    package func debug(
         message: String,
         error: (any Error)?,
         file: StaticString,
@@ -48,7 +60,7 @@ final class MockLogger: LoggerType, InternalLogger {
         )
     }
 
-    nonisolated func info(
+    package func info(
         message: String,
         error: (any Error)?,
         file: StaticString,
@@ -67,7 +79,7 @@ final class MockLogger: LoggerType, InternalLogger {
         )
     }
 
-    nonisolated func error(
+    package func error(
         message: String,
         error: (any Error)?,
         file: StaticString,
@@ -86,7 +98,7 @@ final class MockLogger: LoggerType, InternalLogger {
         )
     }
 
-    nonisolated func critical(
+    package func critical(
         message: String,
         error: (any Error)?,
         file: StaticString,

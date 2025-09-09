@@ -9,13 +9,11 @@ import Testing
 struct DefaultLoggerTests {
     private let message = "This message should be sent to the places"
     private let packageName = "LoggingTests"
-    private let mockLoggingService: MockLoggingService
+    private let mockLoggingService = MockLoggingService()
     private let mockSystemLogger = MockLogger()
     private let logger: DefaultLogger
 
-    init() async {
-        let mockLoggingService = await MockLoggingService()
-        self.mockLoggingService = mockLoggingService
+    init() {
         self.logger = DefaultLogger(
             loggingService: mockLoggingService,
             packageName: packageName,
@@ -23,14 +21,23 @@ struct DefaultLoggerTests {
         )
     }
 
+    // MARK: - Tests
+
     @Test(arguments: product(LogLevel.allCases, [true, false]))
     func logSendsExpectedDataToSystemLog(level: LogLevel, sendError: Bool) async {
         let tag = LogTag(file: #file, function: #function, line: #line)
         let error = sendError ? MockError() : nil
 
-        logger.log(level: level, message, tag: tag, error: error)
+        let logInputs = await AsyncStream { continuation in
+            mockSystemLogger.logResponse = { input in
+                continuation.yield(input)
+            }
+            logger.log(level: level, message, tag: tag, error: error)
+            continuation.finish()
+        }.reduce(into: [MockLogger.LogInput]()) { partialResult, input in
+            partialResult.append(input)
+        }
 
-        let logInputs = await mockSystemLogger.logInputs
         #expect(logInputs.count == 1)
         guard let result = logInputs.first else {
             Issue.record("Unexpected nil result")
@@ -49,24 +56,15 @@ struct DefaultLoggerTests {
         let tag = LogTag(file: #file, function: #function, line: #line)
         let error = sendError ? MockError() : nil
 
-        await withCheckedContinuation { continuation in
-            Task {
-                await mockLoggingService.inject(storeLogCompletionHandler: {
-                    continuation.resume()
-                })
-
-                logger.log(level: level, message, tag: tag, error: error)
+        let result = await withCheckedContinuation { continuation in
+            mockLoggingService.storeLogResponse = {
+                continuation.resume(returning: $0)
             }
+
+            logger.log(level: level, message, tag: tag, error: error)
         }
 
         let after = Date()
-        let storeLogInput = await mockLoggingService.storeLogInput
-        #expect(storeLogInput.count == 1)
-        guard let result = storeLogInput.first else {
-            Issue.record("Unexpected nil result")
-            return
-        }
-
         #expect(result.logLevel == level)
         #expect(result.message == message)
         #expect(result.packageName == packageName)
@@ -76,19 +74,22 @@ struct DefaultLoggerTests {
         expectError(resultError: result.error, expectedError: error)
     }
 
+    // TODO: Fix test
     @Test(.timeLimit(.minutes(1)))
     func logCapturesThrownErrorInSystemLog() async {
         let thrownError = MockError()
-        await mockLoggingService.inject(storeLogThrow: thrownError)
+        mockLoggingService.storeLogResponse = { _ in
+            throw thrownError
+        }
 
-        await withCheckedContinuation { continuation in
+        let logInputs = await withCheckedContinuation { continuation in
             Task { @MainActor in
-                var completed = false
-                mockSystemLogger.logCompletionHandler = {
+                var logInputs: [MockLogger.LogInput] = []
+                mockSystemLogger.logResponse = { logInput in
                     Task { @MainActor in
-                        if completed == false, mockSystemLogger.logInputs.count == 2 {
-                            continuation.resume()
-                            completed = true
+                        logInputs.append(logInput)
+                        if logInputs.count > 1 {
+                            continuation.resume(returning: logInputs)
                         }
                     }
                 }
@@ -102,7 +103,6 @@ struct DefaultLoggerTests {
             }
         }
 
-        let logInputs = await mockSystemLogger.logInputs
         #expect(logInputs.count == 2)
         guard let result = logInputs.last else {
             Issue.record("Unexpected nil result")

@@ -76,7 +76,7 @@ extension Device {
 // MARK: - UserInterfaceIdiom
 
 extension Device {
-    struct UserInterfaceIdiom {
+    package struct UserInterfaceIdiom {
         let rawValue: RawValue
 
         fileprivate init(rawValue: RawValue) {
@@ -98,28 +98,28 @@ extension Device.UserInterfaceIdiom: CustomStringConvertible {
 
 extension Device.UserInterfaceIdiom {
     /// CarPlay user interface type.
-    static let carPlay = Device.UserInterfaceIdiom(rawValue: .carPlay)
+    package static let carPlay = Device.UserInterfaceIdiom(rawValue: .carPlay)
 
     /// Mac user interface type.
-    static let mac = Device.UserInterfaceIdiom(rawValue: .mac)
+    package static let mac = Device.UserInterfaceIdiom(rawValue: .mac)
 
     /// Tablet user interface type.
-    static let pad = Device.UserInterfaceIdiom(rawValue: .pad)
+    package static let pad = Device.UserInterfaceIdiom(rawValue: .pad)
 
     /// Phone user interface type.
-    static let phone = Device.UserInterfaceIdiom(rawValue: .phone)
+    package static let phone = Device.UserInterfaceIdiom(rawValue: .phone)
 
     /// TV user interface type.
-    static let tv = Device.UserInterfaceIdiom(rawValue: .tv)
+    package static let tv = Device.UserInterfaceIdiom(rawValue: .tv)
 
     /// Unknown user interface type.
-    static let unspecified = Device.UserInterfaceIdiom(rawValue: .unspecified)
+    package static let unspecified = Device.UserInterfaceIdiom(rawValue: .unspecified)
 
     /// Vision user interface type.
-    static let vision = Device.UserInterfaceIdiom(rawValue: .vision)
+    package static let vision = Device.UserInterfaceIdiom(rawValue: .vision)
 
     /// Watch user interface type.
-    static let watch = Device.UserInterfaceIdiom(rawValue: .watch)
+    package static let watch = Device.UserInterfaceIdiom(rawValue: .watch)
 }
 
 extension Device.UserInterfaceIdiom: CaseIterable {

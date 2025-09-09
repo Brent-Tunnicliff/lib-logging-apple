@@ -17,7 +17,12 @@ extension LogLevel: CaseIterable {}
 
 extension LogLevel: Comparable {
     package static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
-        lhs.rawValue < rhs.rawValue
+        lhs.order < rhs.order
+    }
+
+    private var order: Int {
+        // For now `rawValue` matches the order.
+        rawValue
     }
 }
 

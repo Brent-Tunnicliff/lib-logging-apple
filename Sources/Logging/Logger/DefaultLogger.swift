@@ -38,9 +38,7 @@ extension DefaultLogger: InternalLogger {
         let timestamp = Date()
         systemLogger.log(level: level, message, tag: tag, error: error)
 
-        // Using `detached` as we never want this to be canceled with a parent task.
-        // We always want logs to run until complete.
-        Task.detached { [loggingService, packageName, systemLogger] in
+        Task {
             do {
                 try await loggingService.storeLog(
                     error: error,

@@ -28,35 +28,35 @@ struct ModelMapperTests {
 
     @Test(arguments: Device.UserInterfaceIdiom.allCases)
     func toEntityDevice(userInterfaceIdiom: Device.UserInterfaceIdiom) {
-        let model = Device.mock(userInterfaceIdiom: userInterfaceIdiom)
-        let result = modelMapper.toEntity(model)
-        #expect(result.identifierForVendor == model.identifierForVendor)
-        #expect(result.model == model.model)
-        #expect(result.systemName == model.systemName)
-        #expect(result.systemVersion == model.systemVersion)
+        let device = Device.mock(userInterfaceIdiom: userInterfaceIdiom)
+        let result = modelMapper.toEntity(device: device)
+        #expect(result.identifierForVendor == device.identifierForVendor)
+        #expect(result.model == device.model)
+        #expect(result.systemName == device.systemName)
+        #expect(result.systemVersion == device.systemVersion)
         #expect(result.userInterfaceIdiom == expectedUserInterfaceIdiomMappings[userInterfaceIdiom])
     }
 
     @Test(arguments: Device.UserInterfaceIdiom.allCases)
     func toEntityDeviceUserInterfaceIdiom(userInterfaceIdiom: Device.UserInterfaceIdiom) {
-        let result = modelMapper.toEntity(userInterfaceIdiom)
+        let result = modelMapper.toEntity(userInterfaceIdiom: userInterfaceIdiom)
         #expect(result == expectedUserInterfaceIdiomMappings[userInterfaceIdiom])
     }
 
     @Test
     func toEntityError() {
         let error = MockError()
-        let result = modelMapper.toEntity(error)
+        let result = modelMapper.toEntity(error: error)
         #expect(result.type == "MockError()")
         #expect(result.message == "MockError()")
         #expect(
-            result.localizedDescription == "The operation couldn’t be completed. (LoggingCoreTests.MockError error 1.)"
+            result.localizedDescription == "The operation couldn’t be completed. (LoggingCore.MockError error 1.)"
         )
     }
 
     @Test(arguments: LogLevel.allCases)
     func toEntityLogLevel(logLevel: LogLevel) {
-        let result = modelMapper.toEntity(logLevel)
+        let result = modelMapper.toEntity(logLevel: logLevel)
         #expect(result == expectedLogLevelMappings[logLevel])
     }
 
@@ -68,7 +68,7 @@ struct ModelMapperTests {
             line: 42
         )
 
-        let result = modelMapper.toEntity(logTag)
+        let result = modelMapper.toEntity(logTag: logTag)
         #expect(result.file == "ModelMapperTests-file")
         #expect(result.function == "ModelMapperTests-function")
         #expect(result.line == 42)

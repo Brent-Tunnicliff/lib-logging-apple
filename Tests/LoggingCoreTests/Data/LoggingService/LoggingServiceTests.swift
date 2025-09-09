@@ -7,10 +7,11 @@ import Testing
 @testable import LoggingCore
 
 struct LoggingServiceTests {
-    private let mockDeviceProvider = MockDeviceProvider()
-    private let modelContainer: ModelContainer
-    private let modelMapper: any ModelMapper = DefaultModelMapper()
     private let loggingService: any LoggingService
+    private let mockDeviceProvider = MockDeviceProvider()
+    private let mockFileService = MockFileService()
+    private let mockModelMapper = MockModelMapper()
+    private let modelContainer: ModelContainer
     private let userDefaults = UserDefaults.forTest()
 
     private let message = "This message should be sent to the places"
@@ -23,25 +24,34 @@ struct LoggingServiceTests {
     private let timestamp = Date()
 
     init() async {
-        self.modelContainer = await .emptyInMemoryOnly()
+        self.modelContainer = .emptyInMemoryOnly()
         self.loggingService = DefaultLoggingService(
             deviceProvider: mockDeviceProvider,
+            fileService: mockFileService,
             modelContainer: modelContainer,
-            modelMapper: modelMapper,
+            modelMapper: mockModelMapper,
             userDefaults: userDefaults
         )
     }
 
     @Test(arguments: product(LogLevel.allCases, [true, false]))
     func storeLog(level: LogLevel, sendError: Bool) async throws {
-        let expectedDevice = await modelMapper.toEntity(mockDeviceProvider.current())
-        let expectedLogLevel = modelMapper.toEntity(level)
-        let expectedTag = modelMapper.toEntity(tag)
         let error = sendError ? MockError() : nil
-        let expectedError = error.map(modelMapper.toEntity)
+        let expectedDevice = LogEntity.Device.mock()
+        let expectedError = sendError ? LogEntity.Error.mock() : nil
+        let expectedLogLevel = LogEntity.LogLevel.info
+        let expectedTag = LogEntity.Tag.mock()
+
+        // We need to pass in the mock results on init so it stays Sendable.
+        // So creating new mapper and service here.
+        mockModelMapper.toEntityDeviceResponse = { _ in expectedDevice }
+        mockModelMapper.toEntityErrorResponse = { _ in expectedError ?? .mock() }
+        mockModelMapper.toEntityLogLevelResponse = { _ in expectedLogLevel }
+        mockModelMapper.toEntityLogTagResponse = { _ in expectedTag }
+        mockModelMapper.toEntityUserInterfaceIdiomResponse = { _ in expectedDevice.userInterfaceIdiom }
 
         userDefaults.minimalLogLevel = level
-        try await performStoreLog(error: error, logLevel: level)
+        try await performStoreLog(loggingService: loggingService, error: error, logLevel: level)
         let results: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(results.count == 1)
 
@@ -62,7 +72,7 @@ struct LoggingServiceTests {
     @Test
     func storeLogLowerThanDefinedLogLevelIsIgnored() async throws {
         userDefaults.minimalLogLevel = .info
-        try await performStoreLog(logLevel: .debug)
+        try await performStoreLog(loggingService: loggingService, logLevel: .debug)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(result.isEmpty)
     }
@@ -70,12 +80,13 @@ struct LoggingServiceTests {
     @Test
     func storeLogEqualToDefinedLogLevelIsStored() async throws {
         userDefaults.minimalLogLevel = .info
-        try await performStoreLog(logLevel: .info)
+        try await performStoreLog(loggingService: loggingService, logLevel: .info)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(!result.isEmpty)
     }
 
     private func performStoreLog(
+        loggingService: any LoggingService,
         error: (any Error)? = nil,
         logLevel: LogLevel
     ) async throws {

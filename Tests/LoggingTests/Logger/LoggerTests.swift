@@ -6,7 +6,6 @@ import Testing
 @testable import Logging
 
 /// Tests for Logger extension functions.
-@MainActor
 struct LoggerTests {
     private let logger = MockLogger()
     private let message = "This message should be sent to the places"
@@ -46,19 +45,26 @@ struct LoggerTests {
     private func testLog(
         expectedLogLevel: LogLevel,
         sourceLocation: Testing.SourceLocation = #_sourceLocation,
-        action: () -> Void
+        action: @escaping @Sendable () -> Void
     ) async {
-        await withCheckedContinuation { continuation in
+        let logInputs = await AsyncStream { continuation in
             Task { @MainActor in
-                logger.logCompletionHandler = {
-                    continuation.resume()
+                logger.logResponse = {
+                    // In the the real logger we don't care if we jump isolation.
+                    // But this test is built with the assumption we never jump isolations.
+                    // So assert we are still on the Main actor to avoid unreliable results.
+                    MainActor.assertIsolated()
+                    continuation.yield($0)
                 }
-            }
 
-            action()
+                action()
+                continuation.finish()
+            }
+        }
+        .reduce(into: [MockLogger.LogInput]()) { partialResult, logInput in
+            partialResult.append(logInput)
         }
 
-        let logInputs = logger.logInputs
         #expect(logInputs.count == 1, sourceLocation: sourceLocation)
         guard let result = logInputs.first else {
             Issue.record("Unexpected nil result", sourceLocation: sourceLocation)

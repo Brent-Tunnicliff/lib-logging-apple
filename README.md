@@ -4,7 +4,7 @@ Package for persistent and reviewable logs for my apple platform projects.
 
 Project contains the package and a nested demo app `Demo/`.
 
-Open `Package.xcworkspace` in Xcode to edit and run both the package and the demo app.
+If you want to run the Demo app, open its project file `Demo/Demo.xcodeproj`.
 
 Import via SPM.
 

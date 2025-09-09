@@ -23,7 +23,6 @@ extension ModelContainer {
 // MARK: - Mock
 
 extension ModelContainer {
-    @MainActor
     package static func emptyInMemoryOnly(name: String = #function) -> ModelContainer {
         do {
             let container = try ModelContainer(

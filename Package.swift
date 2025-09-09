@@ -4,21 +4,16 @@
 
 import PackageDescription
 
-private let swiftSettings: [PackageDescription.SwiftSetting] = [
-    .enableUpcomingFeature("ExistentialAny"),
-    .enableUpcomingFeature("InternalImportsByDefault"),
-]
-
-private let lintBuildPlugin: Target.PluginUsage = .plugin(name: "LintBuildPlugin", package: "swift-format-plugin")
+// MARK: - Package
 
 let package = Package(
     name: "Logging",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v17),
-        .macOS(.v14),
-        .tvOS(.v17),
-        .watchOS(.v10),
+        .iOS(.v18),
+        .macOS(.v15),
+        .tvOS(.v18),
+        .watchOS(.v11),
         .visionOS(.v2),
     ],
     products: [
@@ -43,20 +38,18 @@ let package = Package(
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0"))
     ],
     targets: [
-        .target(
-            name: "LoggingCore",
-            swiftSettings: swiftSettings,
-            plugins: [
-                lintBuildPlugin
-            ]
+        .target(name: "LoggingCore"),
+        .testTarget(
+            name: "LoggingCoreTests",
+            dependencies: ["LoggingCore"]
         ),
         .target(
             name: "Logging",
-            dependencies: ["LoggingCore"],
-            swiftSettings: swiftSettings,
-            plugins: [
-                lintBuildPlugin
-            ]
+            dependencies: ["LoggingCore"]
+        ),
+        .testTarget(
+            name: "LoggingTests",
+            dependencies: ["Logging"]
         ),
         .target(
             name: "LoggingUI",
@@ -67,35 +60,9 @@ let package = Package(
                 .copy("Resources/Settings.bundle"),
                 .copy("Resources/InputFileList.xcfilelist"),
                 .copy("Resources/OutputFileList.xcfilelist"),
-            ],
-            swiftSettings: swiftSettings,
-            plugins: [
-                lintBuildPlugin
             ]
         ),
-        .testTarget(
-            name: "LoggingTests",
-            dependencies: ["Logging"],
-            swiftSettings: swiftSettings,
-            plugins: [
-                lintBuildPlugin
-            ]
-        ),
-        .testTarget(
-            name: "LoggingCoreTests",
-            dependencies: ["LoggingCore"],
-            swiftSettings: swiftSettings,
-            plugins: [
-                lintBuildPlugin
-            ]
-        ),
-        .executableTarget(
-            name: "LoggingSettingsGenerator",
-            swiftSettings: swiftSettings,
-            plugins: [
-                lintBuildPlugin
-            ]
-        ),
+//        .executableTarget(name: "LoggingSettingsGenerator"),
 //        .plugin(
 //            name: "LoggingSettingsGeneratorBuildPlugin",
 //            capability: .buildTool,
@@ -115,3 +82,24 @@ let package = Package(
 //        ),
     ]
 )
+
+// MARK: - Common target settings
+
+// Sets values that are common for every target.
+for target in package.targets {
+
+    // MARK: Plugins
+
+    let plugins = target.plugins ?? []
+    target.plugins = plugins + [
+        .plugin(name: "LintBuildPlugin", package: "swift-format-plugin")
+    ]
+
+    // MARK: Swift compliler settings
+
+    let swiftSettings = target.swiftSettings ?? []
+    target.swiftSettings = swiftSettings + [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableUpcomingFeature("InternalImportsByDefault"),
+    ]
+}

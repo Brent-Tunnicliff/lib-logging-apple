@@ -2,8 +2,10 @@
 
 package import Foundation
 
-package protocol LoggingService: Actor {
+package protocol LoggingService: Sendable {
     func deleteLogs(olderThan timestamp: Date) async throws
+
+    func exportLogs() async throws -> URL
 
     func storeLog(
         error: (any Error)?,
