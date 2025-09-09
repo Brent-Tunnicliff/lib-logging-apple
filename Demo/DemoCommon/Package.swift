@@ -3,19 +3,16 @@
 
 import PackageDescription
 
-private let swiftSettings: [PackageDescription.SwiftSetting] = [
-    .enableUpcomingFeature("ExistentialAny"),
-    .enableUpcomingFeature("InternalImportsByDefault"),
-]
+// MARK: - Package
 
 let package = Package(
     name: "DemoCommon",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v17),
-        .macOS(.v14),
-        .tvOS(.v17),
-        .watchOS(.v10),
+        .iOS(.v18),
+        .macOS(.v15),
+        .tvOS(.v18),
+        .watchOS(.v11),
         .visionOS(.v2),
     ],
     products: [
@@ -26,7 +23,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "../."),
+        .package(path: "../../."),
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
     ],
     targets: [
@@ -37,11 +34,28 @@ let package = Package(
             dependencies: [
                 .product(name: "Logging", package: "lib-logging-apple"),
                 .product(name: "LoggingUI", package: "lib-logging-apple"),
-            ],
-            swiftSettings: swiftSettings,
-            plugins: [
-                .plugin(name: "LintBuildPlugin", package: "swift-format-plugin")
             ]
         )
     ]
 )
+
+// MARK: - Common target settings
+
+// Sets values that are common for every target.
+for target in package.targets {
+
+    // MARK: Plugins
+
+    let plugins = target.plugins ?? []
+    target.plugins = plugins + [
+        .plugin(name: "LintBuildPlugin", package: "swift-format-plugin")
+    ]
+
+    // MARK: Swift compliler settings
+
+    let swiftSettings = target.swiftSettings ?? []
+    target.swiftSettings = swiftSettings + [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableUpcomingFeature("InternalImportsByDefault"),
+    ]
+}
