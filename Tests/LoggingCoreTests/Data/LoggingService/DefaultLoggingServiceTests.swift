@@ -6,8 +6,8 @@ import Testing
 
 @testable import LoggingCore
 
-struct LoggingServiceTests {
-    private let loggingService: any LoggingService
+struct DefaultLoggingServiceTests {
+    private let loggingService: DefaultLoggingService
     private let mockDeviceProvider = MockDeviceProvider()
     private let mockFileService = MockFileService()
     private let mockModelMapper = MockModelMapper()
@@ -34,6 +34,56 @@ struct LoggingServiceTests {
         )
     }
 
+    // MARK: - deleteLogs(olderThan:)
+
+    @Test
+    func deleteLogs() async throws {
+        // data setup
+        let olderThanDate = Date()
+        let logsToDelete = [
+            Date(timeInterval: -10, since: olderThanDate),
+            Date(timeInterval: -20, since: olderThanDate),
+            Date(timeInterval: -30, since: olderThanDate),
+            Date(timeInterval: -40, since: olderThanDate),
+            Date(timeInterval: -50, since: olderThanDate),
+        ].map { LogEntity.mock(timestampCreated: $0) }
+
+        let logsToKeep = [
+            Date(timeInterval: 10, since: olderThanDate),
+            Date(timeInterval: 20, since: olderThanDate),
+            Date(timeInterval: 30, since: olderThanDate),
+            Date(timeInterval: 40, since: olderThanDate),
+            Date(timeInterval: 50, since: olderThanDate),
+            Date(timeInterval: 60, since: olderThanDate),
+        ].map { LogEntity.mock(timestampCreated: $0) }
+
+        let modelContext = ModelContext(modelContainer)
+        modelContext.autosaveEnabled = false
+        try modelContext.transaction {
+            for log in logsToDelete + logsToKeep {
+                modelContext.insert(log)
+            }
+
+            try modelContext.save()
+        }
+
+        // test
+        try await loggingService.deleteLogs(olderThan: olderThanDate)
+
+        // verify
+        let results: [LogEntity] = try modelContext.fetch(FetchDescriptor())
+        #expect(results.count == logsToKeep.count)
+        for expectedResult in logsToKeep {
+            let result = results.first { $0.id == expectedResult.id }
+            #expect(
+                result != nil,
+                "Missing expected result: \(expectedResult.timestampCreated), olderThanDate: \(olderThanDate)"
+            )
+        }
+    }
+
+    // MARK: - storeLog(error:logLevel:message:packageName:tag:timestamp:)
+
     @Test(arguments: product(LogLevel.allCases, [true, false]))
     func storeLog(level: LogLevel, sendError: Bool) async throws {
         let error = sendError ? MockError() : nil
@@ -51,7 +101,7 @@ struct LoggingServiceTests {
         mockModelMapper.toEntityUserInterfaceIdiomResponse = { _ in expectedDevice.userInterfaceIdiom }
 
         userDefaults.minimalLogLevel = level
-        try await performStoreLog(loggingService: loggingService, error: error, logLevel: level)
+        try await performStoreLog(error: error, logLevel: level)
         let results: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(results.count == 1)
 
@@ -72,7 +122,7 @@ struct LoggingServiceTests {
     @Test
     func storeLogLowerThanDefinedLogLevelIsIgnored() async throws {
         userDefaults.minimalLogLevel = .info
-        try await performStoreLog(loggingService: loggingService, logLevel: .debug)
+        try await performStoreLog(logLevel: .debug)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(result.isEmpty)
     }
@@ -80,17 +130,18 @@ struct LoggingServiceTests {
     @Test
     func storeLogEqualToDefinedLogLevelIsStored() async throws {
         userDefaults.minimalLogLevel = .info
-        try await performStoreLog(loggingService: loggingService, logLevel: .info)
+        try await performStoreLog(logLevel: .info)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(!result.isEmpty)
     }
 
+    // MARK: - Helpers
+
     private func performStoreLog(
-        loggingService: any LoggingService,
         error: (any Error)? = nil,
         logLevel: LogLevel
     ) async throws {
-        try await loggingService.storeLog(
+        await loggingService.storeLog(
             error: error,
             logLevel: logLevel,
             message: message,
@@ -98,5 +149,8 @@ struct LoggingServiceTests {
             tag: tag,
             timestamp: timestamp
         )
+
+        // Manually save as we don't want to wait until the autosave every 60 seconds.
+        try await loggingService.save()
     }
 }

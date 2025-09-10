@@ -39,23 +39,14 @@ extension DefaultLogger: InternalLogger {
         systemLogger.log(level: level, message, tag: tag, error: error)
 
         Task {
-            do {
-                try await loggingService.storeLog(
-                    error: error,
-                    logLevel: level,
-                    message: message,
-                    packageName: packageName,
-                    tag: tag,
-                    timestamp: timestamp
-                )
-            } catch {
-                systemLogger.log(
-                    level: .critical,
-                    "Storing log failed: \(error)",
-                    tag: LogTag(file: #file, function: #function, line: #line),
-                    error: error
-                )
-            }
+            await loggingService.storeLog(
+                error: error,
+                logLevel: level,
+                message: message,
+                packageName: packageName,
+                tag: tag,
+                timestamp: timestamp
+            )
         }
     }
 }

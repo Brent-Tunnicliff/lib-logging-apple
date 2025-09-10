@@ -48,7 +48,7 @@ package final class MockLoggingService: LoggingService {
         package let tag: LogTag
         package let timestamp: Date
     }
-    package typealias StoreLogResponse = @Sendable (StoreLogInput) throws -> Void
+    package typealias StoreLogResponse = @Sendable (StoreLogInput) -> Void
     private let storeLogResponseMutex = Mutex<StoreLogResponse>({ _ in })
     package var storeLogResponse: StoreLogResponse {
         get { storeLogResponseMutex.withLock { $0 } }
@@ -61,8 +61,8 @@ package final class MockLoggingService: LoggingService {
         packageName: String,
         tag: LogTag,
         timestamp: Date
-    ) async throws {
-        try storeLogResponse(
+    ) async {
+        storeLogResponse(
             StoreLogInput(
                 error: error,
                 logLevel: logLevel,

@@ -14,5 +14,5 @@ package protocol LoggingService: Sendable {
         packageName: String,
         tag: LogTag,
         timestamp: Date
-    ) async throws
+    ) async
 }

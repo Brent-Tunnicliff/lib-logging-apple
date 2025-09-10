@@ -74,46 +74,6 @@ struct DefaultLoggerTests {
         expectError(resultError: result.error, expectedError: error)
     }
 
-    // TODO: Fix test
-    @Test(.timeLimit(.minutes(1)))
-    func logCapturesThrownErrorInSystemLog() async {
-        let thrownError = MockError()
-        mockLoggingService.storeLogResponse = { _ in
-            throw thrownError
-        }
-
-        let logInputs = await withCheckedContinuation { continuation in
-            Task { @MainActor in
-                var logInputs: [MockLogger.LogInput] = []
-                mockSystemLogger.logResponse = { logInput in
-                    Task { @MainActor in
-                        logInputs.append(logInput)
-                        if logInputs.count > 1 {
-                            continuation.resume(returning: logInputs)
-                        }
-                    }
-                }
-
-                logger.log(
-                    level: .debug,
-                    message,
-                    tag: LogTag(file: #file, function: #function, line: #line),
-                    error: nil
-                )
-            }
-        }
-
-        #expect(logInputs.count == 2)
-        guard let result = logInputs.last else {
-            Issue.record("Unexpected nil result")
-            return
-        }
-
-        #expect(result.level == .critical)
-        #expect(result.message == "Storing log failed: MockError()")
-        expectError(resultError: result.error, expectedError: thrownError)
-    }
-
     private func expectError<ResultError: Error, ExpectedError: Error & Equatable>(
         resultError: ResultError?,
         expectedError: ExpectedError?,

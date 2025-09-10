@@ -10,6 +10,7 @@ package typealias LogEntity = LogEntityV1
 extension LogEntity {
     package static func mock(
         device: Device = .mock(),
+        id: UUID = UUID(),
         level: LogLevel = .debug,
         message: String = "Mock log",
         packageName: String = "Logging",
@@ -19,6 +20,7 @@ extension LogEntity {
     ) -> LogEntity {
         LogEntity(
             device: device,
+            id: id,
             level: level,
             message: message,
             packageName: packageName,

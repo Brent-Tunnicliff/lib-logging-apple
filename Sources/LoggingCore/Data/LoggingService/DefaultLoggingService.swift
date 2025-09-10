@@ -9,7 +9,7 @@ package actor DefaultLoggingService: ModelActor {
     let modelContainer: ModelContainer
     let modelExecutor: any ModelExecutor
 
-    private let deviceProvider: any DeviceProvider
+    private let currentDevice: Task<Device, Never>
     private let fileService: any FileService
     private let logsBatchSize = 10
     private let modelMapper: any ModelMapper
@@ -22,7 +22,9 @@ package actor DefaultLoggingService: ModelActor {
         modelMapper: any ModelMapper,
         userDefaults: UserDefaults
     ) {
-        self.deviceProvider = deviceProvider
+        self.currentDevice = Task {
+            await deviceProvider.currentDevice()
+        }
         self.fileService = fileService
         self.modelExecutor = DefaultSerialModelExecutor(
             modelContext: ModelContext(modelContainer)
@@ -41,21 +43,32 @@ package actor DefaultLoggingService: ModelActor {
             userDefaults: UserDefaults.standard
         )
     }
+
+    /// Manually trigger a save of any pending data.
+    func save() throws {
+        guard modelContext.hasChanges else {
+            return
+        }
+
+        try modelContext.save()
+    }
 }
 
 // MARK: - LoggingService
 
 extension DefaultLoggingService: LoggingService {
-    package func deleteLogs(olderThan timestamp: Date) async throws {
-        // TODO: Implement deleting of old logs
-        fatalError("Not yet implemented")
+    package func deleteLogs(olderThan timestamp: Date) throws {
+        try modelContext.delete(
+            model: LogEntity.self,
+            where: #Predicate { $0.timestampCreated < timestamp }
+        )
     }
 
-    package func exportLogs() async throws -> URL {
+    package func exportLogs() throws -> URL {
         // TODO: Implement export
         fatalError("Not yet implemented")
 
-        // var logs = try await getLogs().makeIterator()
+        // var logs = try await getLogsPagination().makeIterator()
         // let firstLog = logs.next()
 
         // for log in logs {
@@ -70,13 +83,13 @@ extension DefaultLoggingService: LoggingService {
         packageName: String,
         tag: LogTag,
         timestamp: Date
-    ) async throws {
+    ) async {
         // TODO: Build minimum log level logic to only store the levels desired.
         guard logLevel >= userDefaults.minimalLogLevel else {
             return
         }
 
-        let device = await deviceProvider.currentDevice()
+        let device = await currentDevice.value
         let model = LogEntity(
             device: modelMapper.toEntity(device: device),
             level: modelMapper.toEntity(logLevel: logLevel),
@@ -88,14 +101,13 @@ extension DefaultLoggingService: LoggingService {
         )
 
         modelContext.insert(model)
-        try modelContext.save()
     }
 }
 
 // MARK: - Private
 
 extension DefaultLoggingService {
-    private func getLogs() async throws -> FetchResultsCollection<LogEntity> {
+    private func getLogsPagination() async throws -> FetchResultsCollection<LogEntity> {
         try modelContext.fetch(
             FetchDescriptor<LogEntity>(
                 sortBy: [SortDescriptor(\LogEntity.timestampCreated)]
