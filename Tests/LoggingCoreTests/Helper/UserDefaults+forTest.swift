@@ -21,6 +21,3 @@ extension UserDefaults {
         return userDefaults
     }
 }
-
-// This is not safe, but should be ok for the tests if careful.
-extension UserDefaults: @unchecked @retroactive Sendable {}

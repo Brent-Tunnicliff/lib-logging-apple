@@ -25,6 +25,12 @@ let package = Package(
             name: "LoggingUI",
             targets: ["LoggingUI"]
         ),
+        // Only adding LoggingCore as a product so I can enable test coverage for it.
+        // None of its interfaces are expected to be public.
+        .library(
+            name: "LoggingCore",
+            targets: ["LoggingCore"]
+        ),
 //        .plugin(
 //            name: "LoggingSettingsGeneratorBuildPlugin",
 //            targets: ["LoggingSettingsGeneratorBuildPlugin"]
@@ -35,7 +41,7 @@ let package = Package(
 //        ),
     ],
     dependencies: [
-        .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0"))
+        .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
     ],
     targets: [
         .target(name: "LoggingCore"),

@@ -6,10 +6,13 @@ import Testing
 
 @testable import LoggingCore
 
+// Isolating to MainActor as `UserDefaults` is not Sendable
+@MainActor
 struct DefaultLoggingServiceTests {
     private let loggingService: DefaultLoggingService
     private let mockDeviceProvider = MockDeviceProvider()
     private let mockFileService = MockFileService()
+    private let mockLogCleanupTrigger = MockLogCleanupTrigger()
     private let mockModelMapper = MockModelMapper()
     private let modelContainer: ModelContainer
     private let userDefaults = UserDefaults.forTest()
@@ -23,11 +26,12 @@ struct DefaultLoggingServiceTests {
     )
     private let timestamp = Date()
 
-    init() async {
+    init() {
         self.modelContainer = .emptyInMemoryOnly()
         self.loggingService = DefaultLoggingService(
             deviceProvider: mockDeviceProvider,
             fileService: mockFileService,
+            logCleanupTrigger: mockLogCleanupTrigger,
             modelContainer: modelContainer,
             modelMapper: mockModelMapper,
             userDefaults: userDefaults
