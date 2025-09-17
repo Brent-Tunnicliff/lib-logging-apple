@@ -14,16 +14,16 @@ env:
 
 jobs:
   test:
-    runs-on: macos-15
+    runs-on: macos-26
     strategy:
       # Don't fail the other matrix values if one fails.
       fail-fast: false
       matrix:
         target: [
-          { platform: "iOS", simulator_version: "18" },
-          { platform: "tvOS", simulator_version: "18" },
-          { platform: "watchOS", simulator_version: "11" },
-          { platform: "visionOS", simulator_version: "2" },
+          { platform: "iOS", simulator_version: "26" },
+          { platform: "tvOS", simulator_version: "26" },
+          { platform: "watchOS", simulator_version: "26" },
+          { platform: "visionOS", simulator_version: "26" },
 
           # macOS runs on the host and doesn't need a simulator.
           { platform: "macOS", simulator_version: "" }
@@ -39,7 +39,7 @@ jobs:
         with:
           platform: "${{ matrix.target.platform }}"
           simulator_version: "${{ matrix.target.simulator_version }}"
-          xcode_path: "/Applications/Xcode_16.4.app"
+          xcode_path: "/Applications/Xcode_26.0.app"
 
       # ---------------------------
       # Build and test package

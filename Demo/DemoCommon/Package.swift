@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -9,11 +9,11 @@ let package = Package(
     name: "DemoCommon",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v18),
-        .macOS(.v15),
-        .tvOS(.v18),
-        .watchOS(.v11),
-        .visionOS(.v2),
+        .iOS(.v26),
+        .macOS(.v26),
+        .tvOS(.v26),
+        .watchOS(.v26),
+        .visionOS(.v26),
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -34,7 +34,8 @@ let package = Package(
             dependencies: [
                 .product(name: "Logging", package: "lib-logging-apple"),
                 .product(name: "LoggingUI", package: "lib-logging-apple"),
-            ]
+            ],
+            swiftSettings: [.defaultIsolation(MainActor.self)]
         )
     ]
 )
@@ -56,6 +57,9 @@ for target in package.targets {
     let swiftSettings = target.swiftSettings ?? []
     target.swiftSettings = swiftSettings + [
         .enableUpcomingFeature("ExistentialAny"),
+        .enableUpcomingFeature("InferIsolatedConformances"),
         .enableUpcomingFeature("InternalImportsByDefault"),
+        .enableUpcomingFeature("MemberImportVisibility"),
+        .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
     ]
 }

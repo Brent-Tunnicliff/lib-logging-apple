@@ -1,5 +1,7 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import Foundation
+
 final class DefaultModelMapper: ModelMapper {
     func toEntity(device: Device) -> LogEntity.Device {
         LogEntity.Device(

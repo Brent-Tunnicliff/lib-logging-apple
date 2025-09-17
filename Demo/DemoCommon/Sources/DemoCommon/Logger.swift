@@ -4,6 +4,7 @@ import Foundation
 import Logging
 
 enum Logger {
+    nonisolated
     private static var bundleIdentifier: String {
         guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
             preconditionFailure("Unexpected nil Bundle.main.bundleIdentifier")
@@ -12,6 +13,9 @@ enum Logger {
         return bundleIdentifier
     }
 
+    nonisolated
     static let app: any LoggerType = DefaultLogger(packageName: bundleIdentifier)
+
+    nonisolated
     static let other: any LoggerType = DefaultLogger(packageName: "other")
 }

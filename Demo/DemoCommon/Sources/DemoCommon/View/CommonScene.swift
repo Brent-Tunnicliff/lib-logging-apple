@@ -1,6 +1,8 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import Logging
 import LoggingUI
+import SwiftData
 public import SwiftUI
 
 /// Common scene for both the demo app and the watch companion.

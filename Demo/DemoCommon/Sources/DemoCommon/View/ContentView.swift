@@ -1,5 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import Logging
 import LoggingUI
 import SwiftData
 import SwiftUI
