@@ -74,6 +74,20 @@ struct DefaultLoggerTests {
         expectError(resultError: result.error, expectedError: error)
     }
 
+    @Test(arguments: LogLevel.allCases)
+    func extensionFunctionsMapToExpectedLogLevel(level: LogLevel) async {
+        let loggingFunction = level.expectedExtensionFunction(for: logger)
+        let result = await withCheckedContinuation { continuation in
+            mockLoggingService.storeLogResponse = {
+                continuation.resume(returning: $0)
+            }
+
+            loggingFunction(message, nil, #file, #function, #line)
+        }
+
+        #expect(result.logLevel == level)
+    }
+
     private func expectError<ResultError: Error, ExpectedError: Error & Equatable>(
         resultError: ResultError?,
         expectedError: ExpectedError?,
@@ -101,5 +115,19 @@ struct DefaultLoggerTests {
         }
 
         #expect(errorResult == expectedError, sourceLocation: sourceLocation)
+    }
+}
+
+extension LogLevel {
+    typealias DefaultLoggerFunction = @Sendable (String, (any Error)?, StaticString, StaticString, UInt) -> Void
+    fileprivate func expectedExtensionFunction(
+        for logger: any LoggerType
+    ) -> DefaultLoggerFunction {
+        switch self {
+        case .debug: logger.debug(_:error:file:function:line:)
+        case .info: logger.info(_:error:file:function:line:)
+        case .error: logger.error(_:error:file:function:line:)
+        case .critical: logger.critical(_:error:file:function:line:)
+        }
     }
 }
