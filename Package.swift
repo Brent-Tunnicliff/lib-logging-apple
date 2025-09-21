@@ -41,13 +41,17 @@ let package = Package(
 //        ),
     ],
     dependencies: [
+        .package(url: "https://github.com/apple/swift-algorithms", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
     ],
     targets: [
         .target(name: "LoggingCore"),
         .testTarget(
             name: "LoggingCoreTests",
-            dependencies: ["LoggingCore"]
+            dependencies: [
+                "LoggingCore",
+                .product(name: "Algorithms", package: "swift-algorithms"),
+            ]
         ),
         .target(
             name: "Logging",
@@ -55,7 +59,10 @@ let package = Package(
         ),
         .testTarget(
             name: "LoggingTests",
-            dependencies: ["Logging"]
+            dependencies: [
+                "Logging",
+                .product(name: "Algorithms", package: "swift-algorithms"),
+            ]
         ),
         .target(
             name: "LoggingUI",

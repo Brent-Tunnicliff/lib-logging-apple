@@ -1,5 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import Algorithms
 import Foundation
 import LoggingCore
 import Testing
@@ -23,7 +24,7 @@ struct DefaultLoggerTests {
 
     // MARK: - Tests
 
-    @Test(arguments: product(LogLevel.allCases, [true, false]))
+    @Test(arguments: Array(product(LogLevel.allCases, [true, false])))
     func logSendsExpectedDataToSystemLog(level: LogLevel, sendError: Bool) async {
         let tag = LogTag(file: #file, function: #function, line: #line)
         let error = sendError ? MockError() : nil
@@ -50,7 +51,7 @@ struct DefaultLoggerTests {
         expectError(resultError: result.error, expectedError: error)
     }
 
-    @Test(arguments: product(LogLevel.allCases, [true, false]))
+    @Test(arguments: Array(product(LogLevel.allCases, [true, false])))
     func logSendsExpectedDataToLoggingService(level: LogLevel, sendError: Bool) async {
         let before = Date()
         let tag = LogTag(file: #file, function: #function, line: #line)

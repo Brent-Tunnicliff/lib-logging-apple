@@ -2,6 +2,8 @@
 
 import Synchronization
 
+@testable import LoggingCore
+
 final class MockModelMapper: ModelMapper {
     // MARK: - toEntity(device:)
 

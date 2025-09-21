@@ -1,8 +1,9 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import LoggingCore
 import Synchronization
 
-package final class MockDeviceProvider: DeviceProvider {
+final class MockDeviceProvider: DeviceProvider {
     private let deviceMutex = Mutex<Device>(.mock())
     var deviceValue: Device {
         get {
@@ -13,7 +14,7 @@ package final class MockDeviceProvider: DeviceProvider {
         }
     }
 
-    package func currentDevice() async -> Device {
+    func currentDevice() async -> Device {
         deviceValue
     }
 }

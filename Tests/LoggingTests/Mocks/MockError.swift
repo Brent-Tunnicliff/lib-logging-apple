@@ -2,6 +2,4 @@
 
 import Foundation
 
-package struct MockError: Error, Equatable {
-    package init() {}
-}
+struct MockError: Error, Equatable {}

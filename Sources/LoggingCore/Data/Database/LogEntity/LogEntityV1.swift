@@ -15,7 +15,7 @@ package final class LogEntityV1: Equatable, Identifiable {
     package private(set) var timestampCreated: Date
     package private(set) var error: Error?
 
-    init(
+    package init(
         device: Device,
         id: UUID = UUID(),
         level: LogLevel,
@@ -43,6 +43,12 @@ extension LogEntityV1 {
         package let type: String
         package let message: String
         package let localizedDescription: String
+
+        package init(type: String, message: String, localizedDescription: String) {
+            self.type = type
+            self.message = message
+            self.localizedDescription = localizedDescription
+        }
     }
 
     package struct Device: Codable, Equatable {
@@ -51,6 +57,20 @@ extension LogEntityV1 {
         package let systemName: String?
         package let systemVersion: String?
         package let userInterfaceIdiom: UserInterfaceIdiom
+
+        package init(
+            identifierForVendor: UUID?,
+            model: String?,
+            systemName: String?,
+            systemVersion: String?,
+            userInterfaceIdiom: UserInterfaceIdiom
+        ) {
+            self.identifierForVendor = identifierForVendor
+            self.model = model
+            self.systemName = systemName
+            self.systemVersion = systemVersion
+            self.userInterfaceIdiom = userInterfaceIdiom
+        }
     }
 
     package enum LogLevel: String, Codable, Equatable, CaseIterable {
@@ -64,6 +84,12 @@ extension LogEntityV1 {
         package let file: String
         package let function: String
         package let line: UInt
+
+        package init(file: String, function: String, line: UInt) {
+            self.file = file
+            self.function = function
+            self.line = line
+        }
     }
 
     package enum UserInterfaceIdiom: String, Codable, Equatable, CaseIterable {

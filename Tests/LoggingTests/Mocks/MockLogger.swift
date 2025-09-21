@@ -1,27 +1,26 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-package import LoggingCore
+import Logging
+import LoggingCore
 import Synchronization
 
 /// Mock Logger for use in tests and previews or where needed.
-package final class MockLogger: InternalLogger {
-    package init() {}
-
+final class MockLogger: InternalLogger {
     // MARK: - log
 
-    package struct LogInput {
-        package let level: LogLevel
-        package let message: String
-        package let tag: LogTag
-        package let error: (any Error)?
+    struct LogInput {
+        let level: LogLevel
+        let message: String
+        let tag: LogTag
+        let error: (any Error)?
     }
-    package typealias LogResponse = @Sendable (LogInput) -> Void
+    typealias LogResponse = @Sendable (LogInput) -> Void
     private let logResponseMutex = Mutex<LogResponse>({ _ in })
-    package var logResponse: LogResponse {
+    var logResponse: LogResponse {
         get { logResponseMutex.withLock { $0 } }
         set { logResponseMutex.withLock { $0 = newValue } }
     }
-    package func log(
+    func log(
         level: LogLevel,
         _ message: String,
         tag: LogTag,
@@ -41,7 +40,7 @@ package final class MockLogger: InternalLogger {
 // MARK: - LoggerType
 
 extension MockLogger: LoggerType {
-    package func debug(
+    func debug(
         message: String,
         error: (any Error)?,
         file: StaticString,
@@ -60,7 +59,7 @@ extension MockLogger: LoggerType {
         )
     }
 
-    package func info(
+    func info(
         message: String,
         error: (any Error)?,
         file: StaticString,
@@ -79,7 +78,7 @@ extension MockLogger: LoggerType {
         )
     }
 
-    package func error(
+    func error(
         message: String,
         error: (any Error)?,
         file: StaticString,
@@ -98,7 +97,7 @@ extension MockLogger: LoggerType {
         )
     }
 
-    package func critical(
+    func critical(
         message: String,
         error: (any Error)?,
         file: StaticString,

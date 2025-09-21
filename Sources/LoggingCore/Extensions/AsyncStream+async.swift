@@ -4,6 +4,7 @@ extension AsyncStream {
     /// Convenient wrapper for wrapping a single task and handling cancellations.
     ///
     /// If task throws it will also finish the stream (e.g. `CancellationError`).
+    /// Immediately after the `build` function returns or throws, we finish the steam.
     static func async(
         _ elementType: Element.Type = Element.self,
         bufferingPolicy limit: AsyncStream.Continuation.BufferingPolicy = .unbounded,

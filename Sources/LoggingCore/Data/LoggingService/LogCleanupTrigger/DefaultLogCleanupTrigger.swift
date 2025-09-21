@@ -12,8 +12,7 @@ actor DefaultLogCleanupTrigger {
             return true
         }
 
-        let cleanupDue = lastLogCleanup.addingTimeInterval(cleanupIntervals)
-        return Date() < cleanupDue
+        return lastLogCleanup.addingTimeInterval(cleanupIntervals) <= Date()
     }
 
     init(

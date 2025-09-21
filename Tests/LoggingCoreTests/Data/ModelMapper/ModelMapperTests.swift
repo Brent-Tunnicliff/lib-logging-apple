@@ -50,7 +50,7 @@ struct ModelMapperTests {
         #expect(result.type == "MockError()")
         #expect(result.message == "MockError()")
         #expect(
-            result.localizedDescription == "The operation couldn’t be completed. (LoggingCore.MockError error 1.)"
+            result.localizedDescription == "The operation couldn’t be completed. (LoggingCoreTests.MockError error 1.)"
         )
     }
 

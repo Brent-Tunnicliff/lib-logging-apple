@@ -27,10 +27,10 @@ extension Duration {
 
     @inlinable
     package static func days<T>(_ days: T) -> Duration where T: BinaryInteger {
-        hours(24)
+        hours(days * 24)
     }
 
     package static func days(_ days: Double) -> Duration {
-        hours(24)
+        hours(days * 24)
     }
 }

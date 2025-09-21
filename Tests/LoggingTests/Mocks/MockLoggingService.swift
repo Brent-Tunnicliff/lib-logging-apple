@@ -1,10 +1,11 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-package import Foundation
+import Foundation
+import LoggingCore
 import SwiftData
 import Synchronization
 
-package final class MockLoggingService: LoggingService {
+final class MockLoggingService: LoggingService {
     package init() {}
 
     // MARK: - deleteLogs

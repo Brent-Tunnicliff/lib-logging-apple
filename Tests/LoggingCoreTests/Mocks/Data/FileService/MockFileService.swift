@@ -2,6 +2,8 @@
 
 import Foundation
 
+@testable import LoggingCore
+
 final class MockFileService: FileService {
     var directory: URL { .mock }
 }

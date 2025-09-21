@@ -1,5 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import Algorithms
 import Foundation
 import SwiftData
 import Testing
@@ -88,7 +89,7 @@ struct DefaultLoggingServiceTests {
 
     // MARK: - storeLog(error:logLevel:message:packageName:tag:timestamp:)
 
-    @Test(arguments: product(LogLevel.allCases, [true, false]))
+    @Test(arguments: Array(product(LogLevel.allCases, [true, false])))
     func storeLog(level: LogLevel, sendError: Bool) async throws {
         let error = sendError ? MockError() : nil
         let expectedDevice = LogEntity.Device.mock()

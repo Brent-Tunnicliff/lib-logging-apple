@@ -40,7 +40,7 @@ extension ModelContainer {
     }
 
     @MainActor
-    package func injectingMocks(logs: [LogEntity] = LogEntity.defaultMocks()) -> ModelContainer {
+    package func injectingMocks(logs: [LogEntity]) -> ModelContainer {
         for log in logs {
             mainContext.insert(log)
         }

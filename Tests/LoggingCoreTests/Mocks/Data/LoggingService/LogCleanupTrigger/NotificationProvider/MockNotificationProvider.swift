@@ -3,14 +3,16 @@
 import Foundation
 import Synchronization
 
+@testable import LoggingCore
+
 final class MockNotificationProvider: NotificationProvider {
     // MARK: - notifications(named:)
 
     let didBecomeActiveNotification: Notification.Name = .mock(name: "didBecomeActiveNotification")
 
-    package typealias NotificationsResponse = @Sendable (Notification.Name) -> AsyncStream<Void>
+    typealias NotificationsResponse = @Sendable (Notification.Name) -> AsyncStream<Void>
     private let notificationsResponseMutex = Mutex<NotificationsResponse>({ _ in .mock() })
-    package var notificationsResponse: NotificationsResponse {
+    var notificationsResponse: NotificationsResponse {
         get { notificationsResponseMutex.withLock { $0 } }
         set { notificationsResponseMutex.withLock { $0 = newValue } }
     }

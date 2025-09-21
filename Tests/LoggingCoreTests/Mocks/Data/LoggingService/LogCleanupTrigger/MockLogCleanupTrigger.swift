@@ -3,6 +3,8 @@
 import Foundation
 import Synchronization
 
+@testable import LoggingCore
+
 final class MockLogCleanupTrigger: LogCleanupTrigger {
     // MARK: - registerForCleanup()
 

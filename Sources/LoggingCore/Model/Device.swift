@@ -20,20 +20,6 @@ package struct Device {
 
     /// Type of user interface of the device.
     let userInterfaceIdiom: UserInterfaceIdiom
-
-    private init(
-        identifierForVendor: UUID?,
-        model: String?,
-        systemName: String?,
-        systemVersion: String?,
-        userInterfaceIdiom: UserInterfaceIdiom
-    ) {
-        self.identifierForVendor = identifierForVendor
-        self.model = model
-        self.systemName = systemName
-        self.systemVersion = systemVersion
-        self.userInterfaceIdiom = userInterfaceIdiom
-    }
 }
 
 extension Device: Codable {}
@@ -52,25 +38,6 @@ extension Device {
             currentIOKit()
         #endif
     }()
-}
-
-extension Device {
-    /// Create a mock instance of ``Device``.
-    static func mock(
-        identifierForVendor: UUID? = UUID(),
-        model: String? = "iPhone",
-        systemName: String? = "iOS",
-        systemVersion: String? = "18.3",
-        userInterfaceIdiom: UserInterfaceIdiom = .phone
-    ) -> Device {
-        Device(
-            identifierForVendor: identifierForVendor,
-            model: model,
-            systemName: systemName,
-            systemVersion: systemVersion,
-            userInterfaceIdiom: userInterfaceIdiom
-        )
-    }
 }
 
 // MARK: - UserInterfaceIdiom

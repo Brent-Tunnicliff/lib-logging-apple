@@ -1,3 +1,5 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-package typealias LogEntity = LogEntityV1
+import Foundation
+
+struct MockError: Error, Equatable {}
