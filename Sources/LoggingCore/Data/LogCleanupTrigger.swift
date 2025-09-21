@@ -2,6 +2,18 @@
 
 import Foundation
 
+protocol LogCleanupTrigger: Sendable {
+    /// Will yield a value if cleanup should be performed.
+    func registerForCleanup() -> AsyncStream<Void>
+
+    /// Store log cleanup performed.
+    ///
+    /// This is very important to call as it affects how often `registerForCleanup()` returns.
+    func storeLogCleanup(timestamp: Date)
+}
+
+// MARK: - DefaultLogCleanupTrigger
+
 actor DefaultLogCleanupTrigger {
     private let cleanupIntervals = TimeInterval(duration: .days(1))
     private let notificationProvider: any NotificationProvider

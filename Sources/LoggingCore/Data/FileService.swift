@@ -3,6 +3,12 @@
 import Foundation
 import Synchronization
 
+protocol FileService: Sendable {
+    var directory: URL { get }
+}
+
+// MARK: - DefaultFileService
+
 final class DefaultFileService: FileService {
     // Wrapping `fileManager` in Mutex to make it sendable safe.
     // We do not want these calls to be async, as it will be used in an actor in

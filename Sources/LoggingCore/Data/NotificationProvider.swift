@@ -2,6 +2,16 @@
 
 import Foundation
 
+protocol NotificationProvider: Sendable {
+    associatedtype NotificationsAsyncSequence: AsyncSequence<Void, Never> & Sendable
+
+    var didBecomeActiveNotification: Notification.Name { get async }
+
+    func notifications(named name: Notification.Name) -> NotificationsAsyncSequence
+}
+
+// MARK: - DefaultNotificationProvider
+
 final class DefaultNotificationProvider: NotificationProvider {
     var didBecomeActiveNotification: Notification.Name {
         get async {

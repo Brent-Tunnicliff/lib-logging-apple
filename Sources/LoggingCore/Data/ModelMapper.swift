@@ -2,6 +2,17 @@
 
 import Foundation
 
+protocol ModelMapper: Sendable {
+    func toEntity(device: Device) -> LogEntity.Device
+    func toEntity(error: any Error) -> LogEntity.Error
+    func toEntity(logLevel: LogLevel) -> LogEntity.LogLevel
+    func toEntity(logTag: LogTag) -> LogEntity.Tag
+    func toEntity(userInterfaceIdiom: Device.UserInterfaceIdiom) -> LogEntity.UserInterfaceIdiom
+    func toExportContent(logEntity: LogEntity) -> String
+}
+
+// MARK: - DefaultModelMapper
+
 final class DefaultModelMapper: ModelMapper {
     func toEntity(device: Device) -> LogEntity.Device {
         LogEntity.Device(
