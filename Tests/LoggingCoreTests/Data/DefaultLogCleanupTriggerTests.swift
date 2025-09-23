@@ -1,20 +1,20 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
 import Foundation
+import Synchronization
 import Testing
 
 @testable import LoggingCore
 
-@MainActor
 struct LoggingCoreTests {
     private let logCleanupTrigger: DefaultLogCleanupTrigger
     private let mockNotificationProvider = MockNotificationProvider()
-    private let userDefaults = UserDefaults.forTest()
+    private let mockUserDefaultsStore = MockUserDefaultsStore()
 
     init() {
         logCleanupTrigger = DefaultLogCleanupTrigger(
             notificationProvider: mockNotificationProvider,
-            userDefaults: userDefaults
+            userDefaults: mockUserDefaultsStore
         )
     }
 
@@ -73,26 +73,40 @@ struct LoggingCoreTests {
         .timeLimit(.minutes(1)),
         arguments: RegisterForCleanupArgument.allCases
     )
-    func registerForCleanupWithNoLastLogin(_ argument: RegisterForCleanupArgument) async {
-        userDefaults.lastLogCleanup = argument.lastLogCleanup
+    func registerForClean(_ argument: RegisterForCleanupArgument) async throws {
+        mockUserDefaultsStore.lastLogCleanup = argument.lastLogCleanup
         var triggerContinuation: AsyncStream<Void>.Continuation?
         let trigger = AsyncStream<Void> { continuation in
             triggerContinuation = continuation
         }
         mockNotificationProvider.notificationsResponse = { _ in trigger }
 
-        let count = await withCheckedContinuation { checkedContinuation in
-            Task {
-                var count = 0
-                for await _ in logCleanupTrigger.registerForCleanup() {
-                    count += 1
-                }
-                checkedContinuation.resume(returning: count)
-            }
-
-            triggerContinuation?.yield()
-            triggerContinuation?.finish()
+        guard let triggerContinuation else {
+            Issue.record("triggerContinuation is nil")
+            return
         }
+
+        let countReadyMutex = Mutex(false)
+        let countTask = Task {
+            var count = 0
+            for await _ in logCleanupTrigger.registerForCleanup() {
+                if count == 0 {
+                    countReadyMutex.withLock { $0 = true }
+                }
+
+                count += 1
+            }
+            return count
+        }
+
+        while countReadyMutex.withLock({ $0 }) == false {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        triggerContinuation.yield()
+        triggerContinuation.finish()
+
+        let count = await countTask.value
 
         #expect(count == argument.expectedCount)
     }

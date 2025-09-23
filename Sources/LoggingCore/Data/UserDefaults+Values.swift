@@ -3,8 +3,15 @@
 import Combine
 import Foundation
 
-extension UserDefaults {
+protocol UserDefaultsStore: AnyObject {
+    var minimalLogLevel: LogLevel { get set }
+    var lastLogCleanup: Date? { get set }
+}
+
+extension UserDefaults: UserDefaultsStore {
     private var keyPrefix: String { "dev_tunnicliff_lib_logging" }
+
+    // MARK: - minimalLogLevel
 
     // This key needs to match the one defined in `LoggingUI/Settings.bundle`.
     private var minimalLogLevelKey: String { "\(keyPrefix)_minimal_log_level" }
@@ -25,6 +32,8 @@ extension UserDefaults {
             setValue(newValue.rawValue, forKey: minimalLogLevelKey)
         }
     }
+
+    // MARK: - lastLogCleanup
 
     private var lastLogCleanupKey: String { "\(keyPrefix)_last_log_cleanup" }
     @objc dynamic var lastLogCleanup: Date? {

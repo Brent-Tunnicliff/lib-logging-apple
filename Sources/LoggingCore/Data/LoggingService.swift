@@ -33,7 +33,7 @@ package actor DefaultLoggingService: ModelActor {
     private let logsBatchSize = 10
     private let logCleanupTrigger: any LogCleanupTrigger
     private let modelMapper: any ModelMapper
-    private let userDefaults: UserDefaults
+    private let userDefaults: any UserDefaultsStore
 
     init(
         deviceProvider: any DeviceProvider,
@@ -41,7 +41,7 @@ package actor DefaultLoggingService: ModelActor {
         logCleanupTrigger: any LogCleanupTrigger,
         modelContainer: ModelContainer,
         modelMapper: any ModelMapper,
-        userDefaults: UserDefaults
+        userDefaults: any UserDefaultsStore
     ) {
         self.currentDevice = Task {
             await deviceProvider.currentDevice()

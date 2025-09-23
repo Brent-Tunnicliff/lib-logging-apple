@@ -7,8 +7,6 @@ import Testing
 
 @testable import LoggingCore
 
-// Isolating to MainActor as `UserDefaults` is not Sendable
-@MainActor
 struct DefaultLoggingServiceTests {
     private let loggingService: DefaultLoggingService
     private let mockDeviceProvider = MockDeviceProvider()
@@ -16,7 +14,7 @@ struct DefaultLoggingServiceTests {
     private let mockLogCleanupTrigger = MockLogCleanupTrigger()
     private let mockModelMapper = MockModelMapper()
     private let modelContainer: ModelContainer
-    private let userDefaults = UserDefaults.forTest()
+    private let mockUserDefaultsStore = MockUserDefaultsStore()
 
     private let message = "This message should be sent to the places"
     private let packageName = "LoggingTests"
@@ -35,7 +33,7 @@ struct DefaultLoggingServiceTests {
             logCleanupTrigger: mockLogCleanupTrigger,
             modelContainer: modelContainer,
             modelMapper: mockModelMapper,
-            userDefaults: userDefaults
+            userDefaults: mockUserDefaultsStore
         )
     }
 
@@ -105,7 +103,7 @@ struct DefaultLoggingServiceTests {
         mockModelMapper.toEntityLogTagResponse = { _ in expectedTag }
         mockModelMapper.toEntityUserInterfaceIdiomResponse = { _ in expectedDevice.userInterfaceIdiom }
 
-        userDefaults.minimalLogLevel = level
+        mockUserDefaultsStore.minimalLogLevel = level
         try await performStoreLog(error: error, logLevel: level)
         let results: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(results.count == 1)
@@ -126,7 +124,7 @@ struct DefaultLoggingServiceTests {
 
     @Test
     func storeLogLowerThanDefinedLogLevelIsIgnored() async throws {
-        userDefaults.minimalLogLevel = .info
+        mockUserDefaultsStore.minimalLogLevel = .info
         try await performStoreLog(logLevel: .debug)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(result.isEmpty)
@@ -134,7 +132,7 @@ struct DefaultLoggingServiceTests {
 
     @Test
     func storeLogEqualToDefinedLogLevelIsStored() async throws {
-        userDefaults.minimalLogLevel = .info
+        mockUserDefaultsStore.minimalLogLevel = .info
         try await performStoreLog(logLevel: .info)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(!result.isEmpty)
