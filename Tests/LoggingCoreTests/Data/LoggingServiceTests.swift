@@ -7,7 +7,7 @@ import Testing
 
 @testable import LoggingCore
 
-struct DefaultLoggingServiceTests {
+struct LoggingServiceTests {
     private let loggingService: DefaultLoggingService
     private let mockDeviceProvider = MockDeviceProvider()
     private let mockFileService = MockFileService()
@@ -25,6 +25,9 @@ struct DefaultLoggingServiceTests {
     )
     private let timestamp = Date()
 
+    // Isolating the init to `@MainActor` to avoid a potential crash
+    // when calling `ModelContainer.emptyInMemoryOnly()` concurrently.
+    @MainActor
     init() {
         self.modelContainer = .emptyInMemoryOnly()
         self.loggingService = DefaultLoggingService(

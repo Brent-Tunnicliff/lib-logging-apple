@@ -6,7 +6,7 @@ import Testing
 
 @testable import LoggingCore
 
-struct LoggingCoreTests {
+struct LogCleanupTriggerTests {
     private let logCleanupTrigger: DefaultLogCleanupTrigger
     private let mockNotificationProvider = MockNotificationProvider()
     private let mockUserDefaultsStore = MockUserDefaultsStore()
