@@ -10,13 +10,13 @@ final class MockNotificationProvider: NotificationProvider {
 
     let didBecomeActiveNotification: Notification.Name = .mock(name: "didBecomeActiveNotification")
 
-    typealias NotificationsResponse = @Sendable (Notification.Name) -> AsyncStream<Void>
-    private let notificationsResponseMutex = Mutex<NotificationsResponse>({ _ in .mock() })
+    typealias NotificationsResponse = @Sendable (Notification.Name) -> MockAsyncStream<Void>
+    private let notificationsResponseMutex = Mutex<NotificationsResponse>({ _ in MockAsyncStream() })
     var notificationsResponse: NotificationsResponse {
         get { notificationsResponseMutex.withLock { $0 } }
         set { notificationsResponseMutex.withLock { $0 = newValue } }
     }
-    func notifications(named name: Notification.Name) -> AsyncStream<Void> {
+    func notifications(named name: Notification.Name) -> any AsyncSequence<Void, Never> {
         notificationsResponse(name)
     }
 }

@@ -4,7 +4,7 @@ import Foundation
 
 protocol LogCleanupTrigger: Sendable {
     /// Will yield a value if cleanup should be performed.
-    func registerForCleanup() -> AsyncStream<Void>
+    func registerForCleanup() -> any AsyncSequence<Void, Never>
 
     /// Store log cleanup performed.
     ///
@@ -48,8 +48,8 @@ actor DefaultLogCleanupTrigger {
 }
 
 extension DefaultLogCleanupTrigger: LogCleanupTrigger {
-    nonisolated func registerForCleanup() -> AsyncStream<Void> {
-        .async(bufferingPolicy: .bufferingNewest(1)) { [weak self, notificationProvider] continuation in
+    nonisolated func registerForCleanup() -> any AsyncSequence<Void, Never> {
+        AsyncStream.async(bufferingPolicy: .bufferingNewest(1)) { [weak self, notificationProvider] continuation in
             // Trigger one immediately.
             continuation.yield()
 

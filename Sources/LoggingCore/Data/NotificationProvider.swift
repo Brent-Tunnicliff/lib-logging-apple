@@ -3,11 +3,9 @@
 import Foundation
 
 protocol NotificationProvider: Sendable {
-    associatedtype NotificationsAsyncSequence: AsyncSequence<Void, Never> & Sendable
-
     var didBecomeActiveNotification: Notification.Name { get async }
 
-    func notifications(named name: Notification.Name) -> NotificationsAsyncSequence
+    func notifications(named name: Notification.Name) -> any AsyncSequence<Void, Never>
 }
 
 // MARK: - DefaultNotificationProvider
@@ -29,8 +27,8 @@ final class DefaultNotificationProvider: NotificationProvider {
         self.init(notificationCenter: .default)
     }
 
-    func notifications(named name: Notification.Name) -> AsyncStream<Void> {
-        .async { [notificationCenter] continuation in
+    func notifications(named name: Notification.Name) -> any AsyncSequence<Void, Never> {
+        AsyncStream.async { [notificationCenter] continuation in
             for await _ in notificationCenter.notifications(named: name) {
                 try Task.checkCancellation()
                 continuation.yield()

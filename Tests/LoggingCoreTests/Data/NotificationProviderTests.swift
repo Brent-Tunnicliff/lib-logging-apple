@@ -19,12 +19,17 @@ struct NotificationProviderTests {
 
     @Test(.timeLimit(.minutes(1)))
     func notificationsNamed() async throws {
-        var iterator = notificationProvider.notifications(named: notificationName).makeAsyncIterator()
-        async let notificationTriggered = iterator.next() != nil
+        let notificationTriggered = Task {
+            for await _ in notificationProvider.notifications(named: notificationName) {
+                return true
+            }
+
+            return false
+        }
 
         // We need to wait for the above to setup before we can continue.
         try await Task.sleep(for: .milliseconds(500))
         notificationCenter.post(name: notificationName, object: nil)
-        await #expect(notificationTriggered == true)
+        await #expect(notificationTriggered.value == true)
     }
 }

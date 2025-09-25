@@ -84,7 +84,7 @@ package actor DefaultLoggingService: ModelActor {
         try modelContext.save()
     }
 
-    private func registerForCleanup() async {
+    private func registerForCleanup() {
         if let cleanupTask, !cleanupTask.isCancelled {
             // We do not want to trigger multiple tasks.
             return

@@ -15,6 +15,7 @@ struct LoggingServiceTests {
     private let mockModelMapper = MockModelMapper()
     private let modelContainer: ModelContainer
     private let mockUserDefaultsStore = MockUserDefaultsStore()
+    private let registerForCleanupStream: MockAsyncStream<Void>
 
     private let message = "This message should be sent to the places"
     private let packageName = "LoggingTests"
@@ -28,7 +29,11 @@ struct LoggingServiceTests {
     // Isolating the init to `@MainActor` to avoid a potential crash
     // when calling `ModelContainer.emptyInMemoryOnly()` concurrently.
     @MainActor
-    init() {
+    init() async throws {
+        let registerForCleanupStream = MockAsyncStream<Void>()
+        self.mockLogCleanupTrigger.registerForCleanupResponse = {
+            registerForCleanupStream
+        }
         self.modelContainer = .emptyInMemoryOnly()
         self.loggingService = DefaultLoggingService(
             deviceProvider: mockDeviceProvider,
@@ -38,6 +43,7 @@ struct LoggingServiceTests {
             modelMapper: mockModelMapper,
             userDefaults: mockUserDefaultsStore
         )
+        self.registerForCleanupStream = registerForCleanupStream
     }
 
     // MARK: - deleteLogs(olderThan:)
@@ -139,6 +145,45 @@ struct LoggingServiceTests {
         try await performStoreLog(logLevel: .info)
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
         #expect(!result.isEmpty)
+    }
+
+    // MARK: - registerForCleanup()
+
+    @Test(.timeLimit(.minutes(1)))
+    func registerForCleanup() async throws {
+        let now = Date()
+        let logToDelete = LogEntity.mock(
+            timestampCreated: Date(timeInterval: -TimeInterval(duration: .days(91)), since: now)
+        )
+
+        let logToKeep = LogEntity.mock(
+            timestampCreated: Date(timeInterval: -TimeInterval(duration: .days(89)), since: now)
+        )
+
+        let modelContext = ModelContext(modelContainer)
+        modelContext.autosaveEnabled = false
+        try modelContext.transaction {
+            modelContext.insert(logToDelete)
+            modelContext.insert(logToKeep)
+
+            try modelContext.save()
+        }
+
+        async let storeLogCleanupCalled = withCheckedContinuation { continuation in
+            mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
+                continuation.resume(returning: true)
+            }
+        }
+
+        try await registerForCleanupStream.waitForContinuation()
+        registerForCleanupStream.continuation.yield()
+
+        await #expect(storeLogCleanupCalled == true)
+
+        let results: [LogEntity] = try modelContext.fetch(FetchDescriptor())
+        #expect(results.count == 1)
+        #expect(results.first?.id == logToKeep.id)
+
     }
 
     // MARK: - Helpers

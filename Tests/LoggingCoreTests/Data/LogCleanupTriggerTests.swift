@@ -20,9 +20,6 @@ struct LogCleanupTriggerTests {
 
     @Test(.timeLimit(.minutes(1)))
     func registerForCleanupYieldsImmediately() async {
-        // Make sure the mock hangs.
-        mockNotificationProvider.notificationsResponse = { _ in .mock(yieldValue: false, shouldComplete: false) }
-
         await withCheckedContinuation { continuation in
             Task {
                 for await _ in logCleanupTrigger.registerForCleanup() {
@@ -75,36 +72,21 @@ struct LogCleanupTriggerTests {
     )
     func registerForClean(_ argument: RegisterForCleanupArgument) async throws {
         mockUserDefaultsStore.lastLogCleanup = argument.lastLogCleanup
-        var triggerContinuation: AsyncStream<Void>.Continuation?
-        let trigger = AsyncStream<Void> { continuation in
-            triggerContinuation = continuation
-        }
+        let trigger = MockAsyncStream<Void>()
         mockNotificationProvider.notificationsResponse = { _ in trigger }
 
-        guard let triggerContinuation else {
-            Issue.record("triggerContinuation is nil")
-            return
-        }
-
-        let countReadyMutex = Mutex(false)
         let countTask = Task {
             var count = 0
             for await _ in logCleanupTrigger.registerForCleanup() {
-                if count == 0 {
-                    countReadyMutex.withLock { $0 = true }
-                }
-
                 count += 1
             }
             return count
         }
 
-        while countReadyMutex.withLock({ $0 }) == false {
-            try await Task.sleep(for: .milliseconds(10))
-        }
+        try await trigger.waitForContinuation()
 
-        triggerContinuation.yield()
-        triggerContinuation.finish()
+        trigger.continuation.yield()
+        trigger.continuation.finish()
 
         let count = await countTask.value
 

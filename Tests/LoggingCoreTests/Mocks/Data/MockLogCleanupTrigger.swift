@@ -8,13 +8,13 @@ import Synchronization
 final class MockLogCleanupTrigger: LogCleanupTrigger {
     // MARK: - registerForCleanup()
 
-    typealias RegisterForCleanupResponse = @Sendable () -> AsyncStream<Void>
-    private let registerForCleanupResponseMutex = Mutex<RegisterForCleanupResponse>({ .mock() })
+    typealias RegisterForCleanupResponse = @Sendable () -> MockAsyncStream<Void>
+    private let registerForCleanupResponseMutex = Mutex<RegisterForCleanupResponse>({ MockAsyncStream() })
     var registerForCleanupResponse: RegisterForCleanupResponse {
         get { registerForCleanupResponseMutex.withLock { $0 } }
         set { registerForCleanupResponseMutex.withLock { $0 = newValue } }
     }
-    func registerForCleanup() -> AsyncStream<Void> {
+    func registerForCleanup() -> any AsyncSequence<Void, Never> {
         registerForCleanupResponse()
     }
 
