@@ -92,4 +92,12 @@ struct LogCleanupTriggerTests {
 
         #expect(count == argument.expectedCount)
     }
+
+    @Test
+    func storeLogCleanup() async throws {
+        let expectedTimestamp = Date()
+        logCleanupTrigger.storeLogCleanup(timestamp: expectedTimestamp)
+        try await mockUserDefaultsStore.waitForLastLogCleanup()
+        #expect(mockUserDefaultsStore.lastLogCleanup == expectedTimestamp)
+    }
 }
