@@ -19,16 +19,21 @@ struct NotificationProviderTests {
 
     @Test(.timeLimit(.minutes(1)))
     func notificationsNamed() async throws {
+        var setupIsReady = false
         let notificationTriggered = Task {
-            for await _ in notificationProvider.notifications(named: notificationName) {
+            let stream = notificationProvider.notifications(named: notificationName)
+            setupIsReady = true
+            for await _ in stream {
                 return true
             }
 
             return false
         }
 
-        // We need to wait for the above to setup before we can continue.
-        try await Task.sleep(for: .milliseconds(500))
+        while setupIsReady == false {
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
         notificationCenter.post(name: notificationName, object: nil)
         await #expect(notificationTriggered.value == true)
     }
