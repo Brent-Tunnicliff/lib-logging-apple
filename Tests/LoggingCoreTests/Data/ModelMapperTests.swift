@@ -73,4 +73,148 @@ struct ModelMapperTests {
         #expect(result.function == "ModelMapperTests-function")
         #expect(result.line == 42)
     }
+
+    enum ToExportContentArgument: CaseIterable {
+        case withEverything
+        case withoutDeviceIdentifierForVendor
+        case withoutDeviceModel
+        case withoutDeviceSystemName
+        case withoutDeviceSystemVersion
+        case withoutError
+
+        var logEntry: LogEntity {
+            LogEntity(
+                device: LogEntity.Device(
+                    identifierForVendor: deviceIdentifierForVendor,
+                    model: deviceModel,
+                    systemName: deviceSystemName,
+                    systemVersion: deviceSystemVersion,
+                    userInterfaceIdiom: .phone
+                ),
+                id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000001"),
+                level: .info,
+                message: "This is a log",
+                packageName: "LoggingCoreTests",
+                tag: LogEntity.Tag(
+                    file: "LoggingCoreTests/ModelMapperTests.swift",
+                    function: "toExportContentWithError()",
+                    line: 10
+                ),
+                timestampCreated: timestampCreated,
+                error: error
+            )
+        }
+
+        var expectedResult: String {
+            switch self {
+            case .withEverything:
+                """
+                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
+                \tThis is a log
+                \terror: MockError - An error happened (Oh no!)
+                \t00000000-0000-0000-0000-000000000002 iPhone17,3 iOS 26 (phone)
+                """
+            case .withoutDeviceIdentifierForVendor:
+                """
+                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
+                \tThis is a log
+                \terror: MockError - An error happened (Oh no!)
+                \tiPhone17,3 iOS 26 (phone)
+                """
+            case .withoutDeviceModel:
+                """
+                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
+                \tThis is a log
+                \terror: MockError - An error happened (Oh no!)
+                \t00000000-0000-0000-0000-000000000002 iOS 26 (phone)
+                """
+            case .withoutDeviceSystemName:
+                """
+                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
+                \tThis is a log
+                \terror: MockError - An error happened (Oh no!)
+                \t00000000-0000-0000-0000-000000000002 iPhone17,3 26 (phone)
+                """
+            case .withoutDeviceSystemVersion:
+                """
+                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
+                \tThis is a log
+                \terror: MockError - An error happened (Oh no!)
+                \t00000000-0000-0000-0000-000000000002 iPhone17,3 iOS (phone)
+                """
+            case .withoutError:
+                """
+                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
+                \tThis is a log
+                \t00000000-0000-0000-0000-000000000002 iPhone17,3 iOS 26 (phone)
+                """
+            }
+        }
+
+        private var deviceIdentifierForVendor: UUID? {
+            switch self {
+            case .withoutDeviceIdentifierForVendor: nil
+            default: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000002")
+            }
+        }
+
+        private var deviceModel: String? {
+            switch self {
+            case .withoutDeviceModel: nil
+            default: "iPhone17,3"
+            }
+        }
+
+        private var deviceSystemName: String? {
+            switch self {
+            case .withoutDeviceSystemName: nil
+            default: "iOS"
+            }
+        }
+
+        private var deviceSystemVersion: String? {
+            switch self {
+            case .withoutDeviceSystemVersion: nil
+            default: "26"
+            }
+        }
+
+        private var error: LogEntity.Error? {
+            switch self {
+            case .withoutError: nil
+            default:
+                LogEntity.Error(
+                    type: "MockError",
+                    message: "An error happened",
+                    localizedDescription: "Oh no!"
+                )
+            }
+        }
+
+        private var timestampCreated: Date {
+            let dateString = "2025-09-25T12:27:35Z"
+            guard let date = ISO8601DateFormatter().date(from: dateString) else {
+                preconditionFailure("Unexpected nil formatting date '\(dateString)'")
+            }
+
+            return date
+        }
+    }
+
+    @Test(arguments: ToExportContentArgument.allCases)
+    func toExportContent(_ argument: ToExportContentArgument) {
+        let logEntry = argument.logEntry
+        let result = modelMapper.toExportContent(logEntity: logEntry)
+        #expect(result == argument.expectedResult)
+    }
+}
+
+extension UUID {
+    fileprivate static func forced(uuidString: String) -> UUID {
+        guard let id = UUID(uuidString: uuidString) else {
+            preconditionFailure("Unexpected nil for UUID '\(uuidString)'")
+        }
+
+        return id
+    }
 }

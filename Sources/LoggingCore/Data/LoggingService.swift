@@ -167,7 +167,7 @@ extension DefaultLoggingService: LoggingService {
         timestamp: Date
     ) async {
         // TODO: Build minimum log level logic to only store the levels desired.
-        guard logLevel >= userDefaults.minimalLogLevel else {
+        guard userDefaults.minimalLogLevel.supportedLogsLevels.contains(logLevel) else {
             return
         }
 
@@ -196,5 +196,17 @@ extension DefaultLoggingService {
             ),
             batchSize: logsBatchSize
         )
+    }
+}
+
+extension LogLevel {
+    /// Returns the list of supported log levels when self is the minimum supported level.
+    fileprivate var supportedLogsLevels: [LogLevel] {
+        switch self {
+        case .debug: LogLevel.allCases
+        case .info: [.info, .error, .critical]
+        case .error: [.error, .critical]
+        case .critical: [.critical]
+        }
     }
 }

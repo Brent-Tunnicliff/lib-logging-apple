@@ -13,19 +13,6 @@ package enum LogLevel: Int {
 
 extension LogLevel: CaseIterable {}
 
-// MARK: - Comparable
-
-extension LogLevel: Comparable {
-    package static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
-        lhs.order < rhs.order
-    }
-
-    private var order: Int {
-        // For now `rawValue` matches the order.
-        rawValue
-    }
-}
-
 // MARK: - CustomStringConvertible
 
 extension LogLevel: CustomStringConvertible {

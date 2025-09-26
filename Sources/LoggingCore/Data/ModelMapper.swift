@@ -81,7 +81,7 @@ extension LogEntity: ExportContent {
         [\(packageName)] \
         [\(level.exportContent())] \
         [\(tag.exportContent())]
-            \(exportBody())
+        \t\(exportBody())
         """
     }
 

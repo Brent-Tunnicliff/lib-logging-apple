@@ -25,6 +25,12 @@ struct LoggingServiceTests {
         line: 1
     )
     private let timestamp = Date()
+    private let expectedSupportedLogLevels: [LogLevel: [LogLevel]] = [
+        .debug: LogLevel.allCases,
+        .info: [.info, .error, .critical],
+        .error: [.error, .critical],
+        .critical: [.critical],
+    ]
 
     // Isolating the init to `@MainActor` to avoid a potential crash
     // when calling `ModelContainer.emptyInMemoryOnly()` concurrently.
@@ -131,20 +137,20 @@ struct LoggingServiceTests {
         #expect(result.error == expectedError)
     }
 
-    @Test
-    func storeLogLowerThanDefinedLogLevelIsIgnored() async throws {
-        mockUserDefaultsStore.minimalLogLevel = .info
-        try await performStoreLog(logLevel: .debug)
-        let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
-        #expect(result.isEmpty)
-    }
+    @Test(arguments: LogLevel.allCases)
+    func storeLogFilterLogsBelowMinimumLevel(minimalLogLevel: LogLevel) async throws {
+        guard let expectedCount = expectedSupportedLogLevels[minimalLogLevel]?.count else {
+            Issue.record("'\(minimalLogLevel)' has no supported LogLevels")
+            return
+        }
 
-    @Test
-    func storeLogEqualToDefinedLogLevelIsStored() async throws {
-        mockUserDefaultsStore.minimalLogLevel = .info
-        try await performStoreLog(logLevel: .info)
+        mockUserDefaultsStore.minimalLogLevel = minimalLogLevel
+        for logLevel in LogLevel.allCases {
+            try await performStoreLog(logLevel: logLevel)
+        }
+
         let result: [LogEntity] = try ModelContext(modelContainer).fetch(FetchDescriptor())
-        #expect(!result.isEmpty)
+        #expect(result.count == expectedCount)
     }
 
     // MARK: - registerForCleanup()
