@@ -4,8 +4,6 @@ package import Foundation
 import SwiftData
 
 package protocol LoggingService: Sendable {
-    func deleteLogs(olderThan timestamp: Date) async throws
-
     func exportLogs() async throws -> URL
 
     func storeLog(
@@ -87,8 +85,11 @@ package actor DefaultLoggingService: ModelActor {
     private func registerForCleanup() {
         if let cleanupTask, !cleanupTask.isCancelled {
             // We do not want to trigger multiple tasks.
+            Logger.logging.info("Unexpected additional call to 'registerForCleanup()'")
             return
         }
+
+        Logger.logging.info("Registering for log cleanup events.")
 
         // Observe for cleanup of logs triggers.
         self.cleanupTask = Task { [weak self, logCleanupTrigger] in
@@ -103,35 +104,21 @@ package actor DefaultLoggingService: ModelActor {
                 let (logRetentionSeconds, _) = Self.logRetention.components
                 let olderThan = Date().addingTimeInterval(-TimeInterval(logRetentionSeconds))
                 do {
+                    Logger.logging.info("Deleting logs older than '\(olderThan.ISO8601Format())'")
                     try await deleteLogs(olderThan: olderThan)
                     logCleanupTrigger.storeLogCleanup(timestamp: Date())
                 } catch {
                     // In the unexpected case of an error, lets just log it.
-                    await logIssue(
-                        "Failed to cleanup logs older than '\(olderThan)'",
-                        error: error,
-                        logLevel: .critical
-                    )
+                    Logger.logging.critical("Failed to cleanup logs older than '\(olderThan)'", error: error)
                 }
             }
         }
     }
 
-    private func logIssue(
-        _ message: String,
-        error: (any Error)?,
-        logLevel: LogLevel,
-        file: StaticString = #file,
-        function: StaticString = #function,
-        line: UInt = #line
-    ) async {
-        await storeLog(
-            error: error,
-            logLevel: logLevel,
-            message: message,
-            packageName: "DefaultLoggingService",
-            tag: LogTag(file: file, function: function, line: line),
-            timestamp: Date()
+    private func deleteLogs(olderThan timestamp: Date) throws {
+        try modelContext.delete(
+            model: LogEntity.self,
+            where: #Predicate { $0.timestampCreated < timestamp }
         )
     }
 }
@@ -139,14 +126,9 @@ package actor DefaultLoggingService: ModelActor {
 // MARK: - LoggingService
 
 extension DefaultLoggingService: LoggingService {
-    package func deleteLogs(olderThan timestamp: Date) throws {
-        try modelContext.delete(
-            model: LogEntity.self,
-            where: #Predicate { $0.timestampCreated < timestamp }
-        )
-    }
-
     package func exportLogs() throws -> URL {
+        Logger.logging.info("Starting log export")
+
         // TODO: Implement export
         fatalError("Not yet implemented")
 
@@ -189,7 +171,7 @@ extension DefaultLoggingService: LoggingService {
 // MARK: - Private
 
 extension DefaultLoggingService {
-    private func getLogsPagination() async throws -> FetchResultsCollection<LogEntity> {
+    private func getLogsPagination() throws -> FetchResultsCollection<LogEntity> {
         try modelContext.fetch(
             FetchDescriptor<LogEntity>(
                 sortBy: [SortDescriptor(\LogEntity.timestampCreated)]

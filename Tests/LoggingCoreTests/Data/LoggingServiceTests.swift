@@ -52,54 +52,6 @@ struct LoggingServiceTests {
         self.registerForCleanupStream = registerForCleanupStream
     }
 
-    // MARK: - deleteLogs(olderThan:)
-
-    @Test
-    func deleteLogs() async throws {
-        // data setup
-        let olderThanDate = Date()
-        let logsToDelete = [
-            Date(timeInterval: -10, since: olderThanDate),
-            Date(timeInterval: -20, since: olderThanDate),
-            Date(timeInterval: -30, since: olderThanDate),
-            Date(timeInterval: -40, since: olderThanDate),
-            Date(timeInterval: -50, since: olderThanDate),
-        ].map { LogEntity.mock(timestampCreated: $0) }
-
-        let logsToKeep = [
-            Date(timeInterval: 10, since: olderThanDate),
-            Date(timeInterval: 20, since: olderThanDate),
-            Date(timeInterval: 30, since: olderThanDate),
-            Date(timeInterval: 40, since: olderThanDate),
-            Date(timeInterval: 50, since: olderThanDate),
-            Date(timeInterval: 60, since: olderThanDate),
-        ].map { LogEntity.mock(timestampCreated: $0) }
-
-        let modelContext = ModelContext(modelContainer)
-        modelContext.autosaveEnabled = false
-        try modelContext.transaction {
-            for log in logsToDelete + logsToKeep {
-                modelContext.insert(log)
-            }
-
-            try modelContext.save()
-        }
-
-        // test
-        try await loggingService.deleteLogs(olderThan: olderThanDate)
-
-        // verify
-        let results: [LogEntity] = try modelContext.fetch(FetchDescriptor())
-        #expect(results.count == logsToKeep.count)
-        for expectedResult in logsToKeep {
-            let result = results.first { $0.id == expectedResult.id }
-            #expect(
-                result != nil,
-                "Missing expected result: \(expectedResult.timestampCreated), olderThanDate: \(olderThanDate)"
-            )
-        }
-    }
-
     // MARK: - storeLog(error:logLevel:message:packageName:tag:timestamp:)
 
     @Test(arguments: Array(product(LogLevel.allCases, [true, false])))
@@ -157,22 +109,49 @@ struct LoggingServiceTests {
 
     @Test(.timeLimit(.minutes(1)))
     func registerForCleanup() async throws {
+        // data setup
+        let expectedLogRetentionDays = 90
         let now = Date()
-        let logToDelete = LogEntity.mock(
-            timestampCreated: Date(timeInterval: -TimeInterval(duration: .days(91)), since: now)
-        )
 
-        let logToKeep = LogEntity.mock(
-            timestampCreated: Date(timeInterval: -TimeInterval(duration: .days(89)), since: now)
-        )
+        // We don't care too much about precision, testing that logs from 91 days old is good enough.
+        // Otherwise we might introduce flaky tests.
+        let logsToDelete = (1...100).map {
+            LogEntity.mock(
+                timestampCreated: Date(
+                    timeInterval: -TimeInterval(
+                        duration: .days(expectedLogRetentionDays + $0)
+                    ),
+                    since: now
+                )
+            )
+        }
 
+        let logsToKeep = (0..<expectedLogRetentionDays).map {
+            LogEntity.mock(
+                timestampCreated: Date(timeInterval: -TimeInterval(duration: .days($0)), since: now)
+            )
+        }
+
+        let allLogs = logsToDelete + logsToKeep
         let modelContext = ModelContext(modelContainer)
         modelContext.autosaveEnabled = false
         try modelContext.transaction {
-            modelContext.insert(logToDelete)
-            modelContext.insert(logToKeep)
+            for log in allLogs {
+                modelContext.insert(log)
+            }
 
             try modelContext.save()
+        }
+
+        // lets just double check that there are the expected number of logs created in setup
+        // as the rest of the test expects this data.
+        let validateDataResult: [LogEntity] = try! modelContext.fetch(FetchDescriptor())
+        let expectedValidateDataResultCount = 190
+        guard validateDataResult.count == expectedValidateDataResultCount else {
+            Issue.record(
+                "Test setup expected \(expectedValidateDataResultCount) entities but got \(validateDataResult.count)"
+            )
+            return
         }
 
         async let storeLogCleanupCalled = withCheckedContinuation { continuation in
@@ -182,14 +161,21 @@ struct LoggingServiceTests {
         }
 
         try await registerForCleanupStream.waitForContinuation()
-        registerForCleanupStream.continuation.yield()
 
+        // test
+        registerForCleanupStream.continuation.yield()
         await #expect(storeLogCleanupCalled == true)
 
+        // verify
         let results: [LogEntity] = try modelContext.fetch(FetchDescriptor())
-        #expect(results.count == 1)
-        #expect(results.first?.id == logToKeep.id)
-
+        #expect(results.count == logsToKeep.count)
+        for expectedResult in logsToKeep {
+            let result = results.first { $0.id == expectedResult.id }
+            #expect(
+                result != nil,
+                "Missing expected result: \(expectedResult.timestampCreated), olderThanDate: \(now)"
+            )
+        }
     }
 
     // MARK: - Helpers

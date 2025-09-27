@@ -3,7 +3,7 @@
 import Foundation
 import Synchronization
 
-final class MockAsyncStream<Element: Sendable>: AsyncSequence, Sendable {
+final class MockAsyncStream<Element>: AsyncSequence {
     private let continuationMutex = Mutex<AsyncStream<Element>.Continuation?>(nil)
     var continuation: AsyncStream<Element>.Continuation {
         guard let continuation = continuationMutex.withLock({ $0 }) else {
@@ -39,3 +39,5 @@ final class MockAsyncStream<Element: Sendable>: AsyncSequence, Sendable {
         case waitForContinuationTimedOut
     }
 }
+
+extension MockAsyncStream: Sendable where Element: Sendable {}
