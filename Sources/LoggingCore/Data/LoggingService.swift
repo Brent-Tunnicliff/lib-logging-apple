@@ -27,7 +27,7 @@ package actor DefaultLoggingService: ModelActor {
 
     private var cleanupTask: Task<Void, any Error>?
     private let currentDevice: Task<Device, Never>
-    private let fileService: any FileService
+    private let fileManager: any FileManagerType
     private let logsBatchSize = 10
     private let logCleanupTrigger: any LogCleanupTrigger
     private let modelMapper: any ModelMapper
@@ -35,7 +35,7 @@ package actor DefaultLoggingService: ModelActor {
 
     init(
         deviceProvider: any DeviceProvider,
-        fileService: any FileService,
+        fileManager: any FileManagerType,
         logCleanupTrigger: any LogCleanupTrigger,
         modelContainer: ModelContainer,
         modelMapper: any ModelMapper,
@@ -44,7 +44,7 @@ package actor DefaultLoggingService: ModelActor {
         self.currentDevice = Task {
             await deviceProvider.currentDevice()
         }
-        self.fileService = fileService
+        self.fileManager = fileManager
         self.logCleanupTrigger = logCleanupTrigger
         self.modelExecutor = DefaultSerialModelExecutor(
             modelContext: ModelContext(modelContainer)
@@ -61,7 +61,7 @@ package actor DefaultLoggingService: ModelActor {
     private init() {
         self.init(
             deviceProvider: DefaultDeviceProvider(),
-            fileService: DefaultFileService(),
+            fileManager: DefaultFileManager(),
             logCleanupTrigger: DefaultLogCleanupTrigger(),
             modelContainer: .shared,
             modelMapper: DefaultModelMapper(),

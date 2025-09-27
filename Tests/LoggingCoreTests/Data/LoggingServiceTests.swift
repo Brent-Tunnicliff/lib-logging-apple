@@ -10,7 +10,7 @@ import Testing
 struct LoggingServiceTests {
     private let loggingService: DefaultLoggingService
     private let mockDeviceProvider = MockDeviceProvider()
-    private let mockFileService = MockFileService()
+    private let mockFileManager = MockFileManager()
     private let mockLogCleanupTrigger = MockLogCleanupTrigger()
     private let mockModelMapper = MockModelMapper()
     private let modelContainer: ModelContainer
@@ -43,7 +43,7 @@ struct LoggingServiceTests {
         self.modelContainer = .emptyInMemoryOnly()
         self.loggingService = DefaultLoggingService(
             deviceProvider: mockDeviceProvider,
-            fileService: mockFileService,
+            fileManager: mockFileManager,
             logCleanupTrigger: mockLogCleanupTrigger,
             modelContainer: modelContainer,
             modelMapper: mockModelMapper,
