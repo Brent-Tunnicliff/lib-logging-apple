@@ -34,6 +34,9 @@ struct NotificationProviderTests {
             try await Task.sleep(for: .milliseconds(10))
         }
 
+        // Added an extra sleep to add extra buffer as pipeline still appeared flaky.
+        try await Task.sleep(for: .milliseconds(100))
+
         notificationCenter.post(name: notificationName, object: nil)
         await #expect(notificationTriggered.value == true)
     }
