@@ -2,6 +2,7 @@
 
 package import Foundation
 import SwiftData
+import UniformTypeIdentifiers
 
 package protocol LoggingService: Sendable {
     func exportLogs() async throws -> URL
@@ -14,6 +15,11 @@ package protocol LoggingService: Sendable {
         tag: LogTag,
         timestamp: Date
     ) async
+}
+
+package enum LoggingServiceError: Error {
+    case exportFileExists
+    case failedToConvertLogToData
 }
 
 // MARK: - DefaultLoggingService
@@ -129,15 +135,37 @@ extension DefaultLoggingService: LoggingService {
     package func exportLogs() throws -> URL {
         Logger.logging.info("Starting log export")
 
-        // TODO: Implement export
-        fatalError("Not yet implemented")
+        // MARK: Create the export file
 
-        // var logs = try await getLogsPagination().makeIterator()
-        // let firstLog = logs.next()
+        let timestamp = Date().ISO8601Format()
+        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "unknown"
+        let exportFileName = "log_export_\(bundleIdentifier)_\(timestamp)"
+        let temporaryDirectory = fileManager.temporaryDirectory
+        let fileURL = temporaryDirectory.appending(path: exportFileName, directoryHint: .notDirectory)
+            .appendingPathExtension(for: .text)
 
-        // for log in logs {
+        // This should never happen, but if it does lets throw.
+        guard !fileManager.fileExists(at: fileURL) else {
+            Logger.logging.error("File exists already exists '\(fileURL.absoluteString)'")
+            throw LoggingServiceError.exportFileExists
+        }
 
-        // }
+        fileManager.createFile(at: fileURL, contents: nil)
+
+        // MARK: Populate the export
+
+        let fileHandle = try fileManager.getFileHandle(forWritingTo: fileURL)
+        for log in try getLogsPagination() {
+            let logExport = modelMapper.toExportContent(logEntity: log)
+            guard let logExportData = logExport.data(using: .utf8) else {
+                Logger.logging.error("Failed to export log content \(logExport)")
+                throw LoggingServiceError.failedToConvertLogToData
+            }
+
+            try fileHandle.write(contentsOf: logExportData)
+        }
+
+        return fileURL
     }
 
     package func storeLog(
