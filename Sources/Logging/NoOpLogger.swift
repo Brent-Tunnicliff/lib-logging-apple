@@ -12,16 +12,8 @@ public final class NoOpLogger {
 
 extension NoOpLogger: LoggerType {
     /// Conforms to LoggerType but will not capture any of these details.
-    public func debug(message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt) {}
-
-    /// Conforms to LoggerType but will not capture any of these details.
-    public func info(message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt) {}
-
-    /// Conforms to LoggerType but will not capture any of these details.
-    public func error(message: String, error: (any Error)?, file: StaticString, function: StaticString, line: UInt) {}
-
-    /// Conforms to LoggerType but will not capture any of these details.
-    public func critical(
+    public func log(
+        level: LogLevel,
         message: String,
         error: (any Error)?,
         file: StaticString,

@@ -108,46 +108,17 @@ struct ModelMapperTests {
         var expectedResult: String {
             switch self {
             case .withEverything:
-                """
-                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
-                \tThis is a log
-                \terror: MockError - An error happened (Oh no!)
-                \t00000000-0000-0000-0000-000000000002 iPhone17,3 iOS 26 (phone)
-                """
+                "2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10] This is a log, error: MockError - An error happened (Oh no!), device: 00000000-0000-0000-0000-000000000002 iPhone17,3 iOS 26 (phone)"
             case .withoutDeviceIdentifierForVendor:
-                """
-                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
-                \tThis is a log
-                \terror: MockError - An error happened (Oh no!)
-                \tiPhone17,3 iOS 26 (phone)
-                """
+                "2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10] This is a log, error: MockError - An error happened (Oh no!), device: iPhone17,3 iOS 26 (phone)"
             case .withoutDeviceModel:
-                """
-                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
-                \tThis is a log
-                \terror: MockError - An error happened (Oh no!)
-                \t00000000-0000-0000-0000-000000000002 iOS 26 (phone)
-                """
+                "2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10] This is a log, error: MockError - An error happened (Oh no!), device: 00000000-0000-0000-0000-000000000002 iOS 26 (phone)"
             case .withoutDeviceSystemName:
-                """
-                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
-                \tThis is a log
-                \terror: MockError - An error happened (Oh no!)
-                \t00000000-0000-0000-0000-000000000002 iPhone17,3 26 (phone)
-                """
+                "2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10] This is a log, error: MockError - An error happened (Oh no!), device: 00000000-0000-0000-0000-000000000002 iPhone17,3 26 (phone)"
             case .withoutDeviceSystemVersion:
-                """
-                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
-                \tThis is a log
-                \terror: MockError - An error happened (Oh no!)
-                \t00000000-0000-0000-0000-000000000002 iPhone17,3 iOS (phone)
-                """
+                "2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10] This is a log, error: MockError - An error happened (Oh no!), device: 00000000-0000-0000-0000-000000000002 iPhone17,3 iOS (phone)"
             case .withoutError:
-                """
-                2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10]
-                \tThis is a log
-                \t00000000-0000-0000-0000-000000000002 iPhone17,3 iOS 26 (phone)
-                """
+                "2025-09-25T12:27:35Z [LoggingCoreTests] [info] [LoggingCoreTests/ModelMapperTests.swift:toExportContentWithError():10] This is a log, device: 00000000-0000-0000-0000-000000000002 iPhone17,3 iOS 26 (phone)"
             }
         }
 

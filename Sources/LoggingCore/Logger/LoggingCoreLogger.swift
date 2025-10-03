@@ -17,7 +17,7 @@ extension LoggingCoreLogger {
     ) {
         log(
             level: .debug,
-            message,
+            message: message,
             tag: LogTag(
                 file: file,
                 function: function,
@@ -36,7 +36,7 @@ extension LoggingCoreLogger {
     ) {
         log(
             level: .info,
-            message,
+            message: message,
             tag: LogTag(
                 file: file,
                 function: function,
@@ -55,7 +55,7 @@ extension LoggingCoreLogger {
     ) {
         log(
             level: .error,
-            message,
+            message: message,
             tag: LogTag(
                 file: file,
                 function: function,
@@ -74,7 +74,7 @@ extension LoggingCoreLogger {
     ) {
         log(
             level: .critical,
-            message,
+            message: message,
             tag: LogTag(
                 file: file,
                 function: function,
@@ -128,9 +128,9 @@ final class DefaultLoggingCoreLogger: LoggingCoreLogger {
         self.systemLogger = systemLogger
     }
 
-    func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
+    func log(level: LogLevel, message: String, tag: LogTag, error: (any Error)?) {
         let timestamp = Date()
-        systemLogger.log(level: level, message, tag: tag, error: error)
+        systemLogger.log(level: level, message: message, tag: tag, error: error)
 
         Task {
             await loggingService.storeLog(
@@ -146,5 +146,5 @@ final class DefaultLoggingCoreLogger: LoggingCoreLogger {
 }
 
 private final class NoOpLoggingCoreLogger: LoggingCoreLogger {
-    func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {}
+    func log(level: LogLevel, message: String, tag: LogTag, error: (any Error)?) {}
 }

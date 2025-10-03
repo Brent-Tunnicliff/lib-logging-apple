@@ -3,7 +3,7 @@
 package protocol InternalLogger: Sendable {
     func log(
         level: LogLevel,
-        _ message: String,
+        message: String,
         tag: LogTag,
         error: (any Error)?
     )

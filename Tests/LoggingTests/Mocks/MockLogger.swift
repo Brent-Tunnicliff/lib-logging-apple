@@ -1,15 +1,16 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
-import Logging
 import LoggingCore
 import Synchronization
+
+@testable import Logging
 
 /// Mock Logger for use in tests and previews or where needed.
 final class MockLogger: InternalLogger {
     // MARK: - log
 
     struct LogInput {
-        let level: LogLevel
+        let level: LoggingCore.LogLevel
         let message: String
         let tag: LogTag
         let error: (any Error)?
@@ -21,8 +22,8 @@ final class MockLogger: InternalLogger {
         set { logResponseMutex.withLock { $0 = newValue } }
     }
     func log(
-        level: LogLevel,
-        _ message: String,
+        level: LoggingCore.LogLevel,
+        message: String,
         tag: LogTag,
         error: (any Error)?
     ) {
@@ -40,7 +41,8 @@ final class MockLogger: InternalLogger {
 // MARK: - LoggerType
 
 extension MockLogger: LoggerType {
-    func debug(
+    func log(
+        level: Logging.LogLevel,
         message: String,
         error: (any Error)?,
         file: StaticString,
@@ -48,65 +50,8 @@ extension MockLogger: LoggerType {
         line: UInt
     ) {
         log(
-            level: .debug,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
-    }
-
-    func info(
-        message: String,
-        error: (any Error)?,
-        file: StaticString,
-        function: StaticString,
-        line: UInt
-    ) {
-        log(
-            level: .info,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
-    }
-
-    func error(
-        message: String,
-        error: (any Error)?,
-        file: StaticString,
-        function: StaticString,
-        line: UInt
-    ) {
-        log(
-            level: .error,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
-    }
-
-    func critical(
-        message: String,
-        error: (any Error)?,
-        file: StaticString,
-        function: StaticString,
-        line: UInt
-    ) {
-        log(
-            level: .critical,
-            message,
+            level: level.wrapped,
+            message: message,
             tag: LogTag(
                 file: file,
                 function: function,

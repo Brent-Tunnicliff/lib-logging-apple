@@ -24,8 +24,8 @@ struct DefaultLoggerTests {
 
     // MARK: - Tests
 
-    @Test(arguments: Array(product(LogLevel.allCases, [true, false])))
-    func logSendsExpectedDataToSystemLog(level: LogLevel, sendError: Bool) async {
+    @Test(arguments: Array(product(LoggingCore.LogLevel.allCases, [true, false])))
+    func logSendsExpectedDataToSystemLog(level: LoggingCore.LogLevel, sendError: Bool) async {
         let tag = LogTag(file: #file, function: #function, line: #line)
         let error = sendError ? MockError() : nil
 
@@ -33,7 +33,7 @@ struct DefaultLoggerTests {
             mockSystemLogger.logResponse = { input in
                 continuation.yield(input)
             }
-            logger.log(level: level, message, tag: tag, error: error)
+            logger.log(level: level, message: message, tag: tag, error: error)
             continuation.finish()
         }.reduce(into: [MockLogger.LogInput]()) { partialResult, input in
             partialResult.append(input)
@@ -51,8 +51,8 @@ struct DefaultLoggerTests {
         expectError(resultError: result.error, expectedError: error)
     }
 
-    @Test(arguments: Array(product(LogLevel.allCases, [true, false])))
-    func logSendsExpectedDataToLoggingService(level: LogLevel, sendError: Bool) async {
+    @Test(arguments: Array(product(LoggingCore.LogLevel.allCases, [true, false])))
+    func logSendsExpectedDataToLoggingService(level: LoggingCore.LogLevel, sendError: Bool) async {
         let before = Date()
         let tag = LogTag(file: #file, function: #function, line: #line)
         let error = sendError ? MockError() : nil
@@ -62,7 +62,7 @@ struct DefaultLoggerTests {
                 continuation.resume(returning: $0)
             }
 
-            logger.log(level: level, message, tag: tag, error: error)
+            logger.log(level: level, message: message, tag: tag, error: error)
         }
 
         let after = Date()
@@ -75,8 +75,8 @@ struct DefaultLoggerTests {
         expectError(resultError: result.error, expectedError: error)
     }
 
-    @Test(arguments: LogLevel.allCases)
-    func extensionFunctionsMapToExpectedLogLevel(level: LogLevel) async {
+    @Test(arguments: LoggingCore.LogLevel.allCases)
+    func extensionFunctionsMapToExpectedLogLevel(level: LoggingCore.LogLevel) async {
         let loggingFunction = level.expectedExtensionFunction(for: logger)
         let result = await withCheckedContinuation { continuation in
             mockLoggingService.storeLogResponse = {
@@ -119,7 +119,7 @@ struct DefaultLoggerTests {
     }
 }
 
-extension LogLevel {
+extension LoggingCore.LogLevel {
     typealias DefaultLoggerFunction = @Sendable (String, (any Error)?, StaticString, StaticString, UInt) -> Void
     fileprivate func expectedExtensionFunction(
         for logger: any LoggerType

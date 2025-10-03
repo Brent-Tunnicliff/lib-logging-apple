@@ -80,8 +80,8 @@ extension LogEntity: ExportContent {
         \(timestampCreated.ISO8601Format()) \
         [\(packageName)] \
         [\(level.exportContent())] \
-        [\(tag.exportContent())]
-        \t\(exportBody())
+        [\(tag.exportContent())] \
+        \(exportBody())
         """
     }
 
@@ -92,12 +92,16 @@ extension LogEntity: ExportContent {
             device.exportContent(),
         ]
         .compactMap { $0 }
-        .joined(separator: "\n\t")
+        .joined(separator: ", ")
     }
 }
 
 extension LogEntity.Device: ExportContent {
     fileprivate func exportContent() -> String {
+        "device: \(exportDetails)"
+    }
+
+    private var exportDetails: String {
         [
             identifierForVendor?.uuidString,
             model,

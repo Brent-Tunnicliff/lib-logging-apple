@@ -34,9 +34,9 @@ public final class DefaultLogger {
 // MARK: - InternalLogger
 
 extension DefaultLogger: InternalLogger {
-    func log(level: LogLevel, _ message: String, tag: LogTag, error: (any Error)?) {
+    func log(level: LoggingCore.LogLevel, message: String, tag: LogTag, error: (any Error)?) {
         let timestamp = Date()
-        systemLogger.log(level: level, message, tag: tag, error: error)
+        systemLogger.log(level: level, message: message, tag: tag, error: error)
 
         Task {
             await loggingService.storeLog(
@@ -54,15 +54,19 @@ extension DefaultLogger: InternalLogger {
 // MARK: - LoggerType
 
 extension DefaultLogger: LoggerType {
-    /// Captures the inputs as a debug level log.
+    /// Captures the inputs as a log.
+    ///
+    /// Recommended to use the extension functions that use default values instead.
     ///
     /// - Parameters:
+    ///     - level: severity level of the log.
     ///     - message: message to log.
     ///     - error: optional error object to include in the log.
     ///     - file: File of where the log was triggered.
     ///     - function: Function name where the log was triggered.
     ///     - line: Line of where the log was triggered.
-    public func debug(
+    public func log(
+        level: LogLevel,
         message: String,
         error: (any Error)?,
         file: StaticString,
@@ -70,89 +74,8 @@ extension DefaultLogger: LoggerType {
         line: UInt
     ) {
         log(
-            level: .debug,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
-    }
-
-    /// Captures the inputs as a info level log.
-    ///
-    /// - Parameters:
-    ///     - message: message to log.
-    ///     - error: optional error object to include in the log.
-    ///     - file: File of where the log was triggered.
-    ///     - function: Function name where the log was triggered.
-    ///     - line: Line of where the log was triggered.
-    public func info(
-        message: String,
-        error: (any Error)?,
-        file: StaticString,
-        function: StaticString,
-        line: UInt
-    ) {
-        log(
-            level: .info,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
-    }
-
-    /// Captures the inputs as an error level log.
-    ///
-    /// - Parameters:
-    ///     - message: message to log.
-    ///     - error: optional error object to include in the log.
-    ///     - file: File of where the log was triggered.
-    ///     - function: Function name where the log was triggered.
-    ///     - line: Line of where the log was triggered.
-    public func error(
-        message: String,
-        error: (any Error)?,
-        file: StaticString,
-        function: StaticString,
-        line: UInt
-    ) {
-        log(
-            level: .error,
-            message,
-            tag: LogTag(
-                file: file,
-                function: function,
-                line: line
-            ),
-            error: error
-        )
-    }
-
-    /// Captures the inputs as a critical level log.
-    ///
-    /// - Parameters:
-    ///     - message: message to log.
-    ///     - error: optional error object to include in the log.
-    ///     - file: File of where the log was triggered.
-    ///     - function: Function name where the log was triggered.
-    ///     - line: Line of where the log was triggered.
-    public func critical(
-        message: String,
-        error: (any Error)?,
-        file: StaticString,
-        function: StaticString,
-        line: UInt
-    ) {
-        log(
-            level: .critical,
-            message,
+            level: level.wrapped,
+            message: message,
             tag: LogTag(
                 file: file,
                 function: function,

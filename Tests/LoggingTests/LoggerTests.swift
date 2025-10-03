@@ -43,7 +43,7 @@ struct LoggerTests {
     }
 
     private func testLog(
-        expectedLogLevel: LogLevel,
+        expectedLogLevel: LoggingCore.LogLevel,
         sourceLocation: Testing.SourceLocation = #_sourceLocation,
         action: @escaping @Sendable () -> Void
     ) async {
