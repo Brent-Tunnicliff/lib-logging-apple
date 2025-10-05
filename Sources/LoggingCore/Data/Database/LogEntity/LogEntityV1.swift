@@ -14,6 +14,7 @@ package final class LogEntityV1: Equatable, Identifiable {
     package private(set) var tag: Tag
     package private(set) var timestampCreated: Date
     package private(set) var error: Error?
+    package private(set) var thread: String
 
     package init(
         device: Device,
@@ -23,7 +24,8 @@ package final class LogEntityV1: Equatable, Identifiable {
         packageName: String,
         tag: Tag,
         timestampCreated: Date,
-        error: Error?
+        error: Error?,
+        thread: String
     ) {
         self.device = device
         self.id = id
@@ -33,6 +35,7 @@ package final class LogEntityV1: Equatable, Identifiable {
         self.tag = tag
         self.timestampCreated = timestampCreated
         self.error = error
+        self.thread = thread
     }
 }
 

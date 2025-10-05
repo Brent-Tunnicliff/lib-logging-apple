@@ -36,6 +36,7 @@ public final class DefaultLogger {
 extension DefaultLogger: InternalLogger {
     func log(level: LoggingCore.LogLevel, message: String, tag: LogTag, error: (any Error)?) {
         let timestamp = Date()
+        let thread = Thread.nameForLog
         systemLogger.log(level: level, message: message, tag: tag, error: error)
 
         Task {
@@ -45,7 +46,8 @@ extension DefaultLogger: InternalLogger {
                 message: message,
                 packageName: packageName,
                 tag: tag,
-                timestamp: timestamp
+                timestamp: timestamp,
+                thread: thread
             )
         }
     }

@@ -13,7 +13,8 @@ package protocol LoggingService: Sendable {
         message: String,
         packageName: String,
         tag: LogTag,
-        timestamp: Date
+        timestamp: Date,
+        thread: String
     ) async
 }
 
@@ -174,7 +175,8 @@ extension DefaultLoggingService: LoggingService {
         message: String,
         packageName: String,
         tag: LogTag,
-        timestamp: Date
+        timestamp: Date,
+        thread: String
     ) async {
         // TODO: Build minimum log level logic to only store the levels desired.
         guard userDefaults.minimalLogLevel.supportedLogsLevels.contains(logLevel) else {
@@ -189,7 +191,8 @@ extension DefaultLoggingService: LoggingService {
             packageName: packageName,
             tag: modelMapper.toEntity(logTag: tag),
             timestampCreated: timestamp,
-            error: error.map(modelMapper.toEntity)
+            error: error.map(modelMapper.toEntity),
+            thread: thread
         )
 
         modelContext.insert(model)

@@ -25,6 +25,7 @@ struct LoggingServiceTests {
         line: 1
     )
     private let timestamp = Date()
+    private let thread = "Main"
     private let expectedSupportedLogLevels: [LogLevel: [LogLevel]] = [
         .debug: LogLevel.allCases,
         .info: [.info, .error, .critical],
@@ -87,6 +88,7 @@ struct LoggingServiceTests {
         #expect(result.tag == expectedTag)
         #expect(result.timestampCreated == timestamp)
         #expect(result.error == expectedError)
+        #expect(result.thread == thread)
     }
 
     @Test(arguments: LogLevel.allCases)
@@ -190,7 +192,8 @@ struct LoggingServiceTests {
             message: message,
             packageName: packageName,
             tag: tag,
-            timestamp: timestamp
+            timestamp: timestamp,
+            thread: thread
         )
 
         // Manually save as we don't want to wait until the autosave every 60 seconds.

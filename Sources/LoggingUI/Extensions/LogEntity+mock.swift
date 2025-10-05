@@ -12,7 +12,8 @@ extension LogEntity {
         packageName: String = "Logging",
         tag: LogEntity.Tag = .mock(),
         timestampCreated: Date = Date(),
-        error: Error? = nil
+        error: Error? = nil,
+        thread: String = "Main"
     ) -> LogEntity {
         LogEntity(
             device: device,
@@ -22,7 +23,8 @@ extension LogEntity {
             packageName: packageName,
             tag: tag,
             timestampCreated: timestampCreated,
-            error: error
+            error: error,
+            thread: thread
         )
     }
 }

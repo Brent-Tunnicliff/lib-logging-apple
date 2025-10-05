@@ -78,6 +78,7 @@ extension LogEntity: ExportContent {
     fileprivate func exportContent() -> String {
         """
         \(timestampCreated.ISO8601Format()) \
+        [\(thread)] \
         [\(packageName)] \
         [\(level.exportContent())] \
         [\(tag.exportContent())] \

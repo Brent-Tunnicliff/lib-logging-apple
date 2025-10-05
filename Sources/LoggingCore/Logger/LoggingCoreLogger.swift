@@ -130,6 +130,7 @@ final class DefaultLoggingCoreLogger: LoggingCoreLogger {
 
     func log(level: LogLevel, message: String, tag: LogTag, error: (any Error)?) {
         let timestamp = Date()
+        let thread = Thread.nameForLog
         systemLogger.log(level: level, message: message, tag: tag, error: error)
 
         Task {
@@ -139,7 +140,8 @@ final class DefaultLoggingCoreLogger: LoggingCoreLogger {
                 message: message,
                 packageName: packageName,
                 tag: tag,
-                timestamp: timestamp
+                timestamp: timestamp,
+                thread: thread
             )
         }
     }
