@@ -13,7 +13,7 @@ struct AsyncStreamAsyncTests {
     )
     func asyncWrapper(throwsError: Bool) async {
         let testHelper = TestHelper<Int>()
-        let stream = AsyncStream<Int>.async {
+        let stream = await AsyncStream<Int>.async {
             try await testHelper.build(continuation: $0)
         }
 

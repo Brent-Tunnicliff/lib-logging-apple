@@ -4,12 +4,12 @@ import Foundation
 
 protocol LogCleanupTrigger: Sendable {
     /// Will yield a value if cleanup should be performed.
-    func registerForCleanup() -> any AsyncSequence<Void, Never>
+    func registerForCleanup() async -> any AsyncSequence<Void, Never>
 
     /// Store log cleanup performed.
     ///
     /// This is very important to call as it affects how often `registerForCleanup()` returns.
-    func storeLogCleanup(timestamp: Date)
+    func storeLogCleanup(timestamp: Date) async
 }
 
 // MARK: - DefaultLogCleanupTrigger
@@ -52,14 +52,17 @@ actor DefaultLogCleanupTrigger {
 }
 
 extension DefaultLogCleanupTrigger: LogCleanupTrigger {
-    nonisolated func registerForCleanup() -> any AsyncSequence<Void, Never> {
-        AsyncStream.async(bufferingPolicy: .bufferingNewest(1)) { [weak self, notificationProvider] continuation in
+    nonisolated func registerForCleanup() async -> any AsyncSequence<Void, Never> {
+        await AsyncStream.async(
+            bufferingPolicy: .bufferingNewest(1)
+        ) { [weak self, notificationProvider] continuation in
             // Trigger one immediately.
             continuation.yield()
 
             // Start listening for notifications
             let notificationName = await notificationProvider.didBecomeActiveNotification
-            for await _ in notificationProvider.notifications(named: notificationName) {
+            let notificationsStream = await notificationProvider.notifications(named: notificationName)
+            for await _ in notificationsStream {
                 try Task.checkCancellation()
                 // If self is nil then return
                 guard let self else {
@@ -76,9 +79,7 @@ extension DefaultLogCleanupTrigger: LogCleanupTrigger {
         }
     }
 
-    nonisolated func storeLogCleanup(timestamp: Date) {
-        Task {
-            await write(lastLogCleanup: timestamp)
-        }
+    func storeLogCleanup(timestamp: Date) {
+        write(lastLogCleanup: timestamp)
     }
 }

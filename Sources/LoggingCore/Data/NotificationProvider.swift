@@ -5,7 +5,7 @@ import Foundation
 protocol NotificationProvider: Sendable {
     var didBecomeActiveNotification: Notification.Name { get async }
 
-    func notifications(named name: Notification.Name) -> any AsyncSequence<Void, Never>
+    func notifications(named name: Notification.Name) async -> any AsyncSequence<Void, Never>
 }
 
 // MARK: - DefaultNotificationProvider
@@ -17,18 +17,26 @@ final class DefaultNotificationProvider: NotificationProvider {
         }
     }
 
+    private let dateProvider: any DateProvider
     private let notificationCenter: NotificationCenter
 
-    init(notificationCenter: NotificationCenter) {
+    init(
+        dateProvider: any DateProvider,
+        notificationCenter: NotificationCenter
+    ) {
+        self.dateProvider = dateProvider
         self.notificationCenter = notificationCenter
     }
 
     convenience init() {
-        self.init(notificationCenter: .default)
+        self.init(
+            dateProvider: DefaultDateProvider.shared,
+            notificationCenter: .default
+        )
     }
 
-    func notifications(named name: Notification.Name) -> any AsyncSequence<Void, Never> {
-        AsyncStream.async { [notificationCenter] continuation in
+    func notifications(named name: Notification.Name) async -> any AsyncSequence<Void, Never> {
+        await AsyncStream.async { [notificationCenter] continuation in
             for await _ in notificationCenter.notifications(named: name) {
                 try Task.checkCancellation()
                 continuation.yield()

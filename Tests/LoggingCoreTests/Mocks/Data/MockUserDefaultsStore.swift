@@ -18,17 +18,6 @@ final class MockUserDefaultsStore: UserDefaultsStore, Sendable {
         set { lastLogCleanupMutex.withLock { $0 = newValue } }
     }
 
-    func waitForLastLogCleanup(timeout duration: Duration = .seconds(1)) async throws {
-        let timeout = Date(timeIntervalSinceNow: Double(duration.components.seconds))
-        while lastLogCleanup == nil {
-            guard Date() < timeout else {
-                throw MockUserDefaultsStoreError.waitForLastLogCleanupTimedOut
-            }
-
-            try await Task.sleep(for: .milliseconds(10))
-        }
-    }
-
     enum MockUserDefaultsStoreError: Error {
         case waitForLastLogCleanupTimedOut
     }

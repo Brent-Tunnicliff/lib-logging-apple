@@ -104,7 +104,7 @@ package actor DefaultLoggingService: ModelActor {
 
         // Observe for cleanup of logs triggers.
         self.cleanupTask = Task { [weak self, logCleanupTrigger] in
-            for await _ in logCleanupTrigger.registerForCleanup() {
+            for await _ in await logCleanupTrigger.registerForCleanup() {
                 try Task.checkCancellation()
 
                 // If self is nil, then cancel.
@@ -117,7 +117,7 @@ package actor DefaultLoggingService: ModelActor {
                 do {
                     Logger.logging.info("Deleting logs older than '\(olderThan.ISO8601Format())'")
                     try await deleteLogs(olderThan: olderThan)
-                    logCleanupTrigger.storeLogCleanup(timestamp: dateProvider.now)
+                    await logCleanupTrigger.storeLogCleanup(timestamp: dateProvider.now)
                 } catch {
                     // In the unexpected case of an error, lets just log it.
                     Logger.logging.critical("Failed to cleanup logs older than '\(olderThan)'", error: error)

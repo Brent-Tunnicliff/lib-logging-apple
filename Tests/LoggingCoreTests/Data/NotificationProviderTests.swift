@@ -13,6 +13,7 @@ struct NotificationProviderTests {
 
     init() {
         self.notificationProvider = DefaultNotificationProvider(
+            dateProvider: MockDateProvider(),
             notificationCenter: notificationCenter
         )
     }
@@ -21,7 +22,7 @@ struct NotificationProviderTests {
     func notificationsNamed() async throws {
         var setupIsReady = false
         let notificationTriggered = Task {
-            let stream = notificationProvider.notifications(named: notificationName)
+            let stream = await notificationProvider.notifications(named: notificationName)
             setupIsReady = true
             for await _ in stream {
                 return true
