@@ -165,7 +165,7 @@ struct ModelMapperTests {
 
         private var timestampCreated: Date {
             let dateString = "2025-09-25T12:27:35Z"
-            guard let date = ISO8601DateFormatter().date(from: dateString) else {
+            guard let date = try? Date.ISO8601FormatStyle().parse(dateString) else {
                 preconditionFailure("Unexpected nil formatting date '\(dateString)'")
             }
 

@@ -15,7 +15,8 @@ protocol LogCleanupTrigger: Sendable {
 // MARK: - DefaultLogCleanupTrigger
 
 actor DefaultLogCleanupTrigger {
-    private let cleanupIntervals = TimeInterval(duration: .days(1))
+    private let cleanupIntervals = Duration.days(1).asTimeInterval
+    private let dateProvider: any DateProvider
     private let notificationProvider: any NotificationProvider
     private let userDefaults: any UserDefaultsStore
 
@@ -24,19 +25,22 @@ actor DefaultLogCleanupTrigger {
             return true
         }
 
-        return lastLogCleanup.addingTimeInterval(cleanupIntervals) <= Date()
+        return lastLogCleanup.addingTimeInterval(cleanupIntervals) <= dateProvider.now
     }
 
     init(
+        dateProvider: any DateProvider,
         notificationProvider: any NotificationProvider,
         userDefaults: any UserDefaultsStore
     ) {
+        self.dateProvider = dateProvider
         self.notificationProvider = notificationProvider
         self.userDefaults = userDefaults
     }
 
     init() {
         self.init(
+            dateProvider: DefaultDateProvider.shared,
             notificationProvider: DefaultNotificationProvider(),
             userDefaults: UserDefaults.standard
         )

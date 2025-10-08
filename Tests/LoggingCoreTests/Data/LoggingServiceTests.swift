@@ -9,6 +9,7 @@ import Testing
 
 struct LoggingServiceTests {
     private let loggingService: DefaultLoggingService
+    private let mockDateProvider = MockDateProvider()
     private let mockDeviceProvider = MockDeviceProvider()
     private let mockFileManager = MockFileManager()
     private let mockLogCleanupTrigger = MockLogCleanupTrigger()
@@ -43,6 +44,7 @@ struct LoggingServiceTests {
         }
         self.modelContainer = .emptyInMemoryOnly()
         self.loggingService = DefaultLoggingService(
+            dateProvider: mockDateProvider,
             deviceProvider: mockDeviceProvider,
             fileManager: mockFileManager,
             logCleanupTrigger: mockLogCleanupTrigger,
@@ -113,24 +115,21 @@ struct LoggingServiceTests {
     func registerForCleanup() async throws {
         // data setup
         let expectedLogRetentionDays = 90
-        let now = Date()
+        let now = mockDateProvider.now
 
         // We don't care too much about precision, testing that logs from 91 days old is good enough.
         // Otherwise we might introduce flaky tests.
         let logsToDelete = (1...100).map {
             LogEntity.mock(
-                timestampCreated: Date(
-                    timeInterval: -TimeInterval(
-                        duration: .days(expectedLogRetentionDays + $0)
-                    ),
-                    since: now
+                timestampCreated: mockDateProvider.now(
+                    subtracting: Duration.days(expectedLogRetentionDays + $0).asTimeInterval
                 )
             )
         }
 
         let logsToKeep = (0..<expectedLogRetentionDays).map {
             LogEntity.mock(
-                timestampCreated: Date(timeInterval: -TimeInterval(duration: .days($0)), since: now)
+                timestampCreated: mockDateProvider.now(adding: Duration.days($0).asTimeInterval)
             )
         }
 

@@ -10,12 +10,14 @@ import Testing
 struct DefaultLoggerTests {
     private let message = "This message should be sent to the places"
     private let packageName = "LoggingTests"
+    private let mockDateProvider = MockDateProvider()
     private let mockLoggingService = MockLoggingService()
     private let mockSystemLogger = MockLogger()
     private let logger: DefaultLogger
 
     init() {
         self.logger = DefaultLogger(
+            dateProvider: mockDateProvider,
             loggingService: mockLoggingService,
             packageName: packageName,
             systemLogger: mockSystemLogger
@@ -53,7 +55,6 @@ struct DefaultLoggerTests {
 
     @Test(arguments: Array(product(LoggingCore.LogLevel.allCases, [true, false])))
     func logSendsExpectedDataToLoggingService(level: LoggingCore.LogLevel, sendError: Bool) async {
-        let before = Date()
         let tag = LogTag(file: #file, function: #function, line: #line)
         let error = sendError ? MockError() : nil
 
@@ -65,13 +66,11 @@ struct DefaultLoggerTests {
             logger.log(level: level, message: message, tag: tag, error: error)
         }
 
-        let after = Date()
         #expect(result.logLevel == level)
         #expect(result.message == message)
         #expect(result.packageName == packageName)
         #expect(result.tag == tag)
-        #expect(result.timestamp >= before)
-        #expect(result.timestamp <= after)
+        #expect(result.timestamp == mockDateProvider.now)
         expectError(resultError: result.error, expectedError: error)
     }
 

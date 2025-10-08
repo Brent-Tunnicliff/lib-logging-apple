@@ -32,6 +32,7 @@ package actor DefaultLoggingService: ModelActor {
     let modelContainer: ModelContainer
     let modelExecutor: any ModelExecutor
 
+    private let dateProvider: any DateProvider
     private var cleanupTask: Task<Void, any Error>?
     private let currentDevice: Task<Device, Never>
     private let fileManager: any FileManagerType
@@ -41,6 +42,7 @@ package actor DefaultLoggingService: ModelActor {
     private let userDefaults: any UserDefaultsStore
 
     init(
+        dateProvider: any DateProvider,
         deviceProvider: any DeviceProvider,
         fileManager: any FileManagerType,
         logCleanupTrigger: any LogCleanupTrigger,
@@ -51,6 +53,7 @@ package actor DefaultLoggingService: ModelActor {
         self.currentDevice = Task {
             await deviceProvider.currentDevice()
         }
+        self.dateProvider = dateProvider
         self.fileManager = fileManager
         self.logCleanupTrigger = logCleanupTrigger
         self.modelExecutor = DefaultSerialModelExecutor(
@@ -67,6 +70,7 @@ package actor DefaultLoggingService: ModelActor {
 
     private init() {
         self.init(
+            dateProvider: DefaultDateProvider.shared,
             deviceProvider: DefaultDeviceProvider(),
             fileManager: DefaultFileManager(),
             logCleanupTrigger: DefaultLogCleanupTrigger(),
@@ -109,11 +113,11 @@ package actor DefaultLoggingService: ModelActor {
                 }
 
                 let (logRetentionSeconds, _) = Self.logRetention.components
-                let olderThan = Date().addingTimeInterval(-TimeInterval(logRetentionSeconds))
+                let olderThan = dateProvider.now(subtracting: TimeInterval(logRetentionSeconds))
                 do {
                     Logger.logging.info("Deleting logs older than '\(olderThan.ISO8601Format())'")
                     try await deleteLogs(olderThan: olderThan)
-                    logCleanupTrigger.storeLogCleanup(timestamp: Date())
+                    logCleanupTrigger.storeLogCleanup(timestamp: dateProvider.now)
                 } catch {
                     // In the unexpected case of an error, lets just log it.
                     Logger.logging.critical("Failed to cleanup logs older than '\(olderThan)'", error: error)
@@ -138,7 +142,7 @@ extension DefaultLoggingService: LoggingService {
 
         // MARK: Create the export file
 
-        let timestamp = Date().ISO8601Format()
+        let timestamp = dateProvider.now.ISO8601Format()
         let bundleIdentifier = Bundle.main.bundleIdentifier ?? "unknown"
         let exportFileName = "log_export_\(bundleIdentifier)_\(timestamp)"
         let temporaryDirectory = fileManager.temporaryDirectory

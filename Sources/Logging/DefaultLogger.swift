@@ -5,6 +5,7 @@ import LoggingCore
 
 /// Logger that persists logs to disk and sends logs to the system console.
 public final class DefaultLogger {
+    private let dateProvider: any DateProvider
     private let loggingService: any LoggingService
     private let packageName: String
     private let systemLogger: any InternalLogger
@@ -14,6 +15,7 @@ public final class DefaultLogger {
     /// - Parameter packageName: Unique name to give the logger. Each log sent via this logger will be tagged with the packageName.
     public convenience init(packageName: String) {
         self.init(
+            dateProvider: DefaultDateProvider.shared,
             loggingService: DefaultLoggingService.shared,
             packageName: packageName,
             systemLogger: SystemLogger(packageName: packageName)
@@ -21,10 +23,12 @@ public final class DefaultLogger {
     }
 
     init(
+        dateProvider: any DateProvider,
         loggingService: any LoggingService,
         packageName: String,
         systemLogger: any InternalLogger
     ) {
+        self.dateProvider = dateProvider
         self.loggingService = loggingService
         self.packageName = packageName
         self.systemLogger = systemLogger
@@ -35,7 +39,7 @@ public final class DefaultLogger {
 
 extension DefaultLogger: InternalLogger {
     func log(level: LoggingCore.LogLevel, message: String, tag: LogTag, error: (any Error)?) {
-        let timestamp = Date()
+        let timestamp = dateProvider.now
         let thread = Thread.nameForLog
         systemLogger.log(level: level, message: message, tag: tag, error: error)
 

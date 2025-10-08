@@ -8,11 +8,13 @@ import Testing
 
 struct LogCleanupTriggerTests {
     private let logCleanupTrigger: DefaultLogCleanupTrigger
+    private let mockDateProvider = MockDateProvider()
     private let mockNotificationProvider = MockNotificationProvider()
     private let mockUserDefaultsStore = MockUserDefaultsStore()
 
     init() {
         logCleanupTrigger = DefaultLogCleanupTrigger(
+            dateProvider: mockDateProvider,
             notificationProvider: mockNotificationProvider,
             userDefaults: mockUserDefaultsStore
         )
@@ -39,18 +41,18 @@ struct LogCleanupTriggerTests {
         case lastLoginRecent
 
         private static let oneDayInSeconds: TimeInterval = 86_400
-        var lastLogCleanup: Date? {
+        func lastLogCleanup(with mockDateProvider: MockDateProvider) -> Date? {
             switch self {
             case .noLastLogin:
                 nil
             case .lastLoginDueForNewCleanup:
                 // Over one day ago
-                Date().addingTimeInterval(-(Self.oneDayInSeconds + 120))
+                mockDateProvider.now(subtracting: Self.oneDayInSeconds + 120)
             case .lastLoginForIgnore:
                 // Less than one day ago
-                Date().addingTimeInterval(-(Self.oneDayInSeconds - 120))
+                mockDateProvider.now(subtracting: Self.oneDayInSeconds - 120)
             case .lastLoginRecent:
-                Date()
+                mockDateProvider.now
             }
         }
 
@@ -71,7 +73,7 @@ struct LogCleanupTriggerTests {
         arguments: RegisterForCleanupArgument.allCases
     )
     func registerForClean(_ argument: RegisterForCleanupArgument) async throws {
-        mockUserDefaultsStore.lastLogCleanup = argument.lastLogCleanup
+        mockUserDefaultsStore.lastLogCleanup = argument.lastLogCleanup(with: mockDateProvider)
         let trigger = MockAsyncStream<Void>()
         mockNotificationProvider.notificationsResponse = { _ in trigger }
 
@@ -88,9 +90,7 @@ struct LogCleanupTriggerTests {
         trigger.continuation.yield()
         trigger.continuation.finish()
 
-        let count = await countTask.value
-
-        #expect(count == argument.expectedCount)
+        await #expect(countTask.value == argument.expectedCount)
     }
 
     @Test

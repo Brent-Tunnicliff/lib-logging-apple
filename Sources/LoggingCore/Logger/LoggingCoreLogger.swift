@@ -106,12 +106,14 @@ package enum Logger {
 }
 
 final class DefaultLoggingCoreLogger: LoggingCoreLogger {
+    private let dateProvider: any DateProvider
     private let loggingService: any LoggingService
     private let packageName: String
     private let systemLogger: any InternalLogger
 
     convenience init(packageName: String) {
         self.init(
+            dateProvider: DefaultDateProvider.shared,
             loggingService: DefaultLoggingService.shared,
             packageName: packageName,
             systemLogger: SystemLogger(packageName: packageName)
@@ -119,17 +121,19 @@ final class DefaultLoggingCoreLogger: LoggingCoreLogger {
     }
 
     init(
+        dateProvider: any DateProvider,
         loggingService: any LoggingService,
         packageName: String,
         systemLogger: any InternalLogger
     ) {
+        self.dateProvider = dateProvider
         self.loggingService = loggingService
         self.packageName = packageName
         self.systemLogger = systemLogger
     }
 
     func log(level: LogLevel, message: String, tag: LogTag, error: (any Error)?) {
-        let timestamp = Date()
+        let timestamp = dateProvider.now
         let thread = Thread.nameForLog
         systemLogger.log(level: level, message: message, tag: tag, error: error)
 
