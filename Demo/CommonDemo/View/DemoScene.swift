@@ -6,10 +6,10 @@ import SwiftData
 public import SwiftUI
 
 /// Common scene for both the demo app and the watch companion.
-public struct CommonScene: Scene {
+public struct DemoScene: Scene {
     @Environment(\.scenePhase) private var scenePhase
 
-    /// Initialise an instance of ``CommonScene``.
+    /// Initialise an instance of ``DemoScene``.
     public init() {}
 
     /// The content and behavior of the scene.

@@ -3,6 +3,7 @@
   "strings" : {
     "capture_log_button_title" : {
       "comment" : "Title of button to trigger log to be send.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -14,6 +15,7 @@
     },
     "default_database_id_%@" : {
       "comment" : "Specifies the latest id from the default database.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -25,6 +27,7 @@
     },
     "include_error_title" : {
       "comment" : "Title of toggle for enabling or disabling if an error object is attached to the log.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -36,6 +39,7 @@
     },
     "log_capture_type_label_every_five_seconds" : {
       "comment" : "The log will be scheduled to happen on a loop every 5 seconds.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -47,6 +51,7 @@
     },
     "log_capture_type_label_every_second" : {
       "comment" : "The log will be scheduled to happen on a loop every 1 second.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -58,6 +63,7 @@
     },
     "log_capture_type_label_every_ten_seconds" : {
       "comment" : "The log will be scheduled to happen on a loop every 5 seconds.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -69,6 +75,7 @@
     },
     "log_capture_type_label_once" : {
       "comment" : "The log will only be sent one time.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -80,6 +87,7 @@
     },
     "message_title" : {
       "comment" : "Title of the text field a user can use to input a message for the log.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -89,8 +97,21 @@
         }
       }
     },
+    "populate_many_logs_button_title" : {
+      "comment" : "Button that triggers sending a very large amount of logs.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Many Logs"
+          }
+        }
+      }
+    },
     "presenting_type_modal" : {
       "comment" : "Sets the presenting option to a modal sheet or window",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -102,6 +123,7 @@
     },
     "presenting_type_navigation_destination" : {
       "comment" : "Sets the presenting option to default navigation",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -113,6 +135,7 @@
     },
     "select_log_level" : {
       "comment" : "Instructs the user to select a log level in the related picker.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -124,6 +147,7 @@
     },
     "select_trigger_type" : {
       "comment" : "Instructs the user to the trigger type in the related picker.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -135,6 +159,7 @@
     },
     "select_way_to_present_logs" : {
       "comment" : "Instructs the user to select how to present the logs view in the related picker.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {

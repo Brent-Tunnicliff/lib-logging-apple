@@ -25,17 +25,9 @@ extension PresentingType {
     var label: Text {
         switch self {
         case .navigationDestination:
-            Text(
-                "presenting_type_navigation_destination",
-                bundle: .module,
-                comment: "Sets the presenting option to default navigation"
-            )
+            Text(.presentingTypeNavigationDestination)
         case .modal:
-            Text(
-                "presenting_type_modal",
-                bundle: .module,
-                comment: "Sets the presenting option to a modal sheet or window"
-            )
+            Text(.presentingTypeModal)
         }
     }
 }

@@ -15,11 +15,7 @@ struct ContentView: View {
         List {
             Section {
                 // If this is nil, then there may be an issue with the two databases conflicting.
-                Text(
-                    "default_database_id_\(demoEntities.last?.id ?? "nil")",
-                    bundle: .module,
-                    comment: "Specifies the latest id from the default database."
-                )
+                Text(.defaultDatabaseId(demoEntities.last?.id ?? "nil"))
             }
 
             CaptureLogSection(presentingStyle: $presentingStyle)

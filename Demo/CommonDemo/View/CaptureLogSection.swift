@@ -11,6 +11,7 @@ struct CaptureLogSection: View {
     @Binding private var presentingStyle: LogsViewPresentingStyle
     @Environment(\.logSchedulerService) private var logSchedulerService
     @State private var captureError = false
+    @State private var isPopulatingManyLogsProgress = 0
     @State private var message = "Example message"
     @State private var selectedLogLevel = LogLevel.debug
     @State private var selectedCaptureType = LogCaptureType.once
@@ -47,6 +48,14 @@ struct CaptureLogSection: View {
         }
 
         Section {
+            populateManyLogsSectionContents
+        } footer: {
+            if isPopulatingManyLogsProgress > 0 {
+                Text(isPopulatingManyLogsProgress.description)
+            }
+        }
+
+        Section {
             selectedLogLevelPicker
             selectedCaptureTypePicker
             messageTextField
@@ -63,31 +72,45 @@ struct CaptureLogSection: View {
 
     private var captureErrorToggle: some View {
         Toggle(isOn: $captureError) {
-            Text(
-                "include_error_title",
-                bundle: .module,
-                comment: "Title of toggle for enabling or disabling if an error object is attached to the log."
-            )
+            Text(.includeErrorTitle)
         }
     }
 
     private var captureLogButton: some View {
         Button(action: captureLog) {
-            Text(
-                "capture_log_button_title",
-                bundle: .module,
-                comment: "Title of button to trigger log to be send."
-            )
+            Text(.captureLogButtonTitle)
         }
+    }
+
+    private var populateManyLogsSectionContents: some View {
+        Button {
+            let range = 0...100_000
+            isPopulatingManyLogsProgress = range.count
+            Task { @concurrent in
+                for _ in range {
+                    Logger.app.debug("This is an example debug log without an error")
+                    Logger.app.debug("This is an example debug log with an error", error: ExampleError())
+                    Logger.app.info("This is an example info log without an error")
+                    Logger.app.info("This is an example info log with an error", error: ExampleError())
+                    Logger.app.error("This is an example error log without an error")
+                    Logger.app.error("This is an example error log with an error", error: ExampleError())
+                    Logger.app.critical("This is an example critical log without an error")
+                    Logger.app.critical("This is an example critical log with an error", error: ExampleError())
+
+                    Task { @MainActor in
+                        isPopulatingManyLogsProgress -= 1
+                    }
+                }
+            }
+        } label: {
+            Text(.populateManyLogsButtonTitle)
+        }
+        .disabled(isPopulatingManyLogsProgress > 0)
     }
 
     private var messageTextField: some View {
         TextField(text: $message) {
-            Text(
-                "message_title",
-                bundle: .module,
-                comment: "Title of the text field a user can use to input a message for the log."
-            )
+            Text(.messageTitle)
         }
         .textFieldStyle(.roundedBorderIfSupported)
     }
@@ -99,11 +122,7 @@ struct CaptureLogSection: View {
             optionMapper: \.presentingStyle,
             textProvider: \.label
         ) {
-            Text(
-                "select_way_to_present_logs",
-                bundle: .module,
-                comment: "Instructs the user to select how to present the logs view in the related picker."
-            )
+            Text(.selectWayToPresentLogs)
         }
     }
 
@@ -152,11 +171,7 @@ struct CaptureLogSection: View {
             selectedLogLevel: $selectedCaptureType,
             textProvider: \.label
         ) {
-            Text(
-                "select_trigger_type",
-                bundle: .module,
-                comment: "Instructs the user to the trigger type in the related picker."
-            )
+            Text(.selectTriggerType)
         }
     }
 
@@ -166,11 +181,7 @@ struct CaptureLogSection: View {
             selectedLogLevel: $selectedLogLevel,
             textProvider: \.label
         ) {
-            Text(
-                "select_log_level",
-                bundle: .module,
-                comment: "Instructs the user to select a log level in the related picker."
-            )
+            Text(.selectLogLevel)
         }
     }
 
