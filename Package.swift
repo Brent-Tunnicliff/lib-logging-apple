@@ -116,6 +116,10 @@ for target in package.targets {
 
     let swiftSettings = target.swiftSettings ?? []
     target.swiftSettings = swiftSettings + [
+        .strictMemorySafety(),
+
+        // Feature flags
+
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InferIsolatedConformances"),
         .enableUpcomingFeature("InternalImportsByDefault"),

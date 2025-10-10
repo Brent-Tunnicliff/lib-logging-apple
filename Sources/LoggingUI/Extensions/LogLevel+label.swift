@@ -19,38 +19,22 @@ extension Text {
     public enum LogLevel {
         /// Text label for the debug log level.
         public static var debug: Text {
-            Text(
-                "log_level_debug",
-                bundle: .module,
-                comment: "The log severity level - debug information."
-            )
+            Text(.logLevelDebug)
         }
 
         /// Text label for the info log level.
         public static var info: Text {
-            Text(
-                "log_level_info",
-                bundle: .module,
-                comment: "The log severity level - informative."
-            )
+            Text(.logLevelInfo)
         }
 
         /// Text label for the error log level.
         public static var error: Text {
-            Text(
-                "log_level_error",
-                bundle: .module,
-                comment: "The log severity level - error happened."
-            )
+            Text(.logLevelError)
         }
 
         /// Text label for the critical log level.
         public static var critical: Text {
-            Text(
-                "log_level_critical",
-                bundle: .module,
-                comment: "The log severity level - critical issue."
-            )
+            Text(.logLevelCritical)
         }
     }
 }

@@ -2,11 +2,12 @@
 
 package import Foundation
 import SwiftData
+package import SwiftUI
 import UniformTypeIdentifiers
 
 package protocol LoggingService: Sendable {
     func exportLogs() async throws -> URL
-
+    func save() async throws
     func storeLog(
         error: (any Error)?,
         logLevel: LogLevel,
@@ -84,15 +85,6 @@ package actor DefaultLoggingService: ModelActor {
         cleanupTask?.cancel()
     }
 
-    /// Manually trigger a save of any pending data.
-    func save() throws {
-        guard modelContext.hasChanges else {
-            return
-        }
-
-        try modelContext.save()
-    }
-
     private func registerForCleanup() {
         if let cleanupTask, !cleanupTask.isCancelled {
             // We do not want to trigger multiple tasks.
@@ -137,6 +129,8 @@ package actor DefaultLoggingService: ModelActor {
 // MARK: - LoggingService
 
 extension DefaultLoggingService: LoggingService {
+    // TODO: Test any of this actually works.
+    // See https://stackoverflow.com/a/77040413 for populated database help
     package func exportLogs() throws -> URL {
         Logger.logging.info("Starting log export")
 
@@ -160,7 +154,8 @@ extension DefaultLoggingService: LoggingService {
         // MARK: Populate the export
 
         let fileHandle = try fileManager.getFileHandle(forWritingTo: fileURL)
-        for log in try getLogsPagination() {
+        let logs = try getLogsPagination()
+        for log in logs {
             let logExport = modelMapper.toExportContent(logEntity: log)
             guard let logExportData = logExport.data(using: .utf8) else {
                 Logger.logging.error("Failed to export log content \(logExport)")
@@ -171,6 +166,14 @@ extension DefaultLoggingService: LoggingService {
         }
 
         return fileURL
+    }
+
+    package func save() throws {
+        guard modelContext.hasChanges else {
+            return
+        }
+
+        try modelContext.save()
     }
 
     package func storeLog(
@@ -225,5 +228,17 @@ extension LogLevel {
         case .error: [.error, .critical]
         case .critical: [.critical]
         }
+    }
+}
+
+// MARK: - View
+
+extension EnvironmentValues {
+    @Entry package var loggingService: any LoggingService = DefaultLoggingService.shared
+}
+
+extension View {
+    package func loggingService(_ loggingService: any LoggingService) -> some View {
+        environment(\.loggingService, loggingService)
     }
 }

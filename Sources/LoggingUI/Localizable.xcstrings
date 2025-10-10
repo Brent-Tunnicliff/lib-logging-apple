@@ -3,6 +3,7 @@
   "strings" : {
     "device_model_%@" : {
       "comment" : "Specifies the model of device. E.g. iPhone 18.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -14,6 +15,7 @@
     },
     "device_system_unknown" : {
       "comment" : "Specifies the model of device system is unknown. E.g. a known device system would have appeared like 'iOS 16'.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -25,6 +27,7 @@
     },
     "device_user_interface_idiom_label_%@" : {
       "comment" : "Specifies the device's user interface.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -36,6 +39,7 @@
     },
     "identifier_for_vendor_%@" : {
       "comment" : "Displays the unique device identifier that the app is installed on.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -47,6 +51,7 @@
     },
     "log_error_title_%@_%@_%@" : {
       "comment" : "Displays the error details associated with the log.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -58,6 +63,7 @@
     },
     "log_id_%@" : {
       "comment" : "Displays the unique device identifier of that log.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -69,6 +75,7 @@
     },
     "log_level_critical" : {
       "comment" : "The log severity level - critical issue.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -80,6 +87,7 @@
     },
     "log_level_debug" : {
       "comment" : "The log severity level - debug information.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -91,6 +99,7 @@
     },
     "log_level_error" : {
       "comment" : "The log severity level - error happened.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -102,6 +111,7 @@
     },
     "log_level_info" : {
       "comment" : "The log severity level - informative.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -111,19 +121,21 @@
         }
       }
     },
-    "logs_view_empty" : {
-      "comment" : "Informs the user that there are no logs available to show.",
+    "logs_view_end" : {
+      "comment" : "Informs the user that there are no more logs available to show.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No logs to show"
+            "value" : "End of logs"
           }
         }
       }
     },
     "logs_view_title" : {
       "comment" : "The title of the view that lists all logs.",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {

@@ -80,22 +80,14 @@ struct LogItemView: View {
 
     @ViewBuilder
     private var deviceIdentifierForVendorLabel: some View {
-        Text(
-            "identifier_for_vendor_\(log.device.identifierForVendor?.uuidString ?? unknown)",
-            bundle: .module,
-            comment: "Displays the unique device identifier that the app is installed on."
-        )
-        .font(.caption2)
+        Text(.identifierForVendor(log.device.identifierForVendor?.uuidString ?? unknown))
+            .font(.caption2)
     }
 
     @ViewBuilder
     private var deviceModelLabel: some View {
-        Text(
-            "device_model_\(log.device.model ?? unknown)",
-            bundle: .module,
-            comment: "Specifies the model of device. E.g. iPhone 18."
-        )
-        .font(.caption2)
+        Text(.deviceModel(log.device.model ?? unknown))
+            .font(.caption2)
     }
 
     @ViewBuilder
@@ -104,14 +96,7 @@ struct LogItemView: View {
             switch (log.device.systemName, log.device.systemVersion) {
             case (nil, nil):
                 // Unable to determine either.
-                Text(
-                    "device_system_unknown",
-                    bundle: .module,
-                    comment: """
-                        Specifies the model of device system is unknown. \
-                        E.g. a known device system would have appeared like 'iOS 16'.
-                        """
-                )
+                Text(.deviceSystemUnknown)
             case let (nil, systemVersion):
                 // Only show the system version.
                 Text(verbatim: systemVersion ?? unknown)
@@ -131,43 +116,27 @@ struct LogItemView: View {
 
     @ViewBuilder
     private var deviceUserInterfaceIdiomLabel: some View {
-        Group {
-            Text(
-                "device_user_interface_idiom_label_\(log.device.userInterfaceIdiom.label ?? unknown)",
-                bundle: .module,
-                comment: "Specifies the device's user interface."
-            )
-        }
-        .font(.caption2)
+        Text(.deviceUserInterfaceIdiomLabel(log.device.userInterfaceIdiom.label ?? unknown))
+            .font(.caption2)
     }
 
     @ViewBuilder
     private var errorLabel: some View {
         if let error = log.error {
-            Text(
-                "log_error_title_\(error.type)_\(error.message)_\(error.localizedDescription)",
-                bundle: .module,
-                comment: "Displays the error details associated with the log."
-            )
+            Text(.logErrorTitle(error.type, error.message, error.localizedDescription))
         }
     }
 
     @ViewBuilder
     private var logIdLabel: some View {
-        Text(
-            "log_id_\(log.id.uuidString)",
-            bundle: .module,
-            comment: "Displays the unique device identifier of that log."
-        )
-        .font(.caption2)
+        Text(.logId(log.id.uuidString))
+            .font(.caption2)
     }
 
     @ViewBuilder
     private var logLevelLabel: some View {
-        Group {
-            log.level.label
-        }
-        .font(.footnote)
+        log.level.label
+            .font(.footnote)
     }
 
     @ViewBuilder
