@@ -22,6 +22,7 @@ package protocol LoggingService: Sendable {
 package enum LoggingServiceError: Error {
     case exportFileExists
     case failedToConvertLogToData
+    case failedToCreateFile
 }
 
 // MARK: - DefaultLoggingService
@@ -134,27 +135,39 @@ extension DefaultLoggingService: LoggingService {
     package func exportLogs() throws -> URL {
         Logger.logging.info("Starting log export")
 
+        // Save any pending changes before continuing.
+        try save()
+
         // MARK: Create the export file
 
-        let timestamp = dateProvider.now.ISO8601Format()
-        let bundleIdentifier = Bundle.main.bundleIdentifier ?? "unknown"
+        let timestamp = dateProvider.now.ISO8601Format(.init(timeSeparator: .omitted))
+        let bundleIdentifier = (Bundle.main.bundleIdentifier ?? "unknown")
+            .replacingOccurrences(of: ".", with: "_")
         let exportFileName = "log_export_\(bundleIdentifier)_\(timestamp)"
         let temporaryDirectory = fileManager.temporaryDirectory
         let fileURL = temporaryDirectory.appending(path: exportFileName, directoryHint: .notDirectory)
-            .appendingPathExtension(for: .text)
+            .appendingPathExtension(for: .plainText)
 
         // This should never happen, but if it does lets throw.
         guard !fileManager.fileExists(at: fileURL) else {
-            Logger.logging.error("File exists already exists '\(fileURL.absoluteString)'")
+            Logger.logging.error("File already exists '\(fileURL.absoluteString)'")
             throw LoggingServiceError.exportFileExists
         }
 
-        fileManager.createFile(at: fileURL, contents: nil)
+        guard fileManager.createFile(at: fileURL, contents: "".data(using: .utf8)) else {
+            Logger.logging.error("File failed to create '\(fileURL.absoluteString)'")
+            throw LoggingServiceError.failedToCreateFile
+        }
 
         // MARK: Populate the export
 
         let fileHandle = try fileManager.getFileHandle(forWritingTo: fileURL)
-        let logs = try getLogsPagination()
+        var fetchDescriptor = FetchDescriptor<LogEntity>(
+            sortBy: [SortDescriptor(\LogEntity.timestampCreated)]
+        )
+        // Fetching with `batchSize` always throws if we include pending changes.
+        fetchDescriptor.includePendingChanges = false
+        let logs = try modelContext.fetch(fetchDescriptor, batchSize: logsBatchSize)
         for log in logs {
             let logExport = modelMapper.toExportContent(logEntity: log)
             guard let logExportData = logExport.data(using: .utf8) else {
@@ -207,17 +220,6 @@ extension DefaultLoggingService: LoggingService {
 }
 
 // MARK: - Private
-
-extension DefaultLoggingService {
-    private func getLogsPagination() throws -> FetchResultsCollection<LogEntity> {
-        try modelContext.fetch(
-            FetchDescriptor<LogEntity>(
-                sortBy: [SortDescriptor(\LogEntity.timestampCreated)]
-            ),
-            batchSize: logsBatchSize
-        )
-    }
-}
 
 extension LogLevel {
     /// Returns the list of supported log levels when self is the minimum supported level.

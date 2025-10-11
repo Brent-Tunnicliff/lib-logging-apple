@@ -84,7 +84,7 @@ struct CaptureLogSection: View {
 
     private var populateManyLogsSectionContents: some View {
         Button {
-            let range = 0...100_000
+            let range = 0...1_000
             isPopulatingManyLogsProgress = range.count
             Task { @concurrent in
                 for _ in range {

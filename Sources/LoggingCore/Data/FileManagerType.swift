@@ -8,7 +8,7 @@ import Foundation
 protocol FileManagerType {
     var temporaryDirectory: URL { get }
 
-    func createFile(at url: URL, contents: Data?)
+    func createFile(at url: URL, contents: Data?) -> Bool
     func fileExists(at url: URL) -> Bool
     func getFileHandle(forWritingTo url: URL) throws -> any WritableFileHandleType
 }
@@ -25,12 +25,12 @@ final class DefaultFileManager: FileManagerType {
         fileManager.temporaryDirectory
     }
 
-    func createFile(at url: URL, contents: Data?) {
-        fileManager.createFile(atPath: url.absoluteString, contents: contents)
+    func createFile(at url: URL, contents: Data?) -> Bool {
+        fileManager.createFile(atPath: url.path(), contents: contents)
     }
 
     func fileExists(at url: URL) -> Bool {
-        fileManager.fileExists(atPath: url.absoluteString)
+        fileManager.fileExists(atPath: url.path())
     }
 
     func getFileHandle(forWritingTo url: URL) throws -> any WritableFileHandleType {

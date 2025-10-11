@@ -27,6 +27,22 @@ public struct LogsView: View {
                     Logger.logging.error("Failed to save logs", error: error)
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        Task { @concurrent in
+                            do {
+                                let url = try await loggingService.exportLogs()
+                                print(url.absoluteString)
+                            } catch {
+                                print(error)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+            }
     }
 }
 
@@ -64,14 +80,17 @@ private struct LogsViewContent: View {
     }
 
     private var endOfListView: some View {
-        Group {
+        VStack(alignment: .center) {
             if let numberOfLogs, numberOfLogs <= (pageNumber * Self.logsPerPage) {
                 Text(.logsViewEnd)
+                    .font(.footnote)
             } else {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
             }
         }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .listRowSeparatorIfSupported(.hidden)
         .onAppear {
             do {
                 let logsCount = try modelContext.fetchCount(Self.baseFetchDescriptor())
@@ -87,6 +106,16 @@ private struct LogsViewContent: View {
 
     private static func baseFetchDescriptor() -> FetchDescriptor<LogEntity> {
         FetchDescriptor(sortBy: LogEntity.sortedBy)
+    }
+}
+
+extension View {
+    func listRowSeparatorIfSupported(_ visibility: Visibility) -> some View {
+        #if os(tvOS) || os(watchOS)
+            self
+        #else
+            listRowSeparator(visibility)
+        #endif
     }
 }
 

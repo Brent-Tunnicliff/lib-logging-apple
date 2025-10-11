@@ -8,7 +8,7 @@ import Synchronization
 final class MockFileManager: FileManagerType, Sendable {
     var temporaryDirectory: URL { .mock }
 
-    func createFile(at url: URL, contents: Data?) {}
+    func createFile(at url: URL, contents: Data?) -> Bool { true }
 
     func fileExists(at url: URL) -> Bool { false }
 

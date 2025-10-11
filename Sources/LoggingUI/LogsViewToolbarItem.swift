@@ -43,10 +43,12 @@ public struct LogsViewToolbarItem: ToolbarContent {
                 NavigationStack {
                     LogsView()
                         .toolbar {
-                            Button {
-                                isSheetPresented = false
-                            } label: {
-                                Image(systemName: "xmark")
+                            ToolbarItem(placement: .closePlacement) {
+                                Button {
+                                    isSheetPresented = false
+                                } label: {
+                                    Image(systemName: "xmark")
+                                }
                             }
                         }
                 }
@@ -84,6 +86,15 @@ extension ToolbarItemPlacement {
             .topBarTrailing
         #else
             .automatic
+        #endif
+    }
+
+    fileprivate static var closePlacement: ToolbarItemPlacement {
+        #if os(watchOS)
+            // WatchOS does not support `navigation`.
+            .topBarTrailing
+        #else
+            .navigation
         #endif
     }
 }
