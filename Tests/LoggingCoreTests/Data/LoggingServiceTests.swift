@@ -3,6 +3,7 @@
 import Algorithms
 import Foundation
 import SwiftData
+import Synchronization
 import Testing
 
 @testable import LoggingCore
@@ -135,7 +136,6 @@ struct LoggingServiceTests {
 
         let allLogs = logsToDelete + logsToKeep
         let modelContext = ModelContext(modelContainer)
-        modelContext.autosaveEnabled = false
         try modelContext.transaction {
             for log in allLogs {
                 modelContext.insert(log)
@@ -153,17 +153,25 @@ struct LoggingServiceTests {
             return
         }
 
-        async let storeLogCleanupCalled = withCheckedContinuation { continuation in
-            mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
-                continuation.resume(returning: true)
-            }
+        let storeLogCleanupCalled = Atomic(false)
+        mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
+            storeLogCleanupCalled.store(true, ordering: .sequentiallyConsistent)
         }
 
         try await registerForCleanupStream.waitForContinuation()
 
         // test
         registerForCleanupStream.continuation.yield()
-        await #expect(storeLogCleanupCalled == true)
+
+        let start = Date()
+        while storeLogCleanupCalled.load(ordering: .sequentiallyConsistent) == false {
+            guard Date().timeIntervalSince(start) < 1 else {
+                Issue.record("storeLogCleanup was not called")
+                return
+            }
+
+            try await Task.sleep(for: .milliseconds(10))
+        }
 
         // verify
         let results: [LogEntity] = try modelContext.fetch(FetchDescriptor())
