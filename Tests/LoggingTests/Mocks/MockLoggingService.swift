@@ -39,6 +39,10 @@ final class MockLoggingService: LoggingService {
         try exportLogsResponse()
     }
 
+    // MARK: - save
+
+    func save() async throws {}
+
     // MARK: - storeLog
 
     package struct StoreLogInput: Sendable {

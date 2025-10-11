@@ -140,8 +140,6 @@ struct LoggingServiceTests {
             for log in allLogs {
                 modelContext.insert(log)
             }
-
-            try modelContext.save()
         }
 
         // lets just double check that there are the expected number of logs created in setup
