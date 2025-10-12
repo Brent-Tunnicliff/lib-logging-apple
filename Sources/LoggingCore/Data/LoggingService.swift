@@ -162,9 +162,7 @@ extension DefaultLoggingService: LoggingService {
         // MARK: Populate the export
 
         let fileHandle = try fileManager.getFileHandle(forWritingTo: fileURL)
-        var fetchDescriptor = FetchDescriptor<LogEntity>(
-            sortBy: [SortDescriptor(\LogEntity.timestampCreated)]
-        )
+        var fetchDescriptor = FetchDescriptor<LogEntity>(sortBy: .byDateAndId())
         // Fetching with `batchSize` always throws if we include pending changes.
         fetchDescriptor.includePendingChanges = false
         let logs = try modelContext.fetch(fetchDescriptor, batchSize: logsBatchSize)

@@ -105,7 +105,7 @@ private struct LogsViewContent: View {
     }
 
     private static func baseFetchDescriptor() -> FetchDescriptor<LogEntity> {
-        FetchDescriptor(sortBy: LogEntity.sortedBy)
+        FetchDescriptor(sortBy: .byDateAndId(order: .reverse))
     }
 }
 
