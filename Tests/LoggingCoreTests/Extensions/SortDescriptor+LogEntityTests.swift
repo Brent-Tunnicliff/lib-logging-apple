@@ -92,70 +92,70 @@ extension SortDescriptorLogEntityTests.LogEntityByDateAndIdArgument {
 
     fileprivate var logEntityOne: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000001"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000001"),
             timestampCreated: date(for: "2025-01-01T00:00:10Z")
         )
     }
 
     fileprivate var logEntityTwo: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000002"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000002"),
             timestampCreated: date(for: "2025-01-01T00:00:09Z")
         )
     }
 
     fileprivate var logEntityThree: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000003"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000003"),
             timestampCreated: date(for: "2025-01-01T00:00:01Z")
         )
     }
 
     fileprivate var logEntityFour: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000004"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000004"),
             timestampCreated: date(for: "2025-01-01T00:00:07Z")
         )
     }
 
     fileprivate var logEntityFive: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000005"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000005"),
             timestampCreated: date(for: "2025-01-01T00:00:06Z")
         )
     }
 
     fileprivate var logEntitySix: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000006"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000006"),
             timestampCreated: date(for: "2025-01-01T00:00:05Z")
         )
     }
 
     fileprivate var logEntitySeven: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000007"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000007"),
             timestampCreated: date(for: "2025-01-01T00:00:01Z")
         )
     }
 
     fileprivate var logEntityEight: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000008"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000008"),
             timestampCreated: date(for: "2025-01-01T00:00:03Z")
         )
     }
 
     fileprivate var logEntityNine: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000009"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000009"),
             timestampCreated: date(for: "2025-01-01T00:00:02Z")
         )
     }
 
     fileprivate var logEntityTen: LogEntity {
         LogEntity.mock(
-            id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000010"),
+            id: .forced(uuidString: "00000000-0000-0000-0000-000000000010"),
             timestampCreated: date(for: "2025-01-01T00:00:01Z")
         )
     }
@@ -166,15 +166,5 @@ extension SortDescriptorLogEntityTests.LogEntityByDateAndIdArgument {
         } catch {
             preconditionFailure("Failed to parse date '\(dateString)' with error: \(error)")
         }
-    }
-}
-
-extension UUID {
-    fileprivate static func forced(uuidString: String) -> UUID {
-        guard let id = UUID(uuidString: uuidString) else {
-            preconditionFailure("Unexpected nil for UUID '\(uuidString)'")
-        }
-
-        return id
     }
 }

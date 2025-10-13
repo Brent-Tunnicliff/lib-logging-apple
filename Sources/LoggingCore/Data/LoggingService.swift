@@ -143,7 +143,7 @@ extension DefaultLoggingService: LoggingService {
         let timestamp = dateProvider.now.ISO8601Format(.init(timeSeparator: .omitted))
         let bundleIdentifier = (Bundle.main.bundleIdentifier ?? "unknown")
             .replacingOccurrences(of: ".", with: "_")
-        let exportFileName = "log_export_\(bundleIdentifier)_\(timestamp)"
+        let exportFileName = "log_export_\(bundleIdentifier)_\(timestamp)_\(UUID().uuidString)"
         let temporaryDirectory = fileManager.temporaryDirectory
         let fileURL = temporaryDirectory.appending(path: exportFileName, directoryHint: .notDirectory)
             .appendingPathExtension(for: .plainText)
@@ -176,6 +176,8 @@ extension DefaultLoggingService: LoggingService {
             try fileHandle.write(contentsOf: logExportData)
         }
 
+        // Save any remaining contents to disk.
+        try fileHandle.synchronize()
         return fileURL
     }
 

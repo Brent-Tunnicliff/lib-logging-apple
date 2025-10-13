@@ -91,7 +91,7 @@ struct ModelMapperTests {
                     systemVersion: deviceSystemVersion,
                     userInterfaceIdiom: .phone
                 ),
-                id: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000001"),
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000001"),
                 level: .info,
                 message: "This is a log",
                 packageName: "LoggingCoreTests",
@@ -126,7 +126,7 @@ struct ModelMapperTests {
         private var deviceIdentifierForVendor: UUID? {
             switch self {
             case .withoutDeviceIdentifierForVendor: nil
-            default: UUID.forced(uuidString: "00000000-0000-0000-0000-000000000002")
+            default: .forced(uuidString: "00000000-0000-0000-0000-000000000002")
             }
         }
 
@@ -178,15 +178,5 @@ struct ModelMapperTests {
         let logEntry = argument.logEntry
         let result = modelMapper.toExportContent(logEntity: logEntry)
         #expect(result == argument.expectedResult)
-    }
-}
-
-extension UUID {
-    fileprivate static func forced(uuidString: String) -> UUID {
-        guard let id = UUID(uuidString: uuidString) else {
-            preconditionFailure("Unexpected nil for UUID '\(uuidString)'")
-        }
-
-        return id
     }
 }

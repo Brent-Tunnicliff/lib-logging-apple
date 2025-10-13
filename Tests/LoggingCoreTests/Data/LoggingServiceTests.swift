@@ -185,6 +185,73 @@ struct LoggingServiceTests {
         }
     }
 
+    // MARK: - exportLogs()
+
+    @Test
+    func exportLogs() async throws {
+        let modelContext = ModelContext(modelContainer)
+        _ = try await runExportTestSetup(
+            loggingService: loggingService,
+            modelContext: modelContext
+        )
+
+        let expectedResult = expectedExportResult()
+        let result = mockFileManager.mockWritableFileHandleType.writeInput.joined()
+        #expect(result == expectedResult)
+        #expect(mockFileManager.mockWritableFileHandleType.synchronizeCalled)
+    }
+
+    /// Uses a real database and FileManager so we make sure it works.
+    @Test
+    func exportLogsIntegrationTest() async throws {
+        let container = try await Task { @MainActor in
+            try ModelContainer(
+                for: Schema(versionedSchema: LatestSchema.self),
+                configurations: ModelConfiguration("exportLogsIntegrationTest_\(UUID().uuidString)")
+            )
+        }.value
+
+        // We want to use the real file manage for the integration test.
+        let realFileManager = DefaultFileManager()
+        let modelContext = ModelContext(container)
+        let urlResult = try await runExportTestSetup(
+            loggingService: DefaultLoggingService(
+                dateProvider: mockDateProvider,
+                deviceProvider: mockDeviceProvider,
+                fileManager: realFileManager,
+                logCleanupTrigger: mockLogCleanupTrigger,
+                modelContainer: container,
+                modelMapper: mockModelMapper,
+                userDefaults: mockUserDefaultsStore
+            ),
+            modelContext: modelContext
+        )
+
+        // Cleanup file when not needed.
+        defer {
+            do {
+                try FileManager.default.removeItem(at: urlResult)
+            } catch {
+                Issue.record(error, "Failed to clean up file \(urlResult.absoluteString)")
+            }
+        }
+
+        #expect(FileManager.default.fileExists(atPath: urlResult.path()))
+
+        guard let resultData = FileManager.default.contents(atPath: urlResult.path()) else {
+            Issue.record("Unable to get contents of file \(urlResult.absoluteString)")
+            return
+        }
+
+        guard let result = String(data: resultData, encoding: .utf8) else {
+            Issue.record("Unable to decode contents of file \(urlResult.absoluteString)")
+            return
+        }
+
+        let expectedResult = expectedExportResult()
+        #expect(result == expectedResult)
+    }
+
     // MARK: - Helpers
 
     private func performStoreLog(
@@ -203,5 +270,108 @@ struct LoggingServiceTests {
 
         // Manually save as we don't want to wait until the autosave every 60 seconds.
         try await loggingService.save()
+    }
+
+    private func runExportTestSetup(
+        loggingService: any LoggingService,
+        modelContext: ModelContext
+    ) async throws -> URL {
+        // Setup
+        let realModelMapper = DefaultModelMapper()
+        // We actually want the real export for this test.
+        mockModelMapper.toExportContentLogEntityResponse = realModelMapper.toExportContent(logEntity:)
+
+        let device = LogEntity.Device.mock(
+            identifierForVendor: .forced(uuidString: "BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9")
+        )
+
+        let logs: [LogEntity] = [
+            .mock(
+                device: device,
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000001"),
+                level: .debug,
+                timestampCreated: mockDateProvider.now(subtracting: 1),
+                error: nil,
+                thread: "Main"
+            ),
+            .mock(
+                device: device,
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000002"),
+                level: .info,
+                timestampCreated: mockDateProvider.now(subtracting: 2),
+                error: nil,
+                thread: "0002"
+            ),
+            .mock(
+                device: device,
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000003"),
+                level: .error,
+                timestampCreated: mockDateProvider.now(subtracting: 3),
+                error: nil,
+                thread: "0003"
+            ),
+            .mock(
+                device: device,
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000004"),
+                level: .critical,
+                timestampCreated: mockDateProvider.now(subtracting: 4),
+                error: nil,
+                thread: "0004"
+            ),
+            .mock(
+                device: device,
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000005"),
+                level: .debug,
+                timestampCreated: mockDateProvider.now(subtracting: 5),
+                error: .mock(),
+                thread: "0005"
+            ),
+            .mock(
+                device: device,
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000006"),
+                level: .info,
+                timestampCreated: mockDateProvider.now(subtracting: 6),
+                error: .mock(),
+                thread: "0006"
+            ),
+            .mock(
+                device: device,
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000007"),
+                level: .error,
+                timestampCreated: mockDateProvider.now(subtracting: 7),
+                error: .mock(),
+                thread: "0007"
+            ),
+            .mock(
+                device: device,
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000008"),
+                level: .critical,
+                timestampCreated: mockDateProvider.now(subtracting: 8),
+                error: .mock(),
+                thread: "0008"
+            ),
+        ]
+
+        try modelContext.transaction {
+            for log in logs {
+                modelContext.insert(log)
+            }
+        }
+
+        return try await loggingService.exportLogs()
+    }
+
+    private func expectedExportResult() -> String {
+        """
+        2024-12-31T23:59:52Z [0008] [Logging] [critical] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:53Z [0007] [Logging] [error] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:54Z [0006] [Logging] [info] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:55Z [0005] [Logging] [debug] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:56Z [0004] [Logging] [critical] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:57Z [0003] [Logging] [error] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:58Z [0002] [Logging] [info] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:59Z [Main] [Logging] [debug] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+
+        """
     }
 }
