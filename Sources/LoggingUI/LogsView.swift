@@ -120,20 +120,16 @@ extension View {
 }
 
 #Preview("Default") {
-    @Previewable @State var pageNumber = 1
-
     NavigationStack {
-        LogsViewContent(pageNumber: $pageNumber)
+        LogsView()
     }
     .loggingModelContainer(mocked: .populated)
     .loggingService(PreviewLoggingService())
 }
 
 #Preview("Empty") {
-    @Previewable @State var pageNumber = 1
-
     NavigationStack {
-        LogsViewContent(pageNumber: $pageNumber)
+        LogsView()
     }
     .loggingModelContainer(mocked: .empty)
     .loggingService(PreviewLoggingService())
