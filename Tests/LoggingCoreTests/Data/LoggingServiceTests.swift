@@ -158,6 +158,9 @@ struct LoggingServiceTests {
             storeLogCleanupCalled.store(true, ordering: .sequentiallyConsistent)
         }
 
+        // Hacky attempt to avoid a race condition that only fails in pipeline.
+        try await Task.sleep(for: .seconds(1))
+
         // test
         registerForCleanupStream.continuation.yield()
 
