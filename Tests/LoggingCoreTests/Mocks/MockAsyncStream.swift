@@ -4,7 +4,8 @@ import Foundation
 import Synchronization
 
 final class MockAsyncStream<Element>: AsyncSequence {
-    private let continuationMutex = Mutex<AsyncStream<Element>.Continuation?>(nil)
+    private let stream: AsyncStream<Element>
+    private let continuationMutex: Mutex<AsyncStream<Element>.Continuation?>
     var continuation: AsyncStream<Element>.Continuation {
         guard let continuation = continuationMutex.withLock({ $0 }) else {
             preconditionFailure("continuation is nil")
@@ -13,26 +14,26 @@ final class MockAsyncStream<Element>: AsyncSequence {
         return continuation
     }
 
-    func makeAsyncIterator() -> AsyncStream<Element>.AsyncIterator {
-        // Clear old value
-        continuationMutex.withLock { $0 = nil }
-
+    init() {
+        let continuationMutex = Mutex<AsyncStream<Element>.Continuation?>(nil)
         let stream = AsyncStream<Element> { continuation in
             continuationMutex.withLock { $0 = continuation }
         }
+        self.continuationMutex = continuationMutex
+        self.stream = stream
 
-        return stream.makeAsyncIterator()
-    }
-
-    func waitForContinuation(timeout duration: Duration = .seconds(1)) async throws {
-        let timeout = Date(timeIntervalSinceNow: Double(duration.components.seconds))
-        while continuationMutex.withLock({ $0 == nil }) {
-            guard Date() < timeout else {
-                throw MockAsyncStreamError.waitForContinuationTimedOut
+        let start = Date()
+        while self.continuationMutex.withLock({ $0 == nil }) {
+            guard Date().timeIntervalSince(start) < 1 else {
+                preconditionFailure("MockAsyncStream.init timed out")
             }
 
-            try await Task.sleep(for: .milliseconds(10))
+            Thread.sleep(forTimeInterval: 0.01)
         }
+    }
+
+    func makeAsyncIterator() -> AsyncStream<Element>.AsyncIterator {
+        stream.makeAsyncIterator()
     }
 
     enum MockAsyncStreamError: Error {

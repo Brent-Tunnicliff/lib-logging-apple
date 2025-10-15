@@ -144,7 +144,7 @@ struct LoggingServiceTests {
 
         // lets just double check that there are the expected number of logs created in setup
         // as the rest of the test expects this data.
-        let validateDataResult: [LogEntity] = try! modelContext.fetch(FetchDescriptor())
+        let validateDataResult: [LogEntity] = try modelContext.fetch(FetchDescriptor())
         let expectedValidateDataResultCount = 190
         guard validateDataResult.count == expectedValidateDataResultCount else {
             Issue.record(
@@ -157,8 +157,6 @@ struct LoggingServiceTests {
         mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
             storeLogCleanupCalled.store(true, ordering: .sequentiallyConsistent)
         }
-
-        try await registerForCleanupStream.waitForContinuation()
 
         // test
         registerForCleanupStream.continuation.yield()

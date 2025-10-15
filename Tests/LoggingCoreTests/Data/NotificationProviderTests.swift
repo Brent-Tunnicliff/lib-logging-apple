@@ -6,7 +6,6 @@ import Testing
 
 @testable import LoggingCore
 
-@MainActor
 struct NotificationProviderTests {
     private let notificationCenter = WrappedNotificationCenter()
     private let notificationName = Notification.Name(rawValue: "DefaultNotificationProviderTestsMock")
@@ -21,10 +20,10 @@ struct NotificationProviderTests {
 
     @Test(.timeLimit(.minutes(1)))
     func notificationsNamed() async throws {
-        var setupIsReady = false
+        let setupIsReady = Atomic(false)
         let notificationTriggered = Task {
             let stream = await notificationProvider.notifications(named: notificationName)
-            setupIsReady = true
+            setupIsReady.store(true, ordering: .sequentiallyConsistent)
             for await _ in stream {
                 return true
             }
@@ -32,7 +31,9 @@ struct NotificationProviderTests {
             return false
         }
 
-        while !setupIsReady || !notificationCenter.addObserverCalled.load(ordering: .sequentiallyConsistent) {
+        while !setupIsReady.load(ordering: .sequentiallyConsistent)
+            || !notificationCenter.addObserverCalled.load(ordering: .sequentiallyConsistent)
+        {
             try await Task.sleep(for: .milliseconds(10))
         }
 

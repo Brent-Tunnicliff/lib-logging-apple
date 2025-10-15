@@ -86,8 +86,6 @@ struct LogCleanupTriggerTests {
             return count
         }
 
-        try await trigger.waitForContinuation()
-
         trigger.continuation.yield()
         trigger.continuation.finish()
 
