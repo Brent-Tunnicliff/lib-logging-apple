@@ -14,6 +14,10 @@ enum LogLevel: CaseIterable {
 
 extension LogLevel {
     var label: Text {
+        Text(labelContent)
+    }
+
+    private var labelContent: LocalizedStringResource {
         switch self {
         case .debug: .LogLevel.debug
         case .info: .LogLevel.info
