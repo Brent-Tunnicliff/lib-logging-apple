@@ -129,8 +129,6 @@ final class DefaultLogsViewModel: LogsViewModel {
             return
         }
 
-        let oldestFetchedLog = fetchedLogs.max(by: { $0.timestampCreated < $1.timestampCreated })
-
         guard let oldestFetchedLog = fetchedLogs.max(by: { $0.timestampCreated < $1.timestampCreated }) else {
             // If there are no logs, no need to continue.
             return
@@ -260,9 +258,8 @@ final class PreviewLogsViewModel: LogsViewModel {
 extension PreviewLogsViewModel.State {
     fileprivate var endOfListState: EndOfLogsListState {
         switch self {
-        case .empty: .noMoreLogs
+        case .empty, .populated: .noMoreLogs
         case .loading: .currentlyLoadingNextPage
-        case .populated: .idle
         case .nextPageFailed: .loadingNextPageFailed
         }
     }

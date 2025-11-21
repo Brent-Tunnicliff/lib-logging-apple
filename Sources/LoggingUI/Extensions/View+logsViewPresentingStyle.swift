@@ -41,9 +41,14 @@ public struct LogsViewPresentingStyle: Sendable, Hashable {
 extension LogsViewPresentingStyle {
     var requiresCloseButton: Bool {
         switch wrapped {
-        case .modal: true
+        case .modal: modalRequiresCloseButton
         case .navigationDestination: false
         }
+    }
+
+    // We only need the close button if the platform does not support windows.
+    private var modalRequiresCloseButton: Bool {
+        !WindowMode.isSupported
     }
 }
 

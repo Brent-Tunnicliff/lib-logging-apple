@@ -10,14 +10,6 @@ public struct LogsViewToolbarItem: ToolbarContent {
 
     #if os(macOS) || os(iOS)
         @Environment(\.openWindow) private var openWindow
-
-        private var supportsWindow: Bool {
-            #if os(iOS)
-                UIApplication.shared.supportsMultipleScenes
-            #elseif os(macOS)
-                true
-            #endif
-        }
     #endif
 
     /// Initialise an instance of ``LogsViewToolbarItem``.
@@ -54,7 +46,7 @@ public struct LogsViewToolbarItem: ToolbarContent {
 
     private func performModal() {
         #if os(iOS) || os(macOS)
-            if supportsWindow {
+            if WindowMode.isSupported {
                 openWindow.logsWindow()
             } else {
                 isSheetPresented = true
