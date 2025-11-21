@@ -22,8 +22,8 @@ package struct Device {
     let userInterfaceIdiom: UserInterfaceIdiom
 }
 
-extension Device: Codable {}
 extension Device: Equatable {}
+extension Device: Hashable {}
 extension Device: Sendable {}
 
 extension Device {
@@ -52,7 +52,6 @@ extension Device {
     }
 }
 
-extension Device.UserInterfaceIdiom: Codable {}
 extension Device.UserInterfaceIdiom: Equatable {}
 extension Device.UserInterfaceIdiom: Hashable {}
 extension Device.UserInterfaceIdiom: Sendable {}
@@ -111,8 +110,10 @@ extension Device.UserInterfaceIdiom {
     }
 }
 
-extension Device.UserInterfaceIdiom.RawValue: Codable {}
 extension Device.UserInterfaceIdiom.RawValue: CaseIterable {}
+extension Device.UserInterfaceIdiom.RawValue: Equatable {}
+extension Device.UserInterfaceIdiom.RawValue: Hashable {}
+extension Device.UserInterfaceIdiom.RawValue: Sendable {}
 
 // MARK: - Constants
 

@@ -37,6 +37,18 @@
         }
       }
     },
+    "export_title" : {
+      "comment" : "Tool for exporting logs to a file for sharing or saving.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export"
+          }
+        }
+      }
+    },
     "identifier_for_vendor_%@" : {
       "comment" : "Displays the unique device identifier that the app is installed on.",
       "extractionState" : "manual",
@@ -56,7 +68,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error: (%1$@) %2$@, (%3$@)"
+            "value" : "Error: (%1$(type)@) %2$(message)@, (%3$(localizedDescription)@)"
           }
         }
       }
@@ -133,6 +145,18 @@
         }
       }
     },
+    "logs_view_next_page_failed" : {
+      "comment" : "Informs the user that an unexpected error occurred while trying to present them additional log messages in the list.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error loading more logs."
+          }
+        }
+      }
+    },
     "logs_view_title" : {
       "comment" : "The title of the view that lists all logs.",
       "extractionState" : "manual",
@@ -141,6 +165,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Logs"
+          }
+        }
+      }
+    },
+    "retry_button" : {
+      "comment" : "Button title for retrying a failed action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
           }
         }
       }

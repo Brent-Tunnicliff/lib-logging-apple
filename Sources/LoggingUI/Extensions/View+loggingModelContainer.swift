@@ -44,7 +44,7 @@ extension MockedLoggingModelContainerState {
     fileprivate var entities: [LogEntity] {
         switch wrapped {
         case .empty: []
-        case .populated: LogEntity.defaultMocks()
+        case .populated: .defaultMocks()
         }
     }
 }

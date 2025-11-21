@@ -9,7 +9,7 @@ struct LogLevelTests {
     @Test(arguments: LoggingCore.LogLevel.allCases)
     func wrapsInternalLogLevel(logLevel: LoggingCore.LogLevel) {
         let publicLogLevel = logLevel.expectedWrapper
-        #expect(publicLogLevel.description == logLevel.description)
+        #expect(publicLogLevel.description == logLevel.rawValue)
     }
 }
 

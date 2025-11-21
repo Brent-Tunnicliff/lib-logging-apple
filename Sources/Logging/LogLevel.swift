@@ -32,7 +32,7 @@ extension LogLevel {
 extension LogLevel: CustomStringConvertible {
     /// A textual representation of this instance.
     public var description: String {
-        wrapped.description
+        wrapped.rawValue
     }
 }
 

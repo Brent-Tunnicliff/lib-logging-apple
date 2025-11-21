@@ -5,17 +5,25 @@ import RegexBuilder
 
 extension Thread {
     package static var nameForLog: String {
-        let thread = Thread.current
+        Thread.current.nameForLog
+    }
 
-        guard !thread.isMainThread else {
+    package var nameForLog: String {
+        guard !isMainThread else {
             return "Main"
         }
 
-        guard let number = thread.extractNumber() else {
+        guard let number = extractNumber() else {
             return "????"
         }
 
-        return String(format: "%04d", number)
+        // If the number has 5 or more digits, then just return the whole number.
+        // This will probably never happen?
+        guard number < 10_000 else {
+            return number.description
+        }
+
+        return number.formatted(.number.precision(.integerLength(4)).grouping(.never))
     }
 
     private func extractNumber() -> Int? {

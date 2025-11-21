@@ -42,23 +42,10 @@ public struct LogsViewToolbarItem: ToolbarContent {
             .sheet(isPresented: $isSheetPresented) {
                 NavigationStack {
                     LogsView()
-                        .toolbar {
-                            ToolbarItem(placement: .closePlacement) {
-                                Button {
-                                    isSheetPresented = false
-                                } label: {
-                                    Image(systemName: "xmark")
-                                }
-                            }
-                        }
                 }
                 .presentationDragIndicator(.visible)
             }
         }
-    }
-
-    private func logsView() -> some View {
-        LogsView()
     }
 
     private func performNavigationDestination() {
@@ -88,68 +75,6 @@ extension ToolbarItemPlacement {
             .automatic
         #endif
     }
-
-    fileprivate static var closePlacement: ToolbarItemPlacement {
-        #if os(watchOS)
-            // WatchOS does not support `navigation`.
-            .topBarTrailing
-        #else
-            .navigation
-        #endif
-    }
-}
-
-extension View {
-    /// Define the way clicking on ``LogsViewToolbarItem`` will present ``LogsView``.
-    public func logsViewPresentingStyle(_ presentingStyle: LogsViewPresentingStyle) -> some View {
-        environment(\.logsViewPresentingStyle, presentingStyle)
-    }
-}
-
-extension EnvironmentValues {
-    @Entry fileprivate var logsViewPresentingStyle: LogsViewPresentingStyle = .default
-}
-
-/// Defines the method used to present the ``LogsView``.
-public struct LogsViewPresentingStyle: Sendable, Hashable {
-    /// Presents ``LogsView`` via navigation.
-    ///
-    /// This must be wrapped within a `NavigationStack` or `NavigationView`. This is the default option.
-    public static let navigationDestination = LogsViewPresentingStyle(wrapped: .navigationDestination)
-
-    /// Presents ``LogsView`` modally.
-    ///
-    /// MacOS presents it as a Window, which requires adding ``LogsWindow`` to the app Scene.
-    /// All other platforms present it as a sheet.
-    public static let modal = LogsViewPresentingStyle(wrapped: .modal)
-
-    let wrapped: Wrapped
-
-    private init(wrapped: Wrapped) {
-        self.wrapped = wrapped
-    }
-
-    enum Wrapped: Sendable, CaseIterable, Hashable {
-        case navigationDestination
-        case modal
-    }
-}
-
-extension LogsViewPresentingStyle: CaseIterable {
-    /// A type that provides a collection of all of its values.
-    public static let allCases: [LogsViewPresentingStyle] = LogsViewPresentingStyle.Wrapped
-        .allCases
-        .map {
-            switch $0 {
-            case .modal: .modal
-            case .navigationDestination: .navigationDestination
-            }
-        }
-}
-
-extension LogsViewPresentingStyle {
-    /// Default presentation style.
-    public static let `default`: LogsViewPresentingStyle = .modal
 }
 
 #Preview("navigationDestination") {

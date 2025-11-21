@@ -29,6 +29,16 @@ extension LogTag: Equatable {
     }
 }
 
+// MARK: - Hashable
+
+extension LogTag: Hashable {
+    package func hash(into hasher: inout Hasher) {
+        hasher.combine(file.description)
+        hasher.combine(function.description)
+        hasher.combine(line)
+    }
+}
+
 // MARK: - Sendable
 
 extension LogTag: Sendable {}

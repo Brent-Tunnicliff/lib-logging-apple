@@ -75,7 +75,7 @@ extension LogEntity.Tag {
     }
 }
 
-extension LogEntity {
+extension [LogEntity] {
     static func defaultMocks() -> [LogEntity] {
         [
             .mock(level: .critical),

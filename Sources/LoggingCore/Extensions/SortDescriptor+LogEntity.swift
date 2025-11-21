@@ -10,3 +10,9 @@ extension [SortDescriptor<LogEntity>] {
         ]
     }
 }
+
+extension SortDescriptor<LogEntity> {
+    package static func byDateAndId(order: SortOrder = .forward) -> [SortDescriptor<LogEntity>] {
+        .byDateAndId(order: order)
+    }
+}

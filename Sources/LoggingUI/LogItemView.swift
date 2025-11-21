@@ -123,7 +123,13 @@ struct LogItemView: View {
     @ViewBuilder
     private var errorLabel: some View {
         if let error = log.error {
-            Text(.logErrorTitle(error.type, error.message, error.localizedDescription))
+            Text(
+                .logErrorTitle(
+                    type: error.type,
+                    message: error.message,
+                    localizedDescription: error.localizedDescription
+                )
+            )
         }
     }
 

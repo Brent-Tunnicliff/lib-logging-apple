@@ -15,11 +15,11 @@ extension UserDefaults: UserDefaultsStore {
 
     // This key needs to match the one defined in `LoggingUI/Settings.bundle`.
     private var minimalLogLevelKey: String { "\(keyPrefix)_minimal_log_level" }
-    @objc dynamic var minimalLogLevel: LogLevel {
+    var minimalLogLevel: LogLevel {
         get {
             // not using `integer(forKey:)` as we do not want it to default to 0.
             guard
-                let value = value(forKey: minimalLogLevelKey) as? Int,
+                let value = string(forKey: minimalLogLevelKey),
                 let logLevel = LogLevel(rawValue: value)
             else {
                 // This default value needs to match the one defined in `LoggingUI/Settings.bundle`.
@@ -36,7 +36,7 @@ extension UserDefaults: UserDefaultsStore {
     // MARK: - lastLogCleanup
 
     private var lastLogCleanupKey: String { "\(keyPrefix)_last_log_cleanup" }
-    @objc dynamic var lastLogCleanup: Date? {
+    var lastLogCleanup: Date? {
         get {
             value(forKey: lastLogCleanupKey) as? Date
         }

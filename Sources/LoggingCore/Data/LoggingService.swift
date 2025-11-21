@@ -2,12 +2,16 @@
 
 package import Foundation
 import SwiftData
-package import SwiftUI
 import UniformTypeIdentifiers
 
 package protocol LoggingService: Sendable {
+    /// Exports all logs to file and returns file path.
     func exportLogs() async throws -> URL
+
+    /// Saves all pending logs.
     func save() async throws
+
+    /// Persists a new log object.
     func storeLog(
         error: (any Error)?,
         logLevel: LogLevel,
@@ -130,8 +134,6 @@ package actor DefaultLoggingService: ModelActor {
 // MARK: - LoggingService
 
 extension DefaultLoggingService: LoggingService {
-    // TODO: Test any of this actually works.
-    // See https://stackoverflow.com/a/77040413 for populated database help
     package func exportLogs() throws -> URL {
         Logger.logging.info("Starting log export")
 
@@ -230,17 +232,5 @@ extension LogLevel {
         case .error: [.error, .critical]
         case .critical: [.critical]
         }
-    }
-}
-
-// MARK: - View
-
-extension EnvironmentValues {
-    @Entry package var loggingService: any LoggingService = DefaultLoggingService.shared
-}
-
-extension View {
-    package func loggingService(_ loggingService: any LoggingService) -> some View {
-        environment(\.loggingService, loggingService)
     }
 }

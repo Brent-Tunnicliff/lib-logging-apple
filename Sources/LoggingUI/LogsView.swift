@@ -2,110 +2,110 @@
 
 import LoggingCore
 import SwiftData
-public import SwiftUI
+import SwiftUI
 
-/// Displays all logs captured.
-public struct LogsView: View {
+struct LogsView: View {
     static var title: Text {
         Text(.logsViewTitle)
     }
 
     @Environment(\.loggingModelContainer) private var loggingModelContainer
-    @Environment(\.loggingService) private var loggingService
-    @State private var pageNumber = 1
 
-    /// The content and behaviour of the view.
-    public var body: some View {
-        LogsViewContent(pageNumber: $pageNumber)
+    var body: some View {
+        LogsViewContent(viewModel: DefaultLogsViewModel())
             .modelContainer(loggingModelContainer)
-            .navigationTitle(Self.title)
-            .task {
-                // Lets trigger save on appear to force sync any pending changes.
-                do {
-                    try await loggingService.save()
-                } catch {
-                    Logger.logging.error("Failed to save logs", error: error)
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        Task { @concurrent in
-                            do {
-                                let url = try await loggingService.exportLogs()
-                                print(url.absoluteString)
-                            } catch {
-                                print(error)
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                }
-            }
     }
 }
 
-/// Acts kinda like a form of pagination, the max number of logs to get per page.
-///
-/// We can potentially have many more logs than the user will scroll through,
-/// so limiting how many we load based on how far the user has scrolled is probably good enough.
 private struct LogsViewContent: View {
-    private static var logsPerPage: Int {
-        100
-    }
-
-    @Binding private var pageNumber: Int
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.logsViewPresentingStyle) private var presentingStyle
     @Environment(\.modelContext) private var modelContext
-    @Query private var logs: [LogEntity]
-    @State private var numberOfLogs: Int?
+    @State private var exporting = false
+    @State private var viewModel: any LogsViewModel
 
-    init(pageNumber: Binding<Int>) {
-        precondition(pageNumber.wrappedValue > 0, "pageNumber '\(pageNumber)' must be greater than 0")
-        self._pageNumber = pageNumber
-        var fetchDescriptor = Self.baseFetchDescriptor()
-        fetchDescriptor.fetchLimit = pageNumber.wrappedValue * Self.logsPerPage
-        self._logs = Query(fetchDescriptor)
+    init(viewModel: any LogsViewModel) {
+        self._viewModel = State(wrappedValue: viewModel)
     }
 
     var body: some View {
+        listOfLogs
+            .navigationTitle(LogsView.title)
+            .navigationSubtitle(navigationSubtitleContent)
+            .task {
+                await viewModel.onAppear(modelContext: modelContext)
+            }
+            .toolbar {
+                ToolbarItem {
+                    Menu {
+                        Button {
+                            exporting = true
+                        } label: {
+                            Label(.exportTitle, systemImage: "square.and.arrow.up")
+                        }
+                        .disabled(exporting)
+                    } label: {
+                        Image(systemName: "ellipsis")
+                    }
+                }
+
+                if presentingStyle.requiresCloseButton {
+                    ToolbarItem {
+                        Button(role: .close, action: dismiss.callAsFunction)
+                    }
+                }
+            }
+            .task(id: exporting) {
+                guard exporting else {
+                    return
+                }
+
+                await viewModel.performExport()
+            }
+    }
+
+    private var listOfLogs: some View {
         List {
-            ForEach(logs) {
+            ForEach(viewModel.logs) {
                 LogItemView(log: $0)
             }
 
             endOfListView
         }
         .listStyle(.plain)
+        .refreshable {
+            await viewModel.refresh(modelContext: modelContext)
+        }
     }
 
     private var endOfListView: some View {
         VStack(alignment: .center) {
-            if let numberOfLogs, numberOfLogs <= (pageNumber * Self.logsPerPage) {
-                Text(.logsViewEnd)
-                    .font(.footnote)
-            } else {
+            switch viewModel.endOfListState {
+            case .currentlyLoadingNextPage:
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
+            case .idle:
+                EmptyView()
+            case .loadingNextPageFailed:
+                Text(.logsViewNextPageFailed)
+                Button(.retryButton) {
+                    viewModel.loadNextPage(modelContext: modelContext)
+                }
+            case .noMoreLogs:
+                Text(.logsViewEnd)
+                    .font(.footnote)
             }
         }
+        .font(.footnote)
         .frame(maxWidth: .infinity, alignment: .center)
         .listRowSeparatorIfSupported(.hidden)
         .onAppear {
-            do {
-                let logsCount = try modelContext.fetchCount(Self.baseFetchDescriptor())
-                if numberOfLogs != logsCount {
-                    numberOfLogs = logsCount
-                }
-                pageNumber += 1
-            } catch {
-                Logger.logging.error("Failed to fetch logs count", error: error)
-            }
+            viewModel.loadNextPage(modelContext: modelContext)
         }
     }
 
-    private static func baseFetchDescriptor() -> FetchDescriptor<LogEntity> {
-        FetchDescriptor(sortBy: .byDateAndId(order: .reverse))
+    private var navigationSubtitleContent: Text {
+        Text((viewModel.totalLogsCount ?? 0).formatted(.number))
     }
 }
 
@@ -121,32 +121,18 @@ extension View {
 
 #Preview("Default") {
     NavigationStack {
-        LogsView()
+        LogsViewContent(viewModel: PreviewLogsViewModel(.populated))
     }
-    .loggingModelContainer(mocked: .populated)
-    .loggingService(PreviewLoggingService())
 }
 
 #Preview("Empty") {
     NavigationStack {
-        LogsView()
+        LogsViewContent(viewModel: PreviewLogsViewModel(.empty))
     }
-    .loggingModelContainer(mocked: .empty)
-    .loggingService(PreviewLoggingService())
 }
 
-private final class PreviewLoggingService: LoggingService {
-    func exportLogs() async throws -> URL { URL.temporaryDirectory }
-
-    func save() async throws {}
-
-    func storeLog(
-        error: (any Error)?,
-        logLevel: LoggingCore.LogLevel,
-        message: String,
-        packageName: String,
-        tag: LoggingCore.LogTag,
-        timestamp: Date,
-        thread: String
-    ) async {}
+#Preview("Loading") {
+    NavigationStack {
+        LogsViewContent(viewModel: PreviewLogsViewModel(.loading))
+    }
 }

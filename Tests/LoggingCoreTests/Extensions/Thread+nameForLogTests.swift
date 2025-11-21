@@ -33,4 +33,23 @@ struct ThreadNameForLogTests {
         #expect(result != "Main")
         #expect(result.wholeMatch(of: regex) != nil, "Result '\(result)' does not match regex.")
     }
+
+    // We want to maintain the full thread number if it gets very large.
+    // Probably won't ever happen, but better to be safe than loose digits.
+    @Test
+    func currentThreadLong() async {
+        let thread = MockThread()
+        let result = thread.nameForLog
+        #expect(result == "12345678")
+    }
+}
+
+private final class MockThread: Thread {
+    override var isMainThread: Bool {
+        false
+    }
+
+    override var description: String {
+        "<NSThread: 0x600001709ac0>{number = 12345678, name = (null)}"
+    }
 }

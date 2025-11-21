@@ -40,7 +40,7 @@ public final class DefaultLogger {
 extension DefaultLogger: InternalLogger {
     func log(level: LoggingCore.LogLevel, message: String, tag: LogTag, error: (any Error)?) {
         let timestamp = dateProvider.now
-        let thread = Thread.nameForLog
+        let thread = Thread.current.nameForLog
         systemLogger.log(level: level, message: message, tag: tag, error: error)
 
         Task {
