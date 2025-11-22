@@ -14,7 +14,9 @@ final class MockLogCleanupTrigger: LogCleanupTrigger {
         get { registerForCleanupResponseMutex.withLock { $0 } }
         set { registerForCleanupResponseMutex.withLock { $0 = newValue } }
     }
-    func registerForCleanup() -> any AsyncSequence<Void, Never> {
+    func registerForCleanup(
+        bufferingPolicy limit: AsyncStream<Void>.Continuation.BufferingPolicy
+    ) async -> any AsyncSequence<Void, Never> {
         registerForCleanupResponse()
     }
 

@@ -38,6 +38,11 @@ package actor DefaultLoggingService: ModelActor {
     let modelContainer: ModelContainer
     let modelExecutor: any ModelExecutor
 
+    // Main purpose is as a simple way for the tests to wait until it is ready.
+    var isCleanupTaskReady: Bool {
+        cleanupTask != nil
+    }
+
     private let dateProvider: any DateProvider
     private var cleanupTask: Task<Void, any Error>?
     private let currentDevice: Task<Device, Never>
@@ -90,7 +95,7 @@ package actor DefaultLoggingService: ModelActor {
         cleanupTask?.cancel()
     }
 
-    private func registerForCleanup() {
+    private func registerForCleanup() async {
         if let cleanupTask, !cleanupTask.isCancelled {
             // We do not want to trigger multiple tasks.
             Logger.logging.info("Unexpected additional call to 'registerForCleanup()'")
@@ -100,8 +105,9 @@ package actor DefaultLoggingService: ModelActor {
         Logger.logging.info("Registering for log cleanup events.")
 
         // Observe for cleanup of logs triggers.
+        let registerForCleanup = await logCleanupTrigger.registerForCleanup()
         self.cleanupTask = Task { [weak self, logCleanupTrigger] in
-            for await _ in await logCleanupTrigger.registerForCleanup() {
+            for await _ in registerForCleanup {
                 try Task.checkCancellation()
 
                 // If self is nil, then cancel.

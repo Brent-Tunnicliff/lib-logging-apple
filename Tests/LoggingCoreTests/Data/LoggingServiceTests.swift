@@ -158,15 +158,23 @@ struct LoggingServiceTests {
             storeLogCleanupCalled.store(true, ordering: .sequentiallyConsistent)
         }
 
-        // Hacky attempt to avoid a race condition that only fails in pipeline.
-        try await Task.sleep(for: .seconds(1))
+        // Not ideal to observe internal logic, but we need to wait until the Task is ready, else the test hangs.
+        let isCleanupTaskReadyStart = Date()
+        while await !loggingService.isCleanupTaskReady {
+            guard Date().timeIntervalSince(isCleanupTaskReadyStart) < 1 else {
+                Issue.record("Cleanup task timed out")
+                return
+            }
 
-        // test
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        // ready to perform the real test
         registerForCleanupStream.continuation.yield()
 
-        let start = Date()
+        let storeLogCleanupCalledStart = Date()
         while storeLogCleanupCalled.load(ordering: .sequentiallyConsistent) == false {
-            guard Date().timeIntervalSince(start) < 1 else {
+            guard Date().timeIntervalSince(storeLogCleanupCalledStart) < 1 else {
                 Issue.record("storeLogCleanup was not called")
                 return
             }

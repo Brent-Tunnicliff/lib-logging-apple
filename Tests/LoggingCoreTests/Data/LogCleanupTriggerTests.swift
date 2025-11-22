@@ -24,7 +24,7 @@ struct LogCleanupTriggerTests {
     func registerForCleanupYieldsImmediately() async {
         await withCheckedContinuation { continuation in
             Task {
-                for await _ in await logCleanupTrigger.registerForCleanup() {
+                for await _ in await logCleanupTrigger.registerForCleanup(bufferingPolicy: .unbounded) {
                     continuation.resume()
                 }
             }
@@ -72,12 +72,12 @@ struct LogCleanupTriggerTests {
         .timeLimit(.minutes(1)),
         arguments: RegisterForCleanupArgument.allCases
     )
-    func registerForClean(_ argument: RegisterForCleanupArgument) async throws {
+    func registerForCleanup(_ argument: RegisterForCleanupArgument) async throws {
         mockUserDefaultsStore.lastLogCleanup = argument.lastLogCleanup(with: mockDateProvider)
         let trigger = MockAsyncStream<Void>()
         mockNotificationProvider.notificationsResponse = { _ in trigger }
 
-        let registerForCleanup = await logCleanupTrigger.registerForCleanup()
+        let registerForCleanup = await logCleanupTrigger.registerForCleanup(bufferingPolicy: .unbounded)
         let countTask = Task {
             var count = 0
             for await _ in registerForCleanup {

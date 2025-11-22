@@ -4,12 +4,21 @@ import Foundation
 
 protocol LogCleanupTrigger: Sendable {
     /// Will yield a value if cleanup should be performed.
-    func registerForCleanup() async -> any AsyncSequence<Void, Never>
+    func registerForCleanup(
+        bufferingPolicy limit: AsyncStream<Void>.Continuation.BufferingPolicy
+    ) async -> any AsyncSequence<Void, Never>
 
     /// Store log cleanup performed.
     ///
     /// This is very important to call as it affects how often `registerForCleanup()` returns.
     func storeLogCleanup(timestamp: Date) async
+}
+
+extension LogCleanupTrigger {
+    /// Will yield a value if cleanup should be performed with a default buffering of `.bufferingNewest(1)`.
+    func registerForCleanup() async -> any AsyncSequence<Void, Never> {
+        await registerForCleanup(bufferingPolicy: .bufferingNewest(1))
+    }
 }
 
 // MARK: - DefaultLogCleanupTrigger
@@ -52,16 +61,18 @@ actor DefaultLogCleanupTrigger {
 }
 
 extension DefaultLogCleanupTrigger: LogCleanupTrigger {
-    nonisolated func registerForCleanup() async -> any AsyncSequence<Void, Never> {
-        await AsyncStream.async(
-            bufferingPolicy: .bufferingNewest(1)
-        ) { [weak self, notificationProvider] continuation in
-            // Trigger one immediately.
-            continuation.yield()
+    nonisolated func registerForCleanup(
+        bufferingPolicy limit: AsyncStream<Void>.Continuation.BufferingPolicy
+    ) async -> any AsyncSequence<Void, Never> {
+        let (stream, continuation) = AsyncStream<Void>.makeStream(bufferingPolicy: limit)
+        // Trigger one immediately.
+        continuation.yield()
 
-            // Start listening for notifications
-            let notificationName = await notificationProvider.didBecomeActiveNotification
-            let notificationsStream = await notificationProvider.notifications(named: notificationName)
+        // Start listening for notifications
+        let notificationName = await notificationProvider.didBecomeActiveNotification
+        let notificationsStream = notificationProvider.notifications(named: notificationName)
+
+        let task = Task { [weak self] in
             for await _ in notificationsStream {
                 try Task.checkCancellation()
                 // If self is nil then return
@@ -76,7 +87,16 @@ extension DefaultLogCleanupTrigger: LogCleanupTrigger {
 
                 continuation.yield()
             }
+
+            // If `notificationsStream` finishes, then also finish this too.
+            continuation.finish()
         }
+
+        continuation.onTermination = { _ in
+            task.cancel()
+        }
+
+        return stream
     }
 
     func storeLogCleanup(timestamp: Date) {
