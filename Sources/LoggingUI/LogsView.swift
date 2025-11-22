@@ -82,7 +82,7 @@ private struct LogsViewContent: View {
                 Button(.retryButton) {
                     viewModel.loadNextPage(modelContext: modelContext)
                 }
-                .buttonStyle(.glass)
+                .retryButtonStyle()
             case .noMoreLogs:
                 Text(.logsViewEnd)
                     .font(.footnote)
@@ -138,7 +138,7 @@ private struct LogsViewContent: View {
 }
 
 extension View {
-    func listRowSeparatorIfSupported(_ visibility: Visibility) -> some View {
+    fileprivate func listRowSeparatorIfSupported(_ visibility: Visibility) -> some View {
         #if os(tvOS) || os(watchOS)
             self
         #else
@@ -146,7 +146,7 @@ extension View {
         #endif
     }
 
-    var isNavigationSubtitleSupported: Bool {
+    fileprivate var isNavigationSubtitleSupported: Bool {
         #if os(iOS) || os(macOS)
             true
         #else
@@ -154,11 +154,19 @@ extension View {
         #endif
     }
 
-    func navigationSubtitleIfSupported(_ value: Text) -> some View {
+    fileprivate func navigationSubtitleIfSupported(_ value: Text) -> some View {
         #if os(iOS) || os(macOS)
             navigationSubtitle(value)
         #else
             self
+        #endif
+    }
+
+    fileprivate func retryButtonStyle() -> some View {
+        #if os(visionOS)
+            buttonStyle(.bordered)
+        #else
+            buttonStyle(.glass)
         #endif
     }
 }
