@@ -43,6 +43,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-algorithms", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
+        .package(url: "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple", exact: "1.0.0-beta.2"),
     ],
     targets: [
         .target(name: "LoggingCore"),
@@ -67,7 +68,8 @@ let package = Package(
         .target(
             name: "LoggingUI",
             dependencies: [
-                "LoggingCore"
+                "LoggingCore",
+                .product(name: "UserDefaultsHelpers", package: "lib-userdefaults-apple")
             ],
             resources: [
                 .copy("Resources/Settings.bundle"),

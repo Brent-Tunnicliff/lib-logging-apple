@@ -1,6 +1,15 @@
 {
-  "originHash" : "351b318408f07dce824600fed3cafad4466ad3fbc62f12efc2cfa389d82ef27e",
+  "originHash" : "409bc70030db738360d5710b97fc0611f890a55417d406e537a93bb8a6934192",
   "pins" : [
+    {
+      "identity" : "lib-userdefaults-apple",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple",
+      "state" : {
+        "revision" : "74f689106ba64836c0a36fdb3956366b8128a9a3",
+        "version" : "1.0.0-beta.2"
+      }
+    },
     {
       "identity" : "swift-algorithms",
       "kind" : "remoteSourceControl",

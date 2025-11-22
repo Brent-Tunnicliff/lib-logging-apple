@@ -5,6 +5,7 @@ import LoggingCore
 import Observation
 import SwiftData
 import SwiftUI
+import UserDefaultsHelpers
 
 // MARK: - Base
 
@@ -21,7 +22,12 @@ import SwiftUI
 protocol LogsViewModel {
     var endOfListState: EndOfLogsListState { get }
     var logs: [LogEntity] { get }
+    var searchText: String { get set }
     var totalLogsCount: Int? { get }
+    var viewCriticalLogs: Bool { get set }
+    var viewDebugLogs: Bool { get set }
+    var viewErrorLogs: Bool { get set }
+    var viewInfoLogs: Bool { get set }
 
     func loadNextPage(modelContext: ModelContext)
     func onAppear(modelContext: ModelContext) async
@@ -55,19 +61,55 @@ final class DefaultLogsViewModel: LogsViewModel {
         return logs.count == totalLogsCount
     }
 
+    // Filters
+
+    var searchText = "" {
+        didSet { filterLogs() }
+    }
+
+    @ObservationIgnored
+    @UserDefault
+    var viewCriticalLogs: Bool {
+        didSet { filterLogs() }
+    }
+
+    @ObservationIgnored
+    @UserDefault
+    var viewDebugLogs: Bool {
+        didSet { filterLogs() }
+    }
+
+    @ObservationIgnored
+    @UserDefault
+    var viewErrorLogs: Bool {
+        didSet { filterLogs() }
+    }
+
+    @ObservationIgnored
+    @UserDefault
+    var viewInfoLogs: Bool {
+        didSet { filterLogs() }
+    }
+
     convenience init() {
         self.init(
             fetchLimit: 100,
-            loggingService: DefaultLoggingService.shared
+            loggingService: DefaultLoggingService.shared,
+            userDefaults: .standard
         )
     }
 
     init(
         fetchLimit: Int,
-        loggingService: any LoggingService
+        loggingService: any LoggingService,
+        userDefaults: UserDefaults
     ) {
         self.fetchLimit = fetchLimit
         self.loggingService = loggingService
+        self._viewCriticalLogs = UserDefault(\.viewCriticalLogs, store: userDefaults)
+        self._viewDebugLogs = UserDefault(\.viewDebugLogs, store: userDefaults)
+        self._viewErrorLogs = UserDefault(\.viewErrorLogs, store: userDefaults)
+        self._viewInfoLogs = UserDefault(\.viewInfoLogs, store: userDefaults)
     }
 
     // MARK: - LogsViewModel
@@ -186,6 +228,10 @@ final class DefaultLogsViewModel: LogsViewModel {
         )
     }
 
+    private func filterLogs() {
+        // TODO: stuffz
+    }
+
     private func getLogs(
         predicate: Predicate<LogEntity>?,
         modelContext: ModelContext,
@@ -229,10 +275,16 @@ final class DefaultLogsViewModel: LogsViewModel {
 
 // MARK: - Preview
 
+@Observable
 final class PreviewLogsViewModel: LogsViewModel {
     let endOfListState: EndOfLogsListState
     let logs: [LogEntity]
+    var searchText = ""
     let totalLogsCount: Int?
+    var viewCriticalLogs = true
+    var viewDebugLogs = true
+    var viewErrorLogs = true
+    var viewInfoLogs = true
 
     enum State: CaseIterable {
         case empty

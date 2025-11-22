@@ -37,6 +37,7 @@ private struct LogsViewContent: View {
             }
             .toolbar {
                 toolbarFilter
+                toolbarSearchIfSupported
                 toolbarMore
                 toolbarCloseButton
             }
@@ -47,6 +48,7 @@ private struct LogsViewContent: View {
 
                 await viewModel.performExport()
             }
+            .searchable(text: $viewModel.searchText)
     }
 
     private var listOfLogs: some View {
@@ -112,12 +114,25 @@ private struct LogsViewContent: View {
     private var toolbarFilter: some ToolbarContent {
         ToolbarItem(placement: .toolbarFilterPlacement) {
             MenuWithFallback {
-                // Todo
-                Text(verbatim: "Coming soon")
+                Toggle(isOn: $viewModel.viewDebugLogs) {
+                    Text(.logLevelDebug)
+                }
+
+                Toggle(isOn: $viewModel.viewInfoLogs) {
+                    Text(.logLevelInfo)
+                }
+
+                Toggle(isOn: $viewModel.viewErrorLogs) {
+                    Text(.logLevelError)
+                }
+
+                Toggle(isOn: $viewModel.viewCriticalLogs) {
+                    Text(.logLevelCritical)
+                }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
             }
-
+            .menuActionDismissBehavior(.disabledIfSupported)
         }
     }
 
@@ -134,6 +149,18 @@ private struct LogsViewContent: View {
                 Image(systemName: "ellipsis")
             }
         }
+    }
+
+    @ToolbarContentBuilder
+    private var toolbarSearchIfSupported: some ToolbarContent {
+        #if os(macOS) || os(tvOS) || os(watchOS)
+            ToolbarItem {
+                EmptyView()
+            }
+        #else
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+        #endif
     }
 }
 
@@ -187,6 +214,16 @@ extension ToolbarItemPlacement {
             .topBarTrailing
         #else
             .automatic
+        #endif
+    }
+}
+
+extension MenuActionDismissBehavior {
+    static var disabledIfSupported: MenuActionDismissBehavior {
+        #if os(macOS) || os(watchOS)
+            .automatic
+        #else
+            .disabled
         #endif
     }
 }
