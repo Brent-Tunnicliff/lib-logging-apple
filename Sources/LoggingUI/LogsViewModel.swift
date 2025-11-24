@@ -21,6 +21,7 @@ import UserDefaultsHelpers
 /// getting logs to avoid Sendable complexity.
 protocol LogsViewModel {
     var endOfListState: EndOfLogsListState { get }
+    var isViewReady: Bool { get }
     var logs: [LogEntity] { get }
     var searchText: String { get set }
     var totalLogsCount: Int? { get }
@@ -29,16 +30,16 @@ protocol LogsViewModel {
     var viewErrorLogs: Bool { get set }
     var viewInfoLogs: Bool { get set }
 
-    func loadNextPage(modelContext: ModelContext)
+    func loadNextPage()
     func onAppear(modelContext: ModelContext) async
     func performExport() async
-    func refresh(modelContext: ModelContext) async
+    func refresh() async
 }
 
 enum EndOfLogsListState {
-    case currentlyLoadingNextPage
     case idle
-    case loadingNextPageFailed
+    case loading
+    case loadingFailed(any Error)
     case noMoreLogs
 }
 
@@ -46,12 +47,31 @@ enum EndOfLogsListState {
 
 @Observable
 final class DefaultLogsViewModel: LogsViewModel {
+    // MARK: - Properties
+
     private(set) var endOfListState: EndOfLogsListState = .idle
+    @ObservationIgnored
+    private(set) var isViewReady = false
     private(set) var logs: [LogEntity] = []
     private(set) var totalLogsCount: Int?
 
     private let fetchLimit: Int
     private let loggingService: any LoggingService
+
+    @ObservationIgnored
+    private var injectedModelContext: ModelContext?
+    private var modelContext: ModelContext? {
+        guard let injectedModelContext else {
+            // If this happens, something weird has happened.
+            // Crash debug builds, otherwise log.
+            let message = "Unexpected nil modelContext"
+            assertionFailure(message)
+            Logger.logging.critical(message)
+            return nil
+        }
+
+        return injectedModelContext
+    }
 
     var isAtEndOfLogs: Bool {
         guard let totalLogsCount else {
@@ -61,7 +81,7 @@ final class DefaultLogsViewModel: LogsViewModel {
         return logs.count == totalLogsCount
     }
 
-    // Filters
+    // MARK: Filters
 
     var searchText = "" {
         didSet { filterLogs() }
@@ -91,6 +111,8 @@ final class DefaultLogsViewModel: LogsViewModel {
         didSet { filterLogs() }
     }
 
+    // MARK: - init
+
     convenience init() {
         self.init(
             fetchLimit: 100,
@@ -114,16 +136,20 @@ final class DefaultLogsViewModel: LogsViewModel {
 
     // MARK: - LogsViewModel
 
-    func loadNextPage(modelContext: ModelContext) {
+    func loadNextPage() {
+        guard isViewReady, let modelContext else {
+            return
+        }
+
         Logger.logging.info("Loading next page")
-        endOfListState = .currentlyLoadingNextPage
+        endOfListState = .loading
 
         let newLogs: [LogEntity]
         do {
             newLogs = try fetchNextLogs(after: logs.last, modelContext: modelContext)
         } catch {
-            Logger.logging.error("Failed to nod next page", error: error)
-            endOfListState = .loadingNextPageFailed
+            Logger.logging.error("Failed to load next page", error: error)
+            endOfListState = .loadingFailed(error)
             return
         }
 
@@ -133,8 +159,15 @@ final class DefaultLogsViewModel: LogsViewModel {
 
     func onAppear(modelContext: ModelContext) async {
         Logger.logging.info("View appearing")
+        if self.injectedModelContext != modelContext {
+            self.injectedModelContext = modelContext
+            logs = []
+        }
+
         await savePendingLogs()
         syncTotalLogsCount(modelContext: modelContext)
+        isViewReady = true
+        loadNextPage()
     }
 
     func performExport() async {
@@ -152,14 +185,18 @@ final class DefaultLogsViewModel: LogsViewModel {
         }
     }
 
-    func refresh(modelContext: ModelContext) async {
+    func refresh() async {
         Logger.logging.info("Performing refresh")
+        guard let modelContext else {
+            return
+        }
+
         await savePendingLogs()
         syncTotalLogsCount(modelContext: modelContext)
 
         guard let before = logs.first else {
             Logger.logging.info("No logs, so refresh getting first page")
-            loadNextPage(modelContext: modelContext)
+            loadNextPage()
             return
         }
 
@@ -193,17 +230,41 @@ final class DefaultLogsViewModel: LogsViewModel {
     // MARK: - Private
 
     private func fetchNextLogs(after: LogEntity?, modelContext: ModelContext) throws -> [LogEntity] {
-        let predicate = after.map {
-            let otherTimestampCreated = $0.timestampCreated
-            let otherId = $0.id
+        let logLevelsToShow: [LogEntity.LogLevel] = [
+            viewDebugLogs ? .debug : nil,
+            viewInfoLogs ? .info : nil,
+            viewErrorLogs ? .error : nil,
+            viewCriticalLogs ? .critical : nil,
+        ].compactMap { $0 }
+        let basePredicate = LogEntity.filterByLevelPredicate(logLevelsToShow)
 
-            return #Predicate<LogEntity> { value in
+        let afterPredicate: Predicate<LogEntity>
+        if let after {
+            let otherTimestampCreated = after.timestampCreated
+            let otherId = after.id
+
+            afterPredicate = #Predicate { value in
                 value.timestampCreated <= otherTimestampCreated && value.id < otherId
             }
+        } else {
+            afterPredicate = #Predicate { _ in true }
+        }
+
+        let searchPredicate: Predicate<LogEntity>
+        if searchText.isEmpty {
+            searchPredicate = #Predicate { _ in true }
+        } else {
+            searchPredicate = LogEntity.searchPredicate(searchText)
+        }
+
+        let finalPredicate = #Predicate<LogEntity> { log in
+            basePredicate.evaluate(log)
+                && afterPredicate.evaluate(log)
+                && searchPredicate.evaluate(log)
         }
 
         return try getLogs(
-            predicate: predicate,
+            predicate: finalPredicate,
             modelContext: modelContext,
             limit: fetchLimit
         )
@@ -229,7 +290,8 @@ final class DefaultLogsViewModel: LogsViewModel {
     }
 
     private func filterLogs() {
-        // TODO: stuffz
+        logs = []
+        loadNextPage()
     }
 
     private func getLogs(
@@ -242,7 +304,7 @@ final class DefaultLogsViewModel: LogsViewModel {
         let logs = try modelContext.fetch(descriptor)
 
         Logger.logging.info("Fetched \(logs.count) logs")
-        Logger.logging.debug("Fetched logs: \(logs)")
+        Logger.logging.debug("Fetched logs: \(logs.debugDescription)")
 
         return logs
     }
@@ -278,6 +340,7 @@ final class DefaultLogsViewModel: LogsViewModel {
 @Observable
 final class PreviewLogsViewModel: LogsViewModel {
     let endOfListState: EndOfLogsListState
+    let isViewReady = true
     let logs: [LogEntity]
     var searchText = ""
     let totalLogsCount: Int?
@@ -299,20 +362,24 @@ final class PreviewLogsViewModel: LogsViewModel {
         self.totalLogsCount = state.totalLogsCount
     }
 
-    func loadNextPage(modelContext: ModelContext) {}
+    func loadNextPage() {}
     func onAppear(modelContext: ModelContext) async {}
     func performExport() async {}
-    func refresh(modelContext: ModelContext) async {
+    func refresh() async {
         try? await Task.sleep(for: .seconds(1))
     }
 }
 
 extension PreviewLogsViewModel.State {
+    private struct ExampleError: Error {
+        var localizedDescription: String { "An unexpected error occurred." }
+    }
+
     fileprivate var endOfListState: EndOfLogsListState {
         switch self {
         case .empty, .populated: .noMoreLogs
-        case .loading: .currentlyLoadingNextPage
-        case .nextPageFailed: .loadingNextPageFailed
+        case .loading: .loading
+        case .nextPageFailed: .loadingFailed(ExampleError())
         }
     }
 

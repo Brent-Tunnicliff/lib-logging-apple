@@ -145,14 +145,14 @@
         }
       }
     },
-    "logs_view_next_page_failed" : {
+    "logs_view_next_page_failed_%@" : {
       "comment" : "Informs the user that an unexpected error occurred while trying to present them additional log messages in the list.",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error loading more logs."
+            "value" : "Error loading more logs. (%1$(error)@)"
           }
         }
       }

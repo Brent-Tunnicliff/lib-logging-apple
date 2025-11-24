@@ -67,24 +67,22 @@ private struct LogsViewContent: View {
         }
         .listStyle(.plain)
         .refreshable {
-            await viewModel.refresh(modelContext: modelContext)
+            await viewModel.refresh()
         }
     }
 
     private var endOfListView: some View {
         VStack(alignment: .center) {
             switch viewModel.endOfListState {
-            case .currentlyLoadingNextPage:
+            case .loading:
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
             case .idle:
                 EmptyView()
-            case .loadingNextPageFailed:
-                Text(.logsViewNextPageFailed)
-                Button(.retryButton) {
-                    viewModel.loadNextPage(modelContext: modelContext)
-                }
-                .retryButtonStyle()
+            case let .loadingFailed(error):
+                Text(.logsViewNextPageFailed(error: error.localizedDescription))
+                Button(.retryButton, action: viewModel.loadNextPage)
+                    .retryButtonStyle()
             case .noMoreLogs:
                 Text(.logsViewEnd)
                     .font(.footnote)
@@ -93,9 +91,7 @@ private struct LogsViewContent: View {
         .font(.footnote)
         .frame(maxWidth: .infinity, alignment: .center)
         .listRowSeparatorIfSupported(.hidden)
-        .onAppear {
-            viewModel.loadNextPage(modelContext: modelContext)
-        }
+        .onAppear(perform: viewModel.loadNextPage)
     }
 
     private var navigationSubtitleContent: Text {
@@ -153,13 +149,15 @@ private struct LogsViewContent: View {
 
     @ToolbarContentBuilder
     private var toolbarSearchIfSupported: some ToolbarContent {
-        #if os(macOS) || os(tvOS) || os(watchOS)
+        #if os(visionOS)
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+        #elseif os(iOS)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+        #else
             ToolbarItem {
                 EmptyView()
             }
-        #else
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-            DefaultToolbarItem(kind: .search, placement: .bottomBar)
         #endif
     }
 }

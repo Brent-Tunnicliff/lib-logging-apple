@@ -10,12 +10,14 @@ struct CaptureLogSection: View {
 
     @Binding private var presentingStyle: LogsViewPresentingStyle
     @Environment(\.logSchedulerService) private var logSchedulerService
+    @FocusState private var focusedField
     @State private var captureError = false
     @State private var isPopulatingManyLogsProgress = 0
     @State private var message = "Example message"
     @State private var selectedLogLevel = LogLevel.debug
     @State private var selectedCaptureType = LogCaptureType.once
     @State private var scheduledLogs: [UUID: ScheduledLog]
+    @State private var numberOfLogsToGenerate = 1_000
 
     private let scheduledLogSortComparator = ScheduledLogSortComparator()
 
@@ -82,25 +84,63 @@ struct CaptureLogSection: View {
         }
     }
 
+    @ViewBuilder
     private var populateManyLogsSectionContents: some View {
-        Button {
-            let range = 0...1_000
-            isPopulatingManyLogsProgress = range.count
-            Task { @concurrent in
-                for _ in range {
-                    Logger.app.debug("This is an example debug log without an error")
-                    Logger.app.debug("This is an example debug log with an error", error: ExampleError())
-                    Logger.app.info("This is an example info log without an error")
-                    Logger.app.info("This is an example info log with an error", error: ExampleError())
-                    Logger.app.error("This is an example error log without an error")
-                    Logger.app.error("This is an example error log with an error", error: ExampleError())
-                    Logger.app.critical("This is an example critical log without an error")
-                    Logger.app.critical("This is an example critical log with an error", error: ExampleError())
-
-                    Task { @MainActor in
-                        isPopulatingManyLogsProgress -= 1
+        // Since it is a simple demo app I won't bother with inout validation beyond the very basic.
+        TextField(
+            .populateManyLogsNumber,
+            value: $numberOfLogsToGenerate,
+            formatter: NumberFormatter()
+        )
+        .numberPadKeyboardTypeIfSupported()
+        .focused($focusedField)
+        .toolbar {
+            #if os(iOS)
+                ToolbarItem(placement: .keyboard) {
+                    Button(role: .close) {
+                        focusedField = false
                     }
                 }
+            #endif
+        }
+
+        Button {
+            let range = 0...numberOfLogsToGenerate
+            isPopulatingManyLogsProgress = range.count
+            focusedField = false
+            Task { @concurrent in
+                let logger = Logger.app
+                for _ in range {
+                    let logActions: [() -> Void] = [
+                        { logger.debug("This is an example debug log without an error") },
+                        { logger.debug("This is an example debug log with an error", error: ExampleError()) },
+                        { logger.info("This is an example info log without an error") },
+                        { logger.info("This is an example info log with an error", error: ExampleError()) },
+                        { logger.error("This is an example error log without an error") },
+                        { logger.error("This is an example error log with an error", error: ExampleError()) },
+                        { logger.critical("This is an example critical log without an error") },
+                        { logger.critical("This is an example critical log with an error", error: ExampleError()) },
+                    ]
+
+                    guard let logAction = logActions.randomElement() else {
+                        preconditionFailure("No log action to perform.")
+                    }
+
+                    logAction()
+
+                    // Wait for the count update before moving on
+                    _ = await Task { @MainActor in
+                        isPopulatingManyLogsProgress -= 1
+
+                        // Periodically save logs, better to slow down the loop than be left will massive amount
+                        // of saves happing when navigating to
+                        if isPopulatingManyLogsProgress % 100 == 0 {
+                            try await logger._savePendingLogs()
+                        }
+                    }.result
+                }
+
+                try await logger._savePendingLogs()
             }
         } label: {
             Text(.populateManyLogsButtonTitle)
@@ -223,6 +263,16 @@ struct CaptureLogSection: View {
         withAnimation {
             scheduledLogs[log.id] = nil
         }
+    }
+}
+
+extension View {
+    func numberPadKeyboardTypeIfSupported() -> some View {
+        #if os(iOS) || os(tvOS)
+            keyboardType(.numberPad)
+        #else
+            self
+        #endif
     }
 }
 

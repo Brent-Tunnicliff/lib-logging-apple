@@ -12,6 +12,7 @@ enum Logger {
         return bundleIdentifier
     }
 
-    nonisolated static let app: any LoggerType = DefaultLogger(packageName: bundleIdentifier)
+    // Not erasing type to `LoggerType` as we want to force trigger save.
+    nonisolated static let app = DefaultLogger(packageName: bundleIdentifier)
     nonisolated static let other: any LoggerType = DefaultLogger(packageName: "other")
 }

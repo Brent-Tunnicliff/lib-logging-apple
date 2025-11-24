@@ -33,6 +33,13 @@ public final class DefaultLogger {
         self.packageName = packageName
         self.systemLogger = systemLogger
     }
+
+    /// Force trigger saving pending logs.
+    ///
+    /// Should not be needed as the system handles writing logs to disk periodically.
+    public func _savePendingLogs() async throws {
+        try await loggingService.save()
+    }
 }
 
 // MARK: - InternalLogger

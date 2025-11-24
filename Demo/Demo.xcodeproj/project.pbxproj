@@ -138,9 +138,9 @@
 		845797632C9EED48001B833D = {
 			isa = PBXGroup;
 			children = (
+				842835F92E994A0E002CC697 /* CommonDemo */,
 				8457976E2C9EED48001B833D /* Demo */,
 				84CE21FC2D71C3D100960F13 /* Demo Watch App */,
-				842835F92E994A0E002CC697 /* CommonDemo */,
 				84DE35742E11430500A5326A /* SettingsUITests */,
 				847B56932D5CC445001C7B81 /* Frameworks */,
 				8457976D2C9EED48001B833D /* Products */,
@@ -315,10 +315,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				842835F72E994A0E002CC697 /* CommonDemo */,
 				8457976B2C9EED48001B833D /* Demo */,
 				84CE21FA2D71C3D100960F13 /* Demo Watch App */,
 				84DE35722E11430500A5326A /* SettingsUITests */,
-				842835F72E994A0E002CC697 /* CommonDemo */,
 			);
 		};
 /* End PBXProject section */

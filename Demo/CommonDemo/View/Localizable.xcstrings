@@ -109,6 +109,18 @@
         }
       }
     },
+    "populate_many_logs_number" : {
+      "comment" : "Title of user input field to specify the number of logs to send with the “populate_many_logs_button_title” action.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of logs:"
+          }
+        }
+      }
+    },
     "presenting_type_modal" : {
       "comment" : "Sets the presenting option to a modal sheet or window",
       "extractionState" : "manual",
