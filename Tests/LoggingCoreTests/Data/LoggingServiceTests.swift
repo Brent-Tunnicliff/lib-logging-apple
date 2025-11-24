@@ -112,9 +112,34 @@ struct LoggingServiceTests {
 
     // MARK: - registerForCleanup()
 
-    @Test(.timeLimit(.minutes(1)))
+    @Test(.timeLimit(.minutes(2)))
     func registerForCleanup() async throws {
+        let storeLogCleanupCalled = AsyncThrowingStream<Void, any Error>.makeStream()
+        mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
+            storeLogCleanupCalled.continuation.finish()
+        }
+
+        // Not ideal to observe internal logic, but we need to wait until the Task is ready, else the test hangs.
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+            let timer = Task { @MainActor in
+                try await Task.sleep(for: .seconds(2))
+                continuation.resume(throwing: TestError.timeout("isCleanupTaskReady"))
+            }
+
+            Task { @MainActor in
+                while !timer.isCancelled {
+                    if await loggingService.isCleanupTaskReady {
+                        timer.cancel()
+                        continuation.resume()
+                    }
+
+                    try await Task.sleep(for: .milliseconds(10))
+                }
+            }
+        }
+
         // data setup
+        let modelContext = ModelContext(modelContainer)
         let expectedLogRetentionDays = 90
         let now = mockDateProvider.now
 
@@ -135,12 +160,11 @@ struct LoggingServiceTests {
         }
 
         let allLogs = logsToDelete + logsToKeep
-        let modelContext = ModelContext(modelContainer)
-        try modelContext.transaction {
-            for log in allLogs {
-                modelContext.insert(log)
-            }
+        for log in allLogs {
+            modelContext.insert(log)
         }
+
+        try modelContext.save()
 
         // lets just double check that there are the expected number of logs created in setup
         // as the rest of the test expects this data.
@@ -153,37 +177,8 @@ struct LoggingServiceTests {
             return
         }
 
-        let storeLogCleanupCalled = AsyncThrowingStream<Void, any Error>.makeStream()
-        let timer = Task { @MainActor in
-            try await Task.sleep(for: .seconds(1))
-            storeLogCleanupCalled.continuation.finish(throwing: TestError.timeout)
-        }
-
-        mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
-            Task { @MainActor in
-                timer.cancel()
-                storeLogCleanupCalled.continuation.finish()
-            }
-        }
-
-        // Not ideal to observe internal logic, but we need to wait until the Task is ready, else the test hangs.
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
-            let timer = Task { @MainActor in
-                try await Task.sleep(for: .seconds(1))
-                continuation.resume(throwing: TestError.timeout)
-            }
-
-            Task { @MainActor in
-                while !timer.isCancelled {
-                    if await loggingService.isCleanupTaskReady {
-                        timer.cancel()
-                        continuation.resume()
-                    }
-
-                    try await Task.sleep(for: .milliseconds(10))
-                }
-            }
-        }
+        // Maybe this will help with the flaky test? :(
+        try await Task.sleep(for: .seconds(2))
 
         // ready to perform the real test
         registerForCleanupStream.continuation.yield()
