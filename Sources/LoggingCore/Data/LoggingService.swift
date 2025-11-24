@@ -134,6 +134,8 @@ package actor DefaultLoggingService: ModelActor {
             model: LogEntity.self,
             where: #Predicate { $0.timestampCreated < timestamp }
         )
+
+        try save()
     }
 }
 

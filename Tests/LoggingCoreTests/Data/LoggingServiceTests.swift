@@ -153,34 +153,43 @@ struct LoggingServiceTests {
             return
         }
 
-        let storeLogCleanupCalled = Atomic(false)
-        mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
-            storeLogCleanupCalled.store(true, ordering: .sequentiallyConsistent)
+        async let storeLogCleanupCalled: Bool = withCheckedThrowingContinuation { continuation in
+            let timer = Task { @MainActor in
+                try await Task.sleep(for: .seconds(1))
+                continuation.resume(throwing: TestError.timeout)
+            }
+
+            mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
+                Task { @MainActor in
+                    timer.cancel()
+                    continuation.resume(returning: true)
+                }
+            }
         }
 
         // Not ideal to observe internal logic, but we need to wait until the Task is ready, else the test hangs.
-        let isCleanupTaskReadyStart = Date()
-        while await !loggingService.isCleanupTaskReady {
-            guard Date().timeIntervalSince(isCleanupTaskReadyStart) < 1 else {
-                Issue.record("Cleanup task timed out")
-                return
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+            let timer = Task { @MainActor in
+                try await Task.sleep(for: .seconds(1))
+                continuation.resume(throwing: TestError.timeout)
             }
 
-            try await Task.sleep(for: .milliseconds(10))
+            Task { @MainActor in
+                while !timer.isCancelled {
+                    if await loggingService.isCleanupTaskReady {
+                        timer.cancel()
+                        continuation.resume()
+                    }
+
+                    try await Task.sleep(for: .milliseconds(10))
+                }
+            }
         }
 
         // ready to perform the real test
         registerForCleanupStream.continuation.yield()
 
-        let storeLogCleanupCalledStart = Date()
-        while storeLogCleanupCalled.load(ordering: .sequentiallyConsistent) == false {
-            guard Date().timeIntervalSince(storeLogCleanupCalledStart) < 1 else {
-                Issue.record("storeLogCleanup was not called")
-                return
-            }
-
-            try await Task.sleep(for: .milliseconds(10))
-        }
+        try await #expect(storeLogCleanupCalled)
 
         // verify
         let results: [LogEntity] = try modelContext.fetch(FetchDescriptor())
