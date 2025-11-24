@@ -22,7 +22,7 @@ struct NotificationProviderTests {
     func notificationsNamed() async throws {
         let setupIsReady = Atomic(false)
         let notificationTriggered = Task {
-            let stream = await notificationProvider.notifications(named: notificationName)
+            let stream = notificationProvider.notifications(named: notificationName)
             setupIsReady.store(true, ordering: .sequentiallyConsistent)
             for await _ in stream {
                 return true
