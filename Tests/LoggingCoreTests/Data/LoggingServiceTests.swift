@@ -153,17 +153,16 @@ struct LoggingServiceTests {
             return
         }
 
-        async let storeLogCleanupCalled: Bool = withCheckedThrowingContinuation { continuation in
-            let timer = Task { @MainActor in
-                try await Task.sleep(for: .seconds(1))
-                continuation.resume(throwing: TestError.timeout)
-            }
+        let storeLogCleanupCalled = AsyncThrowingStream<Void, any Error>.makeStream()
+        let timer = Task { @MainActor in
+            try await Task.sleep(for: .seconds(1))
+            storeLogCleanupCalled.continuation.finish(throwing: TestError.timeout)
+        }
 
-            mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
-                Task { @MainActor in
-                    timer.cancel()
-                    continuation.resume(returning: true)
-                }
+        mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
+            Task { @MainActor in
+                timer.cancel()
+                storeLogCleanupCalled.continuation.finish()
             }
         }
 
@@ -189,7 +188,9 @@ struct LoggingServiceTests {
         // ready to perform the real test
         registerForCleanupStream.continuation.yield()
 
-        try await #expect(storeLogCleanupCalled)
+        for try await _ in storeLogCleanupCalled.stream {
+            // Won't return any values, we just want it to finish with success or failure.
+        }
 
         // verify
         let results: [LogEntity] = try modelContext.fetch(FetchDescriptor())
