@@ -112,8 +112,9 @@ struct LoggingServiceTests {
 
     // MARK: - registerForCleanup()
 
-    @Test(.timeLimit(.minutes(2)))
+    @Test(.timeLimit(.minutes(1)))
     func registerForCleanup() async throws {
+        print("registerForCleanup start")
         let storeLogCleanupCalled = AsyncThrowingStream<Void, any Error>.makeStream()
         mockLogCleanupTrigger.storeLogCleanupResponse = { _ in
             storeLogCleanupCalled.continuation.finish()
@@ -139,6 +140,7 @@ struct LoggingServiceTests {
         }
 
         // data setup
+        print("registerForCleanup data setup")
         let modelContext = ModelContext(modelContainer)
         let expectedLogRetentionDays = 90
         let now = mockDateProvider.now
@@ -159,12 +161,15 @@ struct LoggingServiceTests {
             )
         }
 
+        print("registerForCleanup inserting logs")
         let allLogs = logsToDelete + logsToKeep
         for log in allLogs {
             modelContext.insert(log)
         }
 
         try modelContext.save()
+
+        print("registerForCleanup logs saved")
 
         // lets just double check that there are the expected number of logs created in setup
         // as the rest of the test expects this data.
@@ -180,6 +185,8 @@ struct LoggingServiceTests {
         // Maybe this will help with the flaky test? :(
         try await Task.sleep(for: .seconds(2))
 
+        print("registerForCleanup starting test")
+
         // ready to perform the real test
         registerForCleanupStream.continuation.yield()
 
@@ -188,6 +195,7 @@ struct LoggingServiceTests {
         }
 
         // verify
+        print("registerForCleanup verify results")
         let results: [LogEntity] = try modelContext.fetch(FetchDescriptor())
         #expect(results.count == logsToKeep.count)
         for expectedResult in logsToKeep {
