@@ -39,7 +39,7 @@ jobs:
         with:
           platform: "${{ matrix.target.platform }}"
           simulator_version: "${{ matrix.target.simulator_version }}"
-          xcode_path: "/Applications/Xcode_26.0.app"
+          xcode_path: "/Applications/Xcode_26.1.app"
 
       # ---------------------------
       # Build and test package
