@@ -389,13 +389,13 @@ struct LoggingServiceTests {
     private func expectedExportResult() -> String {
         """
         2024-12-31T23:59:52Z [0008] [Logging] [critical] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
-        2024-12-31T23:59:53Z [0007] [Logging] [error] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
-        2024-12-31T23:59:54Z [0006] [Logging] [info] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
-        2024-12-31T23:59:55Z [0005] [Logging] [debug] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:53Z [0007] [Logging] [error   ] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:54Z [0006] [Logging] [info    ] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:55Z [0005] [Logging] [debug   ] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, error: Mock - Something went wrong (not really) (Something went wrong in locale), device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
         2024-12-31T23:59:56Z [0004] [Logging] [critical] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
-        2024-12-31T23:59:57Z [0003] [Logging] [error] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
-        2024-12-31T23:59:58Z [0002] [Logging] [info] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
-        2024-12-31T23:59:59Z [Main] [Logging] [debug] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:57Z [0003] [Logging] [error   ] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:58Z [0002] [Logging] [info    ] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
+        2024-12-31T23:59:59Z [Main] [Logging] [debug   ] [Logging/LogEntity.swift:mock(file:function:line:):76] Mock log, device: BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9 iPhone iOS 18.3 (phone)
 
         """
     }

@@ -123,8 +123,15 @@ extension LogEntity.Error: ExportContent {
 
 extension LogEntity.LogLevel: ExportContent {
     fileprivate func exportContent() -> String {
-        rawValue
+        // Padding the string so they all take up the same space as the longest.
+        rawValue.padding(toLength: Self.maxLength, withPad: " ", startingAt: 0)
     }
+
+    private static let maxLength: Int = {
+        LogEntity.LogLevel.allCases
+            .map(\.rawValue.count)
+            .max() ?? 0
+    }()
 }
 
 extension LogEntity.Tag: ExportContent {
