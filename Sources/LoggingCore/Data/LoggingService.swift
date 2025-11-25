@@ -31,12 +31,18 @@ package enum LoggingServiceError: Error {
 
 // MARK: - DefaultLoggingService
 
-package actor DefaultLoggingService: ModelActor {
+// TODO: Conform `DefaultLoggingService` to `ModelActor`
+// We had to remove `ModelActor` as it keeps running on Main Thread instead of background.
+// Relates to https://developer.apple.com/forums/thread/736226
+package actor DefaultLoggingService {
     package static let shared = DefaultLoggingService()
     static var logRetention: Duration { .days(90) }
 
     let modelContainer: ModelContainer
     let modelExecutor: any ModelExecutor
+
+    // Not needed if we conform to `ModelActor` again.
+    private var modelContext: ModelContext { modelExecutor.modelContext }
 
     // Main purpose is as a simple way for the tests to wait until it is ready.
     var isCleanupTaskReady: Bool {
