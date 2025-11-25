@@ -112,6 +112,9 @@ struct LoggingServiceTests {
 
     // MARK: - registerForCleanup()
 
+    // This test has issues with flakiness in ci that I cannot reproduce locally.
+    // I made optimisations with the test to reduce risks of race conditions, but still seeing the issue.
+    // Test usually takes several seconds to complete, but sometimes the iOS ci job will timeout at 1 minute.
     @Test(.timeLimit(.minutes(1)))
     func registerForCleanup() async throws {
         print("registerForCleanup start")

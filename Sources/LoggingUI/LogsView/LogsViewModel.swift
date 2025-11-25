@@ -23,7 +23,9 @@ protocol LogsViewModel {
     var endOfListState: EndOfLogsListState { get }
     var isViewReady: Bool { get }
     var logs: [LogEntity] { get }
+    var platformSupportsExporting: Bool { get }
     var searchText: String { get set }
+    var showExportView: ExportFileState? { get set }
     var totalLogsCount: Int? { get }
     var viewCriticalLogs: Bool { get set }
     var viewDebugLogs: Bool { get set }
@@ -34,6 +36,16 @@ protocol LogsViewModel {
     func onAppear(modelContext: ModelContext) async
     func performExport() async
     func refresh() async
+}
+
+extension LogsViewModel {
+    var platformSupportsExporting: Bool {
+        #if os(tvOS)
+            false
+        #else
+            true
+        #endif
+    }
 }
 
 enum EndOfLogsListState {
@@ -53,6 +65,7 @@ final class DefaultLogsViewModel: LogsViewModel {
     @ObservationIgnored
     private(set) var isViewReady = false
     private(set) var logs: [LogEntity] = []
+    var showExportView: ExportFileState?
     private(set) var totalLogsCount: Int?
 
     private let fetchLimit: Int
@@ -172,16 +185,17 @@ final class DefaultLogsViewModel: LogsViewModel {
 
     func performExport() async {
         Logger.logging.info("Performing export")
+        let exportFileState = ExportFileState()
+        self.showExportView = exportFileState
 
         do {
             // We assume we do not need to manually call `loggingService.save()` first
             // as it is the same data source.
             let url = try await loggingService.exportLogs()
-
-            // TODO: Do stuff
-            print(url.absoluteString)
+            exportFileState.inject(exportFile: url)
         } catch {
             Logger.logging.error("Export failed", error: error)
+            exportFileState.inject(exportError: error)
         }
     }
 
@@ -343,6 +357,7 @@ final class PreviewLogsViewModel: LogsViewModel {
     let isViewReady = true
     let logs: [LogEntity]
     var searchText = ""
+    var showExportView: ExportFileState?
     let totalLogsCount: Int?
     var viewCriticalLogs = true
     var viewDebugLogs = true

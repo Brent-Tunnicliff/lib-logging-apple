@@ -49,6 +49,7 @@ private struct LogsViewContent: View {
                 await viewModel.performExport()
             }
             .searchable(text: $viewModel.searchText)
+            .exportLogsSheet(exportFileState: $viewModel.showExportView)
     }
 
     private var listOfLogs: some View {
@@ -76,7 +77,6 @@ private struct LogsViewContent: View {
             switch viewModel.endOfListState {
             case .loading:
                 ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle())
             case .idle:
                 EmptyView()
             case let .loadingFailed(error):
@@ -132,17 +132,24 @@ private struct LogsViewContent: View {
         }
     }
 
+    @ToolbarContentBuilder
     private var toolbarMore: some ToolbarContent {
-        ToolbarItem {
-            MenuWithFallback {
-                Button {
-                    exporting = true
+        if viewModel.platformSupportsExporting {
+            ToolbarItem {
+                MenuWithFallback {
+                    // ShareLink doesn't work.
+                    // Maybe https://stackoverflow.com/questions/75504775/programmatically-open-sharelink-in-swiftui
+
+                    // TODO: replace this.
+                    Button {
+                        exporting = true
+                    } label: {
+                        Label(.exportTitle, systemImage: "square.and.arrow.up")
+                    }
+                    .disabled(exporting)
                 } label: {
-                    Label(.exportTitle, systemImage: "square.and.arrow.up")
+                    Image(systemName: "ellipsis")
                 }
-                .disabled(exporting)
-            } label: {
-                Image(systemName: "ellipsis")
             }
         }
     }
