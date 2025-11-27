@@ -20,10 +20,10 @@ jobs:
       fail-fast: false
       matrix:
         target: [
-          { platform: "iOS", simulator_version: "26" },
-          { platform: "tvOS", simulator_version: "26" },
-          { platform: "watchOS", simulator_version: "26" },
-          { platform: "visionOS", simulator_version: "26" },
+          { platform: "iOS", simulator_version: "26.1" },
+          { platform: "tvOS", simulator_version: "26.1" },
+          { platform: "watchOS", simulator_version: "26.1" },
+          { platform: "visionOS", simulator_version: "26.1" },
 
           # macOS runs on the host and doesn't need a simulator.
           { platform: "macOS", simulator_version: "" }
