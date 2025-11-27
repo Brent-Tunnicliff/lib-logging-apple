@@ -23,7 +23,9 @@
         }
       ]
     },
-    "testExecutionOrdering" : "random"
+    "repeatInNewRunnerProcess" : true,
+    "testExecutionOrdering" : "random",
+    "testRepetitionMode" : "retryOnFailure"
   },
   "testTargets" : [
     {
