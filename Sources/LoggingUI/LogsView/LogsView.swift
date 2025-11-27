@@ -21,7 +21,6 @@ private struct LogsViewContent: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.logsViewPresentingStyle) private var presentingStyle
     @Environment(\.modelContext) private var modelContext
-    @State private var exporting = false
     @State private var viewModel: any LogsViewModel
 
     init(viewModel: any LogsViewModel) {
@@ -40,13 +39,6 @@ private struct LogsViewContent: View {
                 toolbarSearchIfSupported
                 toolbarMore
                 toolbarCloseButton
-            }
-            .task(id: exporting) {
-                guard exporting else {
-                    return
-                }
-
-                await viewModel.performExport()
             }
             .searchable(text: $viewModel.searchText)
             .exportLogsSheet(exportFileState: $viewModel.showExportView)
@@ -140,13 +132,11 @@ private struct LogsViewContent: View {
                     // ShareLink doesn't work.
                     // Maybe https://stackoverflow.com/questions/75504775/programmatically-open-sharelink-in-swiftui
 
-                    // TODO: replace this.
-                    Button {
-                        exporting = true
+                    AsyncButton {
+                        await viewModel.performExport()
                     } label: {
                         Label(.exportTitle, systemImage: "square.and.arrow.up")
                     }
-                    .disabled(exporting)
                 } label: {
                     Image(systemName: "ellipsis")
                 }

@@ -152,7 +152,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unexpected error loading more logs. (%1$(error)@)"
+            "value" : "Unexpected error loading more logs (%1$(error)@)"
           }
         }
       }
@@ -188,7 +188,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unexpected error preparing export file. (%1$(error)@)"
+            "value" : "Unexpected error preparing export file (%1$(error)@)"
           }
         }
       }
