@@ -29,14 +29,13 @@ final class MockLoggingService: LoggingService {
 
     // MARK: - exportLogs
 
-    package typealias ExportLogsResponse = @Sendable () throws -> URL
-    private let exportLogsResponseMutex = Mutex<ExportLogsResponse>({ .mock })
-    package var exportLogsResponse: ExportLogsResponse {
-        get { exportLogsResponseMutex.withLock { $0 } }
-        set { exportLogsResponseMutex.withLock { $0 = newValue } }
-    }
-    package func exportLogs() async throws -> URL {
-        try exportLogsResponse()
+    func exportLogs() async throws -> (progress: AsyncStream<Double>, url: Task<URL, any Error>) {
+        let (stream, continuation) = AsyncStream<Double>.makeStream()
+        continuation.yield(0.3)
+        continuation.yield(0.6)
+        continuation.yield(1)
+        continuation.finish()
+        return (stream, Task { .mock })
     }
 
     // MARK: - save

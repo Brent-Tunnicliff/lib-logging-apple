@@ -6,39 +6,41 @@ extension View {
     func exportLogsSheet(exportFileState: Binding<ExportFileState?>) -> some View {
         sheet(item: exportFileState) {
             ExportLogsView(exportFileState: $0)
+                .presentationDragIndicator(.visible)
         }
     }
 }
 
 @Observable
-final class ExportFileState: Identifiable, Equatable {
-    private(set) var exportFile: URL?
-    private(set) var exportError: (any Error)?
+final class ExportFileState: Identifiable {
+    private(set) var error: (any Error)?
+    private(set) var file: URL?
+    private(set) var progress: Double
 
     convenience init() {
-        self.init(exportFile: nil, exportError: nil)
+        self.init(error: nil, file: nil, progress: 0)
     }
 
     fileprivate init(
-        exportFile: URL?,
-        exportError: (any Error)?
+        error: (any Error)?,
+        file: URL?,
+        progress: Double
     ) {
-        self.exportFile = exportFile
-        self.exportError = exportError
+        self.error = error
+        self.file = file
+        self.progress = progress
     }
 
-    func inject(exportFile: URL) {
-        self.exportFile = exportFile
+    func inject(file: URL) {
+        self.file = file
     }
 
-    func inject(exportError: any Error) {
-        self.exportError = exportError
+    func inject(error: any Error) {
+        self.error = error
     }
 
-    static func == (lhs: ExportFileState, rhs: ExportFileState) -> Bool {
-        lhs.id == rhs.id
-            && lhs.exportFile == rhs.exportFile
-            && lhs.exportError?.localizedDescription == rhs.exportError?.localizedDescription
+    func inject(progress: Double) {
+        self.progress = progress
     }
 }
 
@@ -47,87 +49,94 @@ private struct ExportLogsView: View {
     @State private var exportFileState: ExportFileState
 
     init(exportFileState: ExportFileState) {
+        #if os(tvOS)
+            preconditionFailure("Exporting logs not supported in tvOS")
+        #endif
+
         self._exportFileState = State(wrappedValue: exportFileState)
     }
 
     var body: some View {
         NavigationStack {
-            if let error = exportFileState.exportError {
-                Text(.preparingExportFailed(error: error.localizedDescription))
-            } else if let exportFile = exportFileState.exportFile {
-                activityView(url: exportFile)
-            } else {
-                preparingExport
+            VStack(spacing: 16) {
+                ProgressView(
+                    exportFileState.progressTitle,
+                    value: exportFileState.progress
+                )
+
+                if let exportFile = exportFileState.file {
+                    shareLink(exportFile: exportFile)
+                } else if let error = exportFileState.error {
+                    Text(.preparingExportFailed(error: error.localizedDescription))
+                }
+
+                Spacer()
+            }
+            .padding()
+            .toolbar {
+                Button(role: .close, action: dismiss.callAsFunction)
             }
         }
     }
 
-    private var preparingExport: some View {
-        ProgressView(.preparingExport)
-            .toolbar {
-                Button(role: .close, action: dismiss.callAsFunction)
-            }
-    }
-
-    private func activityView(url: URL) -> some View {
-        #if os(iOS)
-            UIKitExportActivityView(url: url)
+    private func shareLink(exportFile: URL) -> some View {
+        #if os(tvOS)
+            Text(verbatim: "NOT SUPPORTED")
         #else
-            // TODO: implement other platforms
-            Text(verbatim: "Coming soon...")
+            ShareLink(item: exportFile)
         #endif
     }
 }
 
-#if os(iOS)
-    import UIKit
-
-    private struct UIKitExportActivityView: UIViewControllerRepresentable {
-        private let activityViewController: UIActivityViewController
-
-        init(url: URL) {
-            self.activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-        }
-
-        func makeUIViewController(context: Context) -> UIActivityViewController {
-            activityViewController
-        }
-
-        func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
-
+extension ExportFileState {
+    fileprivate var progressTitle: LocalizedStringResource {
+        if file != nil {
+            .exportFileReady
+        } else if error != nil {
+            .exportFailed
+        } else {
+            .preparingExport
         }
     }
-#else
-    // NSViewControllerRepresentable?
-#endif
+}
 
 #Preview {
-    @Previewable @State var exportFileState: ExportFileState? = ExportFileState(
-        exportFile: nil,
-        exportError: nil
-    )
+    @Previewable @State var exportFileState: ExportFileState? = ExportFileState()
+    @Previewable @State var taskID = UUID()
 
     VStack(spacing: 16) {
         Button("Export") {
-            exportFileState = ExportFileState(
-                exportFile: nil,
-                exportError: nil
-            )
+            exportFileState = ExportFileState()
+            taskID = UUID()
         }
 
         Button("Export error") {
-            exportFileState = ExportFileState(
-                exportFile: nil,
-                exportError: PreviewError()
-            )
+            exportFileState = ExportFileState()
+            taskID = UUID()
+            Task {
+                try await Task.sleep(for: .seconds(1))
+                exportFileState?.inject(error: PreviewError())
+            }
         }
     }
     .exportLogsSheet(exportFileState: $exportFileState)
-    .task(id: exportFileState) {
+    .task(id: taskID) {
+        guard let exportFileState else {
+            return
+        }
+
         do {
-            try await Task.sleep(for: .seconds(3))
-            if let exportFileState, exportFileState.exportError == nil {
-                exportFileState.inject(exportFile: .Preview.textFile)
+            try await Task.sleep(for: .seconds(1))
+            exportFileState.inject(progress: 0.3)
+
+            try await Task.sleep(for: .seconds(1))
+            exportFileState.inject(progress: 0.6)
+
+            try await Task.sleep(for: .seconds(1))
+            exportFileState.inject(progress: 1)
+
+            if exportFileState.error == nil {
+                exportFileState.inject(file: .Preview.textFile)
             }
         } catch {}
     }

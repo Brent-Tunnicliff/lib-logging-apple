@@ -191,11 +191,19 @@ final class DefaultLogsViewModel: LogsViewModel {
         do {
             // We assume we do not need to manually call `loggingService.save()` first
             // as it is the same data source.
-            let url = try await loggingService.exportLogs()
-            exportFileState.inject(exportFile: url)
+            let exportResult = try await loggingService.exportLogs()
+
+            Task {
+                for await value in exportResult.progress {
+                    try Task.checkCancellation()
+                    exportFileState.inject(progress: value)
+                }
+            }
+
+            await exportFileState.inject(file: try exportResult.url.value)
         } catch {
             Logger.logging.error("Export failed", error: error)
-            exportFileState.inject(exportError: error)
+            exportFileState.inject(error: error)
         }
     }
 

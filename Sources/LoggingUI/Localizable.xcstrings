@@ -37,6 +37,30 @@
         }
       }
     },
+    "export_failed" : {
+      "comment" : "Informs the user that the logs export file failed to generate.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export failed"
+          }
+        }
+      }
+    },
+    "export_file_ready" : {
+      "comment" : "Informs the user that the logs export file they want is now ready.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export file ready"
+          }
+        }
+      }
+    },
     "export_title" : {
       "comment" : "Tool for exporting logs to a file for sharing or saving.",
       "extractionState" : "manual",

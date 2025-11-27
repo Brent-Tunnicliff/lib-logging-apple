@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 
 package protocol LoggingService: Sendable {
     /// Exports all logs to file and returns file path.
-    func exportLogs() async throws -> URL
+    func exportLogs() async throws -> (progress: AsyncStream<Double>, url: Task<URL, any Error>)
 
     /// Saves all pending logs.
     func save() async throws
@@ -49,9 +49,10 @@ package actor DefaultLoggingService {
         cleanupTask != nil
     }
 
-    private let dateProvider: any DateProvider
     private var cleanupTask: Task<Void, any Error>?
     private let currentDevice: Task<Device, Never>
+    private let dateProvider: any DateProvider
+    private let exportBufferingPolicy: AsyncStream<Double>.Continuation.BufferingPolicy
     private let fileManager: any FileManagerType
     private let logsBatchSize = 10
     private let logCleanupTrigger: any LogCleanupTrigger
@@ -61,6 +62,7 @@ package actor DefaultLoggingService {
     init(
         dateProvider: any DateProvider,
         deviceProvider: any DeviceProvider,
+        exportBufferingPolicy: AsyncStream<Double>.Continuation.BufferingPolicy,
         fileManager: any FileManagerType,
         logCleanupTrigger: any LogCleanupTrigger,
         modelContainer: ModelContainer,
@@ -71,6 +73,7 @@ package actor DefaultLoggingService {
             await deviceProvider.currentDevice()
         }
         self.dateProvider = dateProvider
+        self.exportBufferingPolicy = exportBufferingPolicy
         self.fileManager = fileManager
         self.logCleanupTrigger = logCleanupTrigger
         self.modelExecutor = DefaultSerialModelExecutor(
@@ -89,6 +92,7 @@ package actor DefaultLoggingService {
         self.init(
             dateProvider: DefaultDateProvider.shared,
             deviceProvider: DefaultDeviceProvider(),
+            exportBufferingPolicy: .bufferingNewest(1),
             fileManager: DefaultFileManager(),
             logCleanupTrigger: DefaultLogCleanupTrigger(),
             modelContainer: .shared,
@@ -148,53 +152,64 @@ package actor DefaultLoggingService {
 // MARK: - LoggingService
 
 extension DefaultLoggingService: LoggingService {
-    package func exportLogs() throws -> URL {
+    package func exportLogs() throws -> (progress: AsyncStream<Double>, url: Task<URL, any Error>) {
         Logger.logging.info("Starting log export")
 
         // Save any pending changes before continuing.
         try save()
 
-        // MARK: Create the export file
+        let totalNumberOfLogs = try modelContext.fetchCount(FetchDescriptor<LogEntity>())
+        let progress = AsyncStream<Double>.makeStream(bufferingPolicy: exportBufferingPolicy)
+        let task: Task<URL, any Error> = Task {
+            // MARK: Create the export file
 
-        let timestamp = dateProvider.now.ISO8601Format(.init(timeSeparator: .omitted))
-        let bundleIdentifier = (Bundle.main.bundleIdentifier ?? "unknown")
-            .replacingOccurrences(of: ".", with: "_")
-        let exportFileName = "log_export_\(bundleIdentifier)_\(timestamp)_\(UUID().uuidString)"
-        let temporaryDirectory = fileManager.temporaryDirectory
-        let fileURL = temporaryDirectory.appending(path: exportFileName, directoryHint: .notDirectory)
-            .appendingPathExtension(for: .plainText)
+            let timestamp = dateProvider.now.ISO8601Format(.init(timeSeparator: .omitted))
+            let bundleIdentifier = (Bundle.main.bundleIdentifier ?? "unknown")
+                .replacingOccurrences(of: ".", with: "_")
+            let exportFileName = "log_export_\(bundleIdentifier)_\(timestamp)_\(UUID().uuidString)"
+            let temporaryDirectory = fileManager.temporaryDirectory
+            let fileURL = temporaryDirectory.appending(path: exportFileName, directoryHint: .notDirectory)
+                .appendingPathExtension(for: .plainText)
 
-        // This should never happen, but if it does lets throw.
-        guard !fileManager.fileExists(at: fileURL) else {
-            Logger.logging.error("File already exists '\(fileURL.absoluteString)'")
-            throw LoggingServiceError.exportFileExists
-        }
-
-        guard fileManager.createFile(at: fileURL, contents: "".data(using: .utf8)) else {
-            Logger.logging.error("File failed to create '\(fileURL.absoluteString)'")
-            throw LoggingServiceError.failedToCreateFile
-        }
-
-        // MARK: Populate the export
-
-        let fileHandle = try fileManager.getFileHandle(forWritingTo: fileURL)
-        var fetchDescriptor = FetchDescriptor<LogEntity>(sortBy: .byDateAndId())
-        // Fetching with `batchSize` always throws if we include pending changes.
-        fetchDescriptor.includePendingChanges = false
-        let logs = try modelContext.fetch(fetchDescriptor, batchSize: logsBatchSize)
-        for log in logs {
-            let logExport = modelMapper.toExportContent(logEntity: log)
-            guard let logExportData = logExport.data(using: .utf8) else {
-                Logger.logging.error("Failed to export log content \(logExport)")
-                throw LoggingServiceError.failedToConvertLogToData
+            // This should never happen, but if it does lets throw.
+            guard !fileManager.fileExists(at: fileURL) else {
+                Logger.logging.error("File already exists '\(fileURL.absoluteString)'")
+                throw LoggingServiceError.exportFileExists
             }
 
-            try fileHandle.write(contentsOf: logExportData)
+            guard fileManager.createFile(at: fileURL, contents: "".data(using: .utf8)) else {
+                Logger.logging.error("File failed to create '\(fileURL.absoluteString)'")
+                throw LoggingServiceError.failedToCreateFile
+            }
+
+            // MARK: Populate the export
+
+            let fileHandle = try fileManager.getFileHandle(forWritingTo: fileURL)
+            var fetchDescriptor = FetchDescriptor<LogEntity>(sortBy: .byDateAndId())
+            // Fetching with `batchSize` always throws if we include pending changes.
+            fetchDescriptor.includePendingChanges = false
+            let logs = try modelContext.fetch(fetchDescriptor, batchSize: logsBatchSize)
+            var count = 0
+            for log in logs {
+                let logExport = modelMapper.toExportContent(logEntity: log)
+                guard let logExportData = logExport.data(using: .utf8) else {
+                    Logger.logging.error("Failed to export log content \(logExport)")
+                    throw LoggingServiceError.failedToConvertLogToData
+                }
+
+                try fileHandle.write(contentsOf: logExportData)
+                count += 1
+                let percentage = Double(count) / Double(totalNumberOfLogs)
+                progress.continuation.yield(percentage)
+            }
+
+            // Save any remaining contents to disk.
+            try fileHandle.synchronize()
+            progress.continuation.finish()
+            return fileURL
         }
 
-        // Save any remaining contents to disk.
-        try fileHandle.synchronize()
-        return fileURL
+        return (progress.stream, task)
     }
 
     package func save() throws {

@@ -47,6 +47,7 @@ struct LoggingServiceTests {
         self.loggingService = DefaultLoggingService(
             dateProvider: mockDateProvider,
             deviceProvider: mockDeviceProvider,
+            exportBufferingPolicy: .unbounded,
             fileManager: mockFileManager,
             logCleanupTrigger: mockLogCleanupTrigger,
             modelContainer: modelContainer,
@@ -218,12 +219,29 @@ struct LoggingServiceTests {
         _ = try await runExportTestSetup(
             loggingService: loggingService,
             modelContext: modelContext
-        )
+        ).url.value
 
         let expectedResult = expectedExportResult()
         let result = mockFileManager.mockWritableFileHandleType.writeInput.joined()
         #expect(result == expectedResult)
         #expect(mockFileManager.mockWritableFileHandleType.synchronizeCalled)
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func exportLogsProgress() async throws {
+        let modelContext = ModelContext(modelContainer)
+        let progress = try await runExportTestSetup(
+            loggingService: loggingService,
+            modelContext: modelContext
+        ).progress
+
+        let expectedResults = [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0]
+        var progressValues: [Double] = []
+        for await value in progress {
+            progressValues.append(value)
+        }
+
+        #expect(progressValues == expectedResults)
     }
 
     /// Uses a real database and FileManager so we make sure it works.
@@ -243,6 +261,7 @@ struct LoggingServiceTests {
             loggingService: DefaultLoggingService(
                 dateProvider: mockDateProvider,
                 deviceProvider: mockDeviceProvider,
+                exportBufferingPolicy: .unbounded,
                 fileManager: realFileManager,
                 logCleanupTrigger: mockLogCleanupTrigger,
                 modelContainer: container,
@@ -250,7 +269,7 @@ struct LoggingServiceTests {
                 userDefaults: mockUserDefaultsStore
             ),
             modelContext: modelContext
-        )
+        ).url.value
 
         // Cleanup file when not needed.
         defer {
@@ -300,7 +319,7 @@ struct LoggingServiceTests {
     private func runExportTestSetup(
         loggingService: any LoggingService,
         modelContext: ModelContext
-    ) async throws -> URL {
+    ) async throws -> (progress: AsyncStream<Double>, url: Task<URL, any Error>) {
         // Setup
         let realModelMapper = DefaultModelMapper()
         // We actually want the real export for this test.
