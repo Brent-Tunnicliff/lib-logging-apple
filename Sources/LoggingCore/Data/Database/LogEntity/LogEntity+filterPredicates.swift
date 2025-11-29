@@ -71,7 +71,7 @@ private enum CommonPredicate {
         return #Predicate { log in
             stringPredicate.evaluate(log.tag.file)
                 || stringPredicate.evaluate(log.tag.function)
-            // Probably no need to search by line number
+                || stringPredicate.evaluate(log.tag.line.description)
         }
     }
 }

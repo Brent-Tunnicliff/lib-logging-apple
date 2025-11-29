@@ -19,7 +19,7 @@ extension URL {
 
 @Suite("URL+MockTests")
 struct URLMockTests {
-    @Test()
+    @Test
     func mockDoesNotCrash() {
         // No need to expect.
         // Initialising URL from string returns optional type, so crashing if nil.
