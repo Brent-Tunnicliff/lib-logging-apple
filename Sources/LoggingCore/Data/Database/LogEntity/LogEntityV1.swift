@@ -4,8 +4,10 @@ package import Foundation
 package import SwiftData
 import Synchronization
 
+// MARK: - LogEntityV1
+
 @Model
-package final class LogEntityV1: Equatable, Identifiable {
+package final class LogEntityV1 {
     package private(set) var device: Device
     @Attribute(.unique)
     package private(set) var id: UUID
@@ -61,83 +63,10 @@ package final class LogEntityV1: Equatable, Identifiable {
     }
 }
 
-// MARK: - Nested Types
+// MARK: Extensions
 
-extension LogEntityV1 {
-    package struct Error: Codable, Equatable {
-        package let type: String
-        package let message: String
-        package let localizedDescription: String
-
-        package init(type: String, message: String, localizedDescription: String) {
-            self.type = type
-            self.message = message
-            self.localizedDescription = localizedDescription
-        }
-    }
-
-    package struct Device: Codable, Equatable {
-        package let identifierForVendor: UUID?
-        package let model: String?
-        package let systemName: String?
-        package let systemVersion: String?
-        package let userInterfaceIdiom: UserInterfaceIdiom
-
-        /// Base value of ``identifierForVendor`` that can be used in Predicates.
-        package private(set) var _identifierForVendorRawValue: String?
-
-        /// Base value of ``userInterfaceIdiom`` that can be used in Predicates.
-        package let _userInterfaceIdiomRawValue: UserInterfaceIdiom.RawValue
-
-        package init(
-            identifierForVendor: UUID?,
-            model: String?,
-            systemName: String?,
-            systemVersion: String?,
-            userInterfaceIdiom: UserInterfaceIdiom
-        ) {
-            self.identifierForVendor = identifierForVendor
-            self.model = model
-            self.systemName = systemName
-            self.systemVersion = systemVersion
-            self.userInterfaceIdiom = userInterfaceIdiom
-            self._identifierForVendorRawValue = identifierForVendor?.uuidString
-            self._userInterfaceIdiomRawValue = userInterfaceIdiom.rawValue
-        }
-    }
-
-    package enum LogLevel: String, Codable, Equatable, CaseIterable {
-        case debug
-        case info
-        case error
-        case critical
-    }
-
-    package struct Tag: Codable, Equatable {
-        package let file: String
-        package let function: String
-        package let line: UInt
-
-        package init(file: String, function: String, line: UInt) {
-            self.file = file
-            self.function = function
-            self.line = line
-        }
-    }
-
-    package enum UserInterfaceIdiom: String, Codable, Equatable, CaseIterable {
-        case carPlay
-        case mac
-        case pad
-        case phone
-        case tv
-        case unspecified
-        case vision
-        case watch
-    }
-}
-
-// MARK: - Nested Types
+extension LogEntityV1: Equatable {}
+extension LogEntityV1: Identifiable {}
 
 extension LogEntityV1: CustomDebugStringConvertible {
     package var debugDescription: String {
@@ -156,6 +85,27 @@ extension LogEntityV1: CustomDebugStringConvertible {
     }
 }
 
+// MARK: - Error
+
+extension LogEntityV1 {
+    package struct Error {
+        package let type: String
+        package let message: String
+        package let localizedDescription: String
+
+        package init(type: String, message: String, localizedDescription: String) {
+            self.type = type
+            self.message = message
+            self.localizedDescription = localizedDescription
+        }
+    }
+}
+
+// MARK: Extensions
+
+extension LogEntityV1.Error: Codable {}
+extension LogEntityV1.Error: Equatable {}
+
 extension LogEntityV1.Error: CustomDebugStringConvertible {
     package var debugDescription: String {
         let properties: [String] = [
@@ -166,6 +116,45 @@ extension LogEntityV1.Error: CustomDebugStringConvertible {
         return "{" + properties.joined(separator: ",") + "}"
     }
 }
+
+// MARK: - Device
+
+extension LogEntityV1 {
+    package struct Device {
+        package let identifierForVendor: UUID?
+        package let model: String?
+        package let systemName: String?
+        package let systemVersion: String?
+        package let userInterfaceIdiom: UserInterfaceIdiom
+
+        /// Base value of ``identifierForVendor`` that can be used in Predicates.
+        let _identifierForVendorRawValue: String?
+
+        /// Base value of ``userInterfaceIdiom`` that can be used in Predicates.
+        let _userInterfaceIdiomRawValue: UserInterfaceIdiom.RawValue
+
+        package init(
+            identifierForVendor: UUID?,
+            model: String?,
+            systemName: String?,
+            systemVersion: String?,
+            userInterfaceIdiom: UserInterfaceIdiom
+        ) {
+            self.identifierForVendor = identifierForVendor
+            self.model = model
+            self.systemName = systemName
+            self.systemVersion = systemVersion
+            self.userInterfaceIdiom = userInterfaceIdiom
+            self._identifierForVendorRawValue = identifierForVendor?.uuidString
+            self._userInterfaceIdiomRawValue = userInterfaceIdiom.rawValue
+        }
+    }
+}
+
+// MARK: Extensions
+
+extension LogEntityV1.Device: Codable {}
+extension LogEntityV1.Device: Equatable {}
 
 extension LogEntityV1.Device: CustomDebugStringConvertible {
     package var debugDescription: String {
@@ -180,6 +169,44 @@ extension LogEntityV1.Device: CustomDebugStringConvertible {
     }
 }
 
+// MARK: - LogLevel
+
+extension LogEntityV1 {
+    package enum LogLevel: String {
+        case debug
+        case info
+        case error
+        case critical
+    }
+}
+
+// MARK: Extensions
+
+extension LogEntityV1.LogLevel: CaseIterable {}
+extension LogEntityV1.LogLevel: Codable {}
+extension LogEntityV1.LogLevel: Equatable {}
+
+// MARK: - Tag
+
+extension LogEntityV1 {
+    package struct Tag {
+        package let file: String
+        package let function: String
+        package let line: UInt
+
+        package init(file: String, function: String, line: UInt) {
+            self.file = file
+            self.function = function
+            self.line = line
+        }
+    }
+}
+
+// MARK: Extensions
+
+extension LogEntityV1.Tag: Codable {}
+extension LogEntityV1.Tag: Equatable {}
+
 extension LogEntityV1.Tag: CustomDebugStringConvertible {
     package var debugDescription: String {
         let properties: [String] = [
@@ -190,3 +217,24 @@ extension LogEntityV1.Tag: CustomDebugStringConvertible {
         return "{" + properties.joined(separator: ",") + "}"
     }
 }
+
+// MARK: - UserInterfaceIdiom
+
+extension LogEntityV1 {
+    package enum UserInterfaceIdiom: String {
+        case carPlay
+        case mac
+        case pad
+        case phone
+        case tv
+        case unspecified
+        case vision
+        case watch
+    }
+}
+
+// MARK: Extensions
+
+extension LogEntityV1.UserInterfaceIdiom: CaseIterable {}
+extension LogEntityV1.UserInterfaceIdiom: Codable {}
+extension LogEntityV1.UserInterfaceIdiom: Equatable {}
