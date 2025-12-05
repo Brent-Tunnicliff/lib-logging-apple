@@ -325,11 +325,11 @@ struct LoggingServiceTests {
         // We actually want the real export for this test.
         mockModelMapper.toExportContentLogEntityResponse = realModelMapper.toExportContent(logEntity:)
 
-        let device = LogEntity.Device.mock(
+        let device = try LogEntity.Device.mock(
             identifierForVendor: .forced(uuidString: "BD0ED1A2-8CA2-4384-8211-A1655A5E2FC9")
         )
 
-        let logs: [LogEntity] = [
+        let logs: [LogEntity] = try [
             .mock(
                 device: device,
                 id: .forced(uuidString: "00000000-0000-0000-0000-000000000001"),

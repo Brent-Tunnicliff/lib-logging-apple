@@ -13,14 +13,14 @@ struct SortDescriptorLogEntityTests {
     @Test(arguments: LogEntityByDateAndIdArgument.allCases)
     func logEntityByDateAndId(_ argument: LogEntityByDateAndIdArgument) async throws {
         let sortDescriptors: [SortDescriptor<LogEntity>] = .byDateAndId(order: argument.order)
-        let input = argument.input
-        let expectedResult = argument.expectedResult
+        let input = try argument.input
+        let expectedResult = try argument.expectedResult
 
         // Validating the dynamic input data is valid.
         #expect(input.count > 1)
         #expect(Set(input.map(\.id)).count == input.count)
 
-        let results = argument.input.sorted(using: sortDescriptors)
+        let results = try argument.input.sorted(using: sortDescriptors)
         #expect(results.count == input.count)
 
         for (offset, expectedLogEntity) in expectedResult.enumerated() {
@@ -42,18 +42,20 @@ extension SortDescriptorLogEntityTests {
         case reverse
 
         var input: [LogEntity] {
-            [
-                logEntityOne,
-                logEntityTwo,
-                logEntityThree,
-                logEntityFour,
-                logEntityFive,
-                logEntitySix,
-                logEntitySeven,
-                logEntityEight,
-                logEntityNine,
-                logEntityTen,
-            ].shuffled()
+            get throws {
+                try [
+                    logEntityOne,
+                    logEntityTwo,
+                    logEntityThree,
+                    logEntityFour,
+                    logEntityFive,
+                    logEntitySix,
+                    logEntitySeven,
+                    logEntityEight,
+                    logEntityNine,
+                    logEntityTen,
+                ].shuffled()
+            }
         }
 
         var order: SortOrder {
@@ -64,24 +66,26 @@ extension SortDescriptorLogEntityTests {
         }
 
         var expectedResult: [LogEntity] {
-            switch self {
-            case .forward:
-                [
-                    logEntityThree,
-                    logEntitySeven,
-                    logEntityTen,
-                    logEntityNine,
-                    logEntityEight,
-                    logEntitySix,
-                    logEntityFive,
-                    logEntityFour,
-                    logEntityTwo,
-                    logEntityOne,
-                ]
-            case .reverse:
-                // We expect the `reverse` order to literally be the opposite order to forward.
-                // We don't have any other conditions.
-                LogEntityByDateAndIdArgument.forward.expectedResult.reversed()
+            get throws {
+                switch self {
+                case .forward:
+                    try [
+                        logEntityThree,
+                        logEntitySeven,
+                        logEntityTen,
+                        logEntityNine,
+                        logEntityEight,
+                        logEntitySix,
+                        logEntityFive,
+                        logEntityFour,
+                        logEntityTwo,
+                        logEntityOne,
+                    ]
+                case .reverse:
+                    // We expect the `reverse` order to literally be the opposite order to forward.
+                    // We don't have any other conditions.
+                    try LogEntityByDateAndIdArgument.forward.expectedResult.reversed()
+                }
             }
         }
     }
@@ -91,73 +95,93 @@ extension SortDescriptorLogEntityTests.LogEntityByDateAndIdArgument {
     // MARK: - Test data
 
     fileprivate var logEntityOne: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000001"),
-            timestampCreated: date(for: "2025-01-01T00:00:10Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000001"),
+                timestampCreated: date(for: "2025-01-01T00:00:10Z")
+            )
+        }
     }
 
     fileprivate var logEntityTwo: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000002"),
-            timestampCreated: date(for: "2025-01-01T00:00:09Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000002"),
+                timestampCreated: date(for: "2025-01-01T00:00:09Z")
+            )
+        }
     }
 
     fileprivate var logEntityThree: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000003"),
-            timestampCreated: date(for: "2025-01-01T00:00:01Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000003"),
+                timestampCreated: date(for: "2025-01-01T00:00:01Z")
+            )
+        }
     }
 
     fileprivate var logEntityFour: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000004"),
-            timestampCreated: date(for: "2025-01-01T00:00:07Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000004"),
+                timestampCreated: date(for: "2025-01-01T00:00:07Z")
+            )
+        }
     }
 
     fileprivate var logEntityFive: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000005"),
-            timestampCreated: date(for: "2025-01-01T00:00:06Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000005"),
+                timestampCreated: date(for: "2025-01-01T00:00:06Z")
+            )
+        }
     }
 
     fileprivate var logEntitySix: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000006"),
-            timestampCreated: date(for: "2025-01-01T00:00:05Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000006"),
+                timestampCreated: date(for: "2025-01-01T00:00:05Z")
+            )
+        }
     }
 
     fileprivate var logEntitySeven: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000007"),
-            timestampCreated: date(for: "2025-01-01T00:00:01Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000007"),
+                timestampCreated: date(for: "2025-01-01T00:00:01Z")
+            )
+        }
     }
 
     fileprivate var logEntityEight: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000008"),
-            timestampCreated: date(for: "2025-01-01T00:00:03Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000008"),
+                timestampCreated: date(for: "2025-01-01T00:00:03Z")
+            )
+        }
     }
 
     fileprivate var logEntityNine: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000009"),
-            timestampCreated: date(for: "2025-01-01T00:00:02Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000009"),
+                timestampCreated: date(for: "2025-01-01T00:00:02Z")
+            )
+        }
     }
 
     fileprivate var logEntityTen: LogEntity {
-        LogEntity.mock(
-            id: .forced(uuidString: "00000000-0000-0000-0000-000000000010"),
-            timestampCreated: date(for: "2025-01-01T00:00:01Z")
-        )
+        get throws {
+            try LogEntity.mock(
+                id: .forced(uuidString: "00000000-0000-0000-0000-000000000010"),
+                timestampCreated: date(for: "2025-01-01T00:00:01Z")
+            )
+        }
     }
 
     private func date(for dateString: String) -> Date {

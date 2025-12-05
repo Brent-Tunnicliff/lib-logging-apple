@@ -104,7 +104,7 @@ struct LogEntityFilterPredicatesTests {
         SearchPredicateArgument(input: "7", expectedLogs: [7]),
     ])
     func searchPredicate(_ argument: SearchPredicateArgument) throws {
-        let logEntities = Self.searchPredicateLogEntities()
+        let logEntities = try Self.searchPredicateLogEntities()
         let expectedResults = logEntities.filter {
             argument.expectedLogs.contains($0.key)
         }.map(\.value)
@@ -138,13 +138,13 @@ struct LogEntityFilterPredicatesTests {
         let expectedLogs: [Int]
     }
 
-    fileprivate static func searchPredicateLogEntities() -> [Int: LogEntity] {
+    fileprivate static func searchPredicateLogEntities() throws -> [Int: LogEntity] {
         let userInterfaceIdioms = LogEntity.UserInterfaceIdiom.allCases
         let idFormatter = NumberFormatter()
         idFormatter.minimumIntegerDigits = 12
 
-        let entities = userInterfaceIdioms.enumerated().reduce(into: [Int: LogEntity]()) { partialResult, value in
-            let (number, userInterfaceIdiom) = value
+        var entities: [Int: LogEntity] = [:]
+        for (number, userInterfaceIdiom) in userInterfaceIdioms.enumerated() {
             guard let idComponent = idFormatter.string(from: NSNumber(value: number)) else {
                 preconditionFailure("Failed to generate expected log id string for \(number)")
             }
@@ -166,7 +166,7 @@ struct LogEntityFilterPredicatesTests {
                 deviceSystemVersion = nil
                 error = nil
             } else {
-                deviceIdentifierForVendor = .forced(uuidString: deviceIdentifierForVendorString)
+                deviceIdentifierForVendor = try .forced(uuidString: deviceIdentifierForVendorString)
                 deviceModel = "device_model_\(number)"
                 deviceSystemName = "device_systemName_\(number)"
                 deviceSystemVersion = "device_systemVersion_\(number)"
@@ -191,7 +191,7 @@ struct LogEntityFilterPredicatesTests {
                 line: UInt(number) * 11
             )
 
-            let entity = LogEntity(
+            let entity = try LogEntity(
                 device: device,
                 id: .forced(uuidString: idString),
                 // we don't search for level, so value does not matter.
@@ -205,7 +205,7 @@ struct LogEntityFilterPredicatesTests {
                 thread: "thread_\(number)"
             )
 
-            partialResult[number] = entity
+            entities[number] = entity
         }
 
         // Validate generated values

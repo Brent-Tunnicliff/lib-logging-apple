@@ -83,27 +83,29 @@ struct ModelMapperTests {
         case withoutError
 
         var logEntry: LogEntity {
-            LogEntity(
-                device: LogEntity.Device(
-                    identifierForVendor: deviceIdentifierForVendor,
-                    model: deviceModel,
-                    systemName: deviceSystemName,
-                    systemVersion: deviceSystemVersion,
-                    userInterfaceIdiom: .phone
-                ),
-                id: .forced(uuidString: "00000000-0000-0000-0000-000000000001"),
-                level: .info,
-                message: "This is a log",
-                packageName: "LoggingCoreTests",
-                tag: LogEntity.Tag(
-                    file: "LoggingCoreTests/ModelMapperTests.swift",
-                    function: "toExportContentWithError()",
-                    line: 10
-                ),
-                timestampCreated: timestampCreated,
-                error: error,
-                thread: "Main"
-            )
+            get throws {
+                try LogEntity(
+                    device: LogEntity.Device(
+                        identifierForVendor: deviceIdentifierForVendor,
+                        model: deviceModel,
+                        systemName: deviceSystemName,
+                        systemVersion: deviceSystemVersion,
+                        userInterfaceIdiom: .phone
+                    ),
+                    id: .forced(uuidString: "00000000-0000-0000-0000-000000000001"),
+                    level: .info,
+                    message: "This is a log",
+                    packageName: "LoggingCoreTests",
+                    tag: LogEntity.Tag(
+                        file: "LoggingCoreTests/ModelMapperTests.swift",
+                        function: "toExportContentWithError()",
+                        line: 10
+                    ),
+                    timestampCreated: timestampCreated,
+                    error: error,
+                    thread: "Main"
+                )
+            }
         }
 
         var expectedResult: String {
@@ -124,9 +126,11 @@ struct ModelMapperTests {
         }
 
         private var deviceIdentifierForVendor: UUID? {
-            switch self {
-            case .withoutDeviceIdentifierForVendor: nil
-            default: .forced(uuidString: "00000000-0000-0000-0000-000000000002")
+            get throws {
+                switch self {
+                case .withoutDeviceIdentifierForVendor: nil
+                default: try .forced(uuidString: "00000000-0000-0000-0000-000000000002")
+                }
             }
         }
 
@@ -174,8 +178,8 @@ struct ModelMapperTests {
     }
 
     @Test(arguments: ToExportContentArgument.allCases)
-    func toExportContent(_ argument: ToExportContentArgument) {
-        let logEntry = argument.logEntry
+    func toExportContent(_ argument: ToExportContentArgument) throws {
+        let logEntry = try argument.logEntry
         let result = modelMapper.toExportContent(logEntity: logEntry)
         #expect(result == argument.expectedResult)
     }
