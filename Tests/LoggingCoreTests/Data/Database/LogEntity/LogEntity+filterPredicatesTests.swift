@@ -5,6 +5,7 @@ import LoggingCore
 import SwiftData
 import Testing
 
+@MainActor
 @Suite("LogEntity+filterPredicatesTests")
 struct LogEntityFilterPredicatesTests {
     // We don't really need to use this modelContainer in the tests,
