@@ -1,16 +1,13 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import CommonUI
 public import SwiftUI
 
 /// The toolbar item used for navigating to ``LogsView``.
 public struct LogsViewToolbarItem: ToolbarContent {
     @Environment(\.logsViewPresentingStyle) var presentingStyle
     @State private var isNavigationDestinationPresented = false
-    @State private var isSheetPresented = false
-
-    #if os(macOS) || os(iOS)
-        @Environment(\.openWindow) private var openWindow
-    #endif
+    @State private var isPresented = false
 
     /// Initialise an instance of ``LogsViewToolbarItem``.
     public init() {}
@@ -21,9 +18,9 @@ public struct LogsViewToolbarItem: ToolbarContent {
             Button {
                 switch presentingStyle.wrapped {
                 case .navigationDestination:
-                    performNavigationDestination()
+                    isNavigationDestinationPresented = true
                 case .modal:
-                    performModal()
+                    isPresented = true
                 }
             } label: {
                 Image(systemName: "rectangle.and.text.magnifyingglass")
@@ -31,29 +28,8 @@ public struct LogsViewToolbarItem: ToolbarContent {
             .navigationDestination(isPresented: $isNavigationDestinationPresented) {
                 LogsView()
             }
-            .sheet(isPresented: $isSheetPresented) {
-                NavigationStack {
-                    LogsView()
-                }
-                .presentationDragIndicator(.visible)
-            }
+            .openWindowIfSupported(isPresented: $isPresented, windowType: .logsWindow)
         }
-    }
-
-    private func performNavigationDestination() {
-        isNavigationDestinationPresented = true
-    }
-
-    private func performModal() {
-        #if os(iOS) || os(macOS)
-            if WindowMode.isSupported {
-                openWindow.logsWindow()
-            } else {
-                isSheetPresented = true
-            }
-        #else
-            isSheetPresented = true
-        #endif
     }
 }
 

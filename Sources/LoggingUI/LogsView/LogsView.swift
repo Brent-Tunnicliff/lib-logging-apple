@@ -1,5 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import CommonUI
 import LoggingCore
 import SwiftData
 import SwiftUI
@@ -36,9 +37,12 @@ private struct LogsViewContent: View {
             }
             .toolbar {
                 toolbarFilter
-                toolbarSearchIfSupported
+
+                if let searchPlacement = BottomToolbarSearchPlacementIfSupported(spaces: .leading) {
+                    searchPlacement
+                }
+
                 toolbarMore
-                toolbarCloseButton
             }
             .searchable(text: $viewModel.searchText)
             .exportLogsSheet(exportFileState: $viewModel.showExportView)
@@ -74,7 +78,7 @@ private struct LogsViewContent: View {
             case let .loadingFailed(error):
                 Text(.logsViewNextPageFailed(error: error.localizedDescription))
                 Button(.retryButton, action: viewModel.loadNextPage)
-                    .retryButtonStyle()
+                    .buttonStyleGlassWithFallback()
             case .noMoreLogs:
                 Text(.logsViewEnd)
                     .font(.footnote)
@@ -90,17 +94,8 @@ private struct LogsViewContent: View {
         Text((viewModel.totalLogsCount ?? 0).formatted(.number))
     }
 
-    @ToolbarContentBuilder
-    private var toolbarCloseButton: some ToolbarContent {
-        if presentingStyle.requiresCloseButton {
-            ToolbarItem(placement: .closePlacement) {
-                Button(role: .close, action: dismiss.callAsFunction)
-            }
-        }
-    }
-
     private var toolbarFilter: some ToolbarContent {
-        ToolbarItem(placement: .toolbarFilterPlacement) {
+        ToolbarItem(placement: .bottomBarWithFallback()) {
             MenuWithFallback {
                 Toggle(isOn: $viewModel.viewDebugLogs) {
                     Text(.logLevelDebug)
@@ -120,7 +115,7 @@ private struct LogsViewContent: View {
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
             }
-            .menuActionDismissBehavior(.disabledIfSupported)
+            .menuActionDismissBehaviorDisabledIfSupported()
         }
     }
 
@@ -129,9 +124,6 @@ private struct LogsViewContent: View {
         if viewModel.platformSupportsExporting {
             ToolbarItem {
                 MenuWithFallback {
-                    // ShareLink doesn't work.
-                    // Maybe https://stackoverflow.com/questions/75504775/programmatically-open-sharelink-in-swiftui
-
                     AsyncButton {
                         await viewModel.performExport()
                     } label: {
@@ -142,84 +134,6 @@ private struct LogsViewContent: View {
                 }
             }
         }
-    }
-
-    @ToolbarContentBuilder
-    private var toolbarSearchIfSupported: some ToolbarContent {
-        #if os(visionOS)
-            DefaultToolbarItem(kind: .search, placement: .bottomBar)
-        #elseif os(iOS)
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-            DefaultToolbarItem(kind: .search, placement: .bottomBar)
-        #else
-            ToolbarItem {
-                EmptyView()
-            }
-        #endif
-    }
-}
-
-extension View {
-    fileprivate func listRowSeparatorIfSupported(_ visibility: Visibility) -> some View {
-        #if os(tvOS) || os(watchOS)
-            self
-        #else
-            listRowSeparator(visibility)
-        #endif
-    }
-
-    fileprivate var isNavigationSubtitleSupported: Bool {
-        #if os(iOS) || os(macOS)
-            true
-        #else
-            false
-        #endif
-    }
-
-    fileprivate func navigationSubtitleIfSupported(_ value: Text) -> some View {
-        #if os(iOS) || os(macOS)
-            navigationSubtitle(value)
-        #else
-            self
-        #endif
-    }
-
-    fileprivate func retryButtonStyle() -> some View {
-        #if os(visionOS)
-            buttonStyle(.bordered)
-        #else
-            buttonStyle(.glass)
-        #endif
-    }
-}
-
-extension ToolbarItemPlacement {
-    fileprivate static var toolbarFilterPlacement: ToolbarItemPlacement {
-        #if os(macOS) || os(tvOS)
-            .automatic
-        #else
-            .bottomBar
-        #endif
-    }
-
-    fileprivate static var closePlacement: ToolbarItemPlacement {
-        #if os(watchOS)
-            // WatchOS does not show the button by default for some reason,
-            // so manually setting it.
-            .topBarTrailing
-        #else
-            .automatic
-        #endif
-    }
-}
-
-extension MenuActionDismissBehavior {
-    static var disabledIfSupported: MenuActionDismissBehavior {
-        #if os(macOS) || os(watchOS)
-            .automatic
-        #else
-            .disabled
-        #endif
     }
 }
 

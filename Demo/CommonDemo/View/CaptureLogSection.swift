@@ -1,5 +1,6 @@
 // Copyright © 2025 Brent Tunnicliff <brent@tunnicliff.dev>
 
+import CommonUI
 import Logging
 import LoggingUI
 import SwiftUI
@@ -92,17 +93,9 @@ struct CaptureLogSection: View {
             value: $numberOfLogsToGenerate,
             formatter: NumberFormatter()
         )
-        .numberPadKeyboardTypeIfSupported()
+        .keyboardTypeNumberPadIfSupported()
         .focused($focusedField)
-        .toolbar {
-            #if os(iOS)
-                ToolbarItem(placement: .keyboard) {
-                    Button(role: .close) {
-                        focusedField = false
-                    }
-                }
-            #endif
-        }
+        .toolbarKeyboardCloseButtonIfSupported(focused: $focusedField)
 
         Button {
             let range = 0...numberOfLogsToGenerate
@@ -152,7 +145,7 @@ struct CaptureLogSection: View {
         TextField(text: $message) {
             Text(.messageTitle)
         }
-        .textFieldStyle(.roundedBorderIfSupported)
+        .textFieldStyleRoundedBorderIfSupported()
     }
 
     private var presentingStylePicker: some View {
@@ -263,16 +256,6 @@ struct CaptureLogSection: View {
         withAnimation {
             scheduledLogs[log.id] = nil
         }
-    }
-}
-
-extension View {
-    func numberPadKeyboardTypeIfSupported() -> some View {
-        #if os(iOS) || os(tvOS)
-            keyboardType(.numberPad)
-        #else
-            self
-        #endif
     }
 }
 
