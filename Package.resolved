@@ -1,6 +1,15 @@
 {
-  "originHash" : "409bc70030db738360d5710b97fc0611f890a55417d406e537a93bb8a6934192",
+  "originHash" : "1624f1d9372eab7ecf56cd9fc125aaf51534060dc1428cf5a9df32edc3d22571",
   "pins" : [
+    {
+      "identity" : "lib-ui-apple",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Brent-Tunnicliff/lib-ui-apple",
+      "state" : {
+        "branch" : "main",
+        "revision" : "be9fb4dc0290e318f4b9ca34e77f15999d126abc"
+      }
+    },
     {
       "identity" : "lib-userdefaults-apple",
       "kind" : "remoteSourceControl",
@@ -24,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Brent-Tunnicliff/swift-format-plugin",
       "state" : {
-        "revision" : "8dc2cebcb58e287f87b5292e519d0ca78ad5933c",
-        "version" : "2.0.1"
+        "revision" : "4783d8fefdc95e7ee7edde17ae505cc871be6e85",
+        "version" : "2.0.2"
       }
     },
     {
@@ -33,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-numerics.git",
       "state" : {
-        "revision" : "bbadd4b853a33fd78c4ae977d17bb2af15eb3f2a",
-        "version" : "1.1.0"
+        "revision" : "0c0290ff6b24942dadb83a929ffaaa1481df04a2",
+        "version" : "1.1.1"
       }
     }
   ],

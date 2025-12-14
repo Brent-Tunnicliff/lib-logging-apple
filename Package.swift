@@ -42,10 +42,10 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-algorithms", .upToNextMajor(from: "1.0.0")),
-//        .package(url: "https://github.com/Brent-Tunnicliff/lib-ui-apple", branch: "main"),
+        .package(url: "https://github.com/Brent-Tunnicliff/lib-ui-apple", branch: "main"),
         .package(url: "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple", exact: "1.0.0-beta.2"),
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
-        .package(path: "../lib-ui-apple")
+//        .package(path: "../lib-ui-apple")
     ],
     targets: [
         .target(name: "LoggingCore"),

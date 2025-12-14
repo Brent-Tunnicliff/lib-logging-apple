@@ -14,7 +14,7 @@
 		842836722E994BCC002CC697 /* CommonDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 842835F82E994A0E002CC697 /* CommonDemo.framework */; };
 		842836732E994BCC002CC697 /* CommonDemo.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 842835F82E994A0E002CC697 /* CommonDemo.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		84CE22082D71C3D200960F13 /* Demo Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 84CE21FB2D71C3D100960F13 /* Demo Watch App.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		84E58CD02EE66F6000900EF1 /* CommonUI in Frameworks */ = {isa = PBXBuildFile; productRef = 84E58CCF2EE66F6000900EF1 /* CommonUI */; };
+		84ED2C3A2EEEE94D00D85746 /* CommonUI in Frameworks */ = {isa = PBXBuildFile; productRef = 84ED2C392EEEE94D00D85746 /* CommonUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,7 +112,7 @@
 		842835F52E994A0E002CC697 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				84E58CD02EE66F6000900EF1 /* CommonUI in Frameworks */,
+				84ED2C3A2EEEE94D00D85746 /* CommonUI in Frameworks */,
 				842836512E994B52002CC697 /* LoggingUI in Frameworks */,
 				8428364C2E994B4E002CC697 /* Logging in Frameworks */,
 			);
@@ -199,7 +199,7 @@
 			packageProductDependencies = (
 				8428364B2E994B4E002CC697 /* Logging */,
 				842836502E994B52002CC697 /* LoggingUI */,
-				84E58CCF2EE66F6000900EF1 /* CommonUI */,
+				84ED2C392EEEE94D00D85746 /* CommonUI */,
 			);
 			productName = CommonDemo;
 			productReference = 842835F82E994A0E002CC697 /* CommonDemo.framework */;
@@ -312,7 +312,7 @@
 			packageReferences = (
 				84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */,
 				8428356D2E97D4C9002CC697 /* XCLocalSwiftPackageReference "../../lib-logging-apple" */,
-				84E58CCE2EE66F6000900EF1 /* XCLocalSwiftPackageReference "../../lib-ui-apple" */,
+				84ED2C382EEEE94D00D85746 /* XCRemoteSwiftPackageReference "lib-ui-apple" */,
 			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 8457976D2C9EED48001B833D /* Products */;
@@ -837,10 +837,6 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../lib-logging-apple";
 		};
-		84E58CCE2EE66F6000900EF1 /* XCLocalSwiftPackageReference "../../lib-ui-apple" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../lib-ui-apple";
-		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -850,6 +846,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.0.0;
+			};
+		};
+		84ED2C382EEEE94D00D85746 /* XCRemoteSwiftPackageReference "lib-ui-apple" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Brent-Tunnicliff/lib-ui-apple";
+			requirement = {
+				branch = main;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -885,8 +889,9 @@
 			package = 84AA7F552D563944006598D6 /* XCRemoteSwiftPackageReference "swift-format-plugin" */;
 			productName = "plugin:LintBuildPlugin";
 		};
-		84E58CCF2EE66F6000900EF1 /* CommonUI */ = {
+		84ED2C392EEEE94D00D85746 /* CommonUI */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 84ED2C382EEEE94D00D85746 /* XCRemoteSwiftPackageReference "lib-ui-apple" */;
 			productName = CommonUI;
 		};
 /* End XCSwiftPackageProductDependency section */
