@@ -15,22 +15,20 @@ enum ArgumentServiceError: Error {
 
 extension ArgumentService {
     var helpMessage: String {
-        ""
+        """
+        Copies the Logging Settings values to the output location.
+
+        Options:
+        \(Flag.allCases.map(\.helpText).joined(separator: "\n"))
+        """
     }
 
     func parseArgument() async throws -> Argument {
-//        try await parseArgument(from: CommandLine.arguments)
-        try await parseArgument(from: ["-i", "path/to/input", "-o", "path/to/output"])
+        try await parseArgument(from: CommandLine.arguments)
     }
 }
 
 final class DefaultArgumentService: ArgumentService, Sendable {
-    private let fileService: any FileService
-
-    init(fileService: any FileService) {
-        self.fileService = fileService
-    }
-
     func parseArgument(from arguments: [String]) async throws -> Argument {
         // If we arguments contain help, then just return right away
         guard !arguments.contains(where: { Flag(rawValue: $0) == .help }) else {
@@ -44,103 +42,35 @@ final class DefaultArgumentService: ArgumentService, Sendable {
             }
 
             guard values[flag] == nil else {
-                throw ArgumentsError.duplicateFlag(argument)
+                throw ArgumentError.duplicateFlag(flag)
             }
 
-            values[flag] = try Self.getNextValue(flag: flag, offset: offset, inputs: arguments)
+            values[flag] = try getNextValue(flag: flag, offset: offset, inputs: arguments)
         }
 
-        let missingFlags = [Flag.input, .output].filter { values[$0] == nil }
-        guard
-            missingFlags.isEmpty,
-            let inputValue = values[.input],
-            let outputValue = values[.output]
-        else {
-            throw ArgumentsError.requiredFlagsMissing(missingFlags.map(\.description))
+        guard let outputValue = values[.output] else {
+            throw ArgumentError.flagMissingValue(.output)
         }
 
-        let inputFiles = try await fileService.contentsOfDirectory(atPath: inputValue)
-            .map {
-                guard let input = URL(string: $0) else {
-                    throw ArgumentsError.invalidURL($0)
-                }
+        guard let output = URL(string: outputValue) else {
+            throw ArgumentError.invalidURL(outputValue)
+        }
 
-                return Argument.File(
-                    input: input,
-                    // TODO: Work out output
-                    output: input
-                )
-            }
-
-        return .files(inputFiles)
+        return .output(output)
     }
 
-    private static func getNextValue(flag: Flag, offset: Int, inputs: [String]) throws -> String {
+    private func getNextValue(flag: Flag, offset: Int, inputs: [String]) throws -> String {
         let nextOffset = offset + 1
         guard nextOffset < inputs.count else {
-            throw ArgumentsError.flagMissingValue(flag.description)
+            throw ArgumentError.flagMissingValue(flag)
         }
 
         let nextValue = inputs[nextOffset]
-        // If next value is a flag, then
+        // If next value is a flag, then the value for the last value is missing.
         guard Flag(rawValue: nextValue) == nil else {
-            throw ArgumentsError.flagMissingValue(flag.description)
+            throw ArgumentError.flagMissingValue(flag)
         }
 
         return nextValue
-    }
-}
-
-final class StubArgumentService: ArgumentService {
-    func parseArgument(from arguments: [String]) -> Argument {
-        .help
-    }
-}
-
-// MARK: - Flag
-
-private enum Flag {
-    case help
-    case input
-    case output
-}
-
-extension Flag: CaseIterable {}
-
-extension Flag: CustomStringConvertible {
-    var description: String {
-        keys.joined(separator: ", ")
-    }
-}
-
-extension Flag {
-    init?(rawValue: String) {
-        guard let flag = Flag.allCases.first(where: { $0.keys.contains(rawValue) }) else {
-            return nil
-        }
-
-        self = flag
-    }
-}
-
-extension Flag {
-    var helpText: String {
-        "\(keys.joined(separator: ", ")): \(helpTextMessage)"
-    }
-
-    var keys: Set<String> {
-        switch self {
-        case .help: ["--help", "-h"]
-        case .input: ["--input", "-i"]
-        case .output: ["--output", "-o"]
-        }
-    }
-
-    private var helpTextMessage: String {
-        switch self {
-        case .help: ""
-        case .input: ""
-        case .output: ""
-        }
     }
 }

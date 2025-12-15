@@ -92,6 +92,25 @@ enum Logger {
 
 Contains views for browsing and exporting the logs in-app. 
 
+## LoggingSettingsGeneratorCommandPlugin
+
+Plugin that finds all `Settings.bundle` locations in the project and injects the `Logging` settings.
+
+For now there has been no logic to also inject it into the Root.plist file, 
+so configuring it as a `PSChildPaneSpecifier` to navigate to `Logging.plist` is a manual step.
+Something like this:
+
+```
+<dict>
+    <key>Type</key>
+    <string>PSChildPaneSpecifier</string>
+    <key>Title</key>
+    <string>logging_title</string>
+    <key>File</key>
+    <string>Logging</string>
+</dict>
+```
+
 ## Disclaimer
 
 This project is open source and open to anyone to use as they see fit.

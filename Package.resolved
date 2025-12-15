@@ -1,5 +1,5 @@
 {
-  "originHash" : "1624f1d9372eab7ecf56cd9fc125aaf51534060dc1428cf5a9df32edc3d22571",
+  "originHash" : "15d87863eba64f5af68841ffc348caac607df5bdb7d2f3b8072b14ecd9b37b71",
   "pins" : [
     {
       "identity" : "lib-ui-apple",
@@ -7,7 +7,7 @@
       "location" : "https://github.com/Brent-Tunnicliff/lib-ui-apple",
       "state" : {
         "branch" : "main",
-        "revision" : "be9fb4dc0290e318f4b9ca34e77f15999d126abc"
+        "revision" : "af0954cca3029e00113dd0487b1415027078a150"
       }
     },
     {

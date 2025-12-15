@@ -31,21 +31,16 @@ let package = Package(
             name: "LoggingCore",
             targets: ["LoggingCore"]
         ),
-//        .plugin(
-//            name: "LoggingSettingsGeneratorBuildPlugin",
-//            targets: ["LoggingSettingsGeneratorBuildPlugin"]
-//        ),
-//        .plugin(
-//            name: "LoggingSettingsGeneratorCommandPlugin",
-//            targets: ["LoggingSettingsGeneratorCommandPlugin"]
-//        ),
+        .plugin(
+            name: "LoggingSettingsGeneratorCommandPlugin",
+            targets: ["LoggingSettingsGeneratorCommandPlugin"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-algorithms", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/Brent-Tunnicliff/lib-ui-apple", branch: "main"),
         .package(url: "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple", exact: "1.0.0-beta.2"),
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
-//        .package(path: "../lib-ui-apple")
     ],
     targets: [
         .target(name: "LoggingCore"),
@@ -75,40 +70,46 @@ let package = Package(
                 .product(name: "UserDefaultsHelpers", package: "lib-userdefaults-apple")
             ],
             resources: [
-                .copy("Resources/Settings.bundle"),
-                .copy("Resources/InputFileList.xcfilelist"),
-                .copy("Resources/OutputFileList.xcfilelist"),
+                .process("Localizable.xcstrings")
             ],
             swiftSettings: [
                 // UI library, so MainActor default makes sense.
                 .defaultIsolation(MainActor.self),
             ]
         ),
-//        .executableTarget(name: "LoggingSettingsGenerator"),
-//        .plugin(
-//            name: "LoggingSettingsGeneratorBuildPlugin",
-//            capability: .buildTool,
-//            dependencies: [
-//                "LoggingSettingsGenerator"
-//            ]
-//        ),
-//        .plugin(
-//            name: "LoggingSettingsGeneratorCommandPlugin",
-//            capability: .command(
-//                intent: .custom(
-//                    verb: "generate-logging-settings",
-//                    description: "Generates Logging settings and injects them into the app 'Settings.bundle'"
-//                ),
-//                permissions: []
-//            )
-//        ),
+        .executableTarget(
+            name: "logging-settings-generator",
+            path: "Sources/LoggingSettingsGenerator",
+            resources: [
+                .copy("Resources/Settings.bundle")
+            ],
+            swiftSettings: [
+                .defaultIsolation(MainActor.self),
+            ]
+        ),
+        .plugin(
+            name: "LoggingSettingsGeneratorCommandPlugin",
+            capability: .command(
+                intent: .custom(
+                    verb: "generate-logging-settings",
+                    description: "Generates Logging settings and injects them into the app 'Settings.bundle'"
+                ),
+                permissions: [
+                    .writeToPackageDirectory(
+                        reason: "Manages the values of the 'Logging' values in 'Settings.bundle'"
+                    )
+                ]
+            ),
+            dependencies: [.target(name: "logging-settings-generator")]
+        ),
     ]
 )
 
 // MARK: - Common target settings
 
 // Sets values that are common for every target.
-for target in package.targets {
+// Plugins cannot contain plugins or swift settings.
+for target in package.targets where target.type != .plugin {
 
     // MARK: Plugins
 
