@@ -229,7 +229,6 @@ extension DefaultLoggingService: LoggingService {
         timestamp: Date,
         thread: String
     ) async {
-        // TODO: Build minimum log level logic to only store the levels desired.
         guard userDefaults.minimalLogLevel.supportedLogsLevels.contains(logLevel) else {
             return
         }

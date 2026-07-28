@@ -37,10 +37,12 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(url: "https://github.com/alexey1312/SnapshotTestingHEIC.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-algorithms", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/Brent-Tunnicliff/lib-ui-apple", branch: "main"),
         .package(url: "https://github.com/Brent-Tunnicliff/lib-userdefaults-apple", exact: "1.0.0-beta.2"),
         .package(url: "https://github.com/Brent-Tunnicliff/swift-format-plugin", .upToNextMajor(from: "2.0.0")),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", .upToNextMajor(from: "1.18.0")),
     ],
     targets: [
         .target(name: "LoggingCore"),
@@ -71,6 +73,18 @@ let package = Package(
             ],
             resources: [
                 .process("Localizable.xcstrings")
+            ],
+            swiftSettings: [
+                // UI library, so MainActor default makes sense.
+                .defaultIsolation(MainActor.self),
+            ]
+        ),
+        .testTarget(
+            name: "LoggingUISnapshotTests",
+            dependencies: [
+                "LoggingUI",
+                .product(name: "SnapshotTesting", package: "swift-snapshot-testing"),
+                .product(name: "SnapshotTestingHEIC", package: "SnapshotTestingHEIC"),
             ],
             swiftSettings: [
                 // UI library, so MainActor default makes sense.
@@ -110,21 +124,20 @@ let package = Package(
 // Sets values that are common for every target.
 // Plugins cannot contain plugins or swift settings.
 for target in package.targets where target.type != .plugin {
-
     // MARK: Plugins
 
-    let plugins = target.plugins ?? []
-    target.plugins = plugins + [
+    let commonPlugins: [PackageDescription.Target.PluginUsage] = [
         .plugin(name: "LintBuildPlugin", package: "swift-format-plugin")
     ]
 
+    target.plugins = (target.plugins ?? []) + commonPlugins
+
     // MARK: Swift compliler settings
 
-    let swiftSettings = target.swiftSettings ?? []
-    target.swiftSettings = swiftSettings + [
-        .strictMemorySafety(),
-
-        // Feature flags
+    let commonSwiftSettings: [PackageDescription.SwiftSetting] = [
+        // Optional: Set defaultIsolation to `MainActor` if desired.
+        // Probably only useful in a UI heavy package.
+        // .defaultIsolation(MainActor.self),
 
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InferIsolatedConformances"),
@@ -132,4 +145,6 @@ for target in package.targets where target.type != .plugin {
         .enableUpcomingFeature("MemberImportVisibility"),
         .enableUpcomingFeature("NonisolatedNonsendingByDefault"),
     ]
+
+    target.swiftSettings = (target.swiftSettings ?? []) + commonSwiftSettings
 }

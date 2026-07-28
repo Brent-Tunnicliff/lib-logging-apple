@@ -142,3 +142,7 @@ jobs:
       # Make sure there are no local changes as any auto generated changes must be checked into git.
       - name: Check git status
         uses: Brent-Tunnicliff/action-git-status@v1
+
+      # Makes sure there are no lint warnings checked in.
+      - name: Strict lint
+        run: swift format lint . --recursive --parallel --strict

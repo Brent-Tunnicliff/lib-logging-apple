@@ -39,6 +39,13 @@
         "identifier" : "LoggingCoreTests",
         "name" : "LoggingCoreTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "LoggingUISnapshotTests",
+        "name" : "LoggingUISnapshotTests"
+      }
     }
   ],
   "version" : 1
